@@ -1,9 +1,9 @@
 class Lesson {
-  constructor(id, title, grade, items = []) {
+  constructor(id, title, grade, units = []) {
     this.id = id
     this.title = title
     this.grade = grade
-    this.items = items
+    this.units = units
   }
 
   getLessonByGrade(grade) {

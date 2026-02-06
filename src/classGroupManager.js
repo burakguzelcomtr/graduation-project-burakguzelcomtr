@@ -1,4 +1,4 @@
-const ClassGroup = require('./classGroup')
+const ClassGroup = require('./classGoup')
 
 class ClassGroupManager {
   createClassGroup(grade, section) {
@@ -16,7 +16,7 @@ class ClassGroupManager {
     if (classGroup.grade !== teacher.grade && classGroup.section !== teacher.section) {
       throw new Error('No matching classroom found')
     }
-    classGroup.teacher = teacher
+    ClassGroup.teacher = teacher
   }
 }
 

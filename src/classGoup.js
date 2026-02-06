@@ -30,10 +30,6 @@ class ClassGroup {
     }
     return this.students.map(student => `${student.name} ${student.surname}`).join(', ')
   }
-
-  set details(_) {
-    throw new Error('You cannot edit classroom details directly.')
-  }
 }
 
 module.exports = ClassGroup

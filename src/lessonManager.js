@@ -1,6 +1,6 @@
 const Lesson = require('./lesson')
-const Quiz = require('./quiz')
-const Topic = require('./topic')
+
+const Topic = require('./lessonMaterial')
 
 class LessonManager {
   constructor() {
@@ -13,25 +13,34 @@ class LessonManager {
     return lesson
   }
 
+  createUnit(id, title) {
+    return { id, title, items: [] }
+  }
+
   createTopic(id, title, content) {
-    return new Topic(id, title, content)
+    return new Topic(id, title, 'topic', content)
   }
 
   createQuiz(id, title, questions = []) {
-    return new Quiz(id, title, questions)
+    return new Topic(id, title, 'quiz', questions)
   }
 
-  addTopic(lesson, topic, order = null) {
-    lesson.items.push({
-      order: order ?? lesson.items.length + 1,
-      content: topic,
+  addUnit(lesson, unit, order = null) {
+    lesson.units.push({
+      id: unit.id,
+      order: order ?? lesson.units.length + 1,
+      title: unit.title,
+      items: unit.items ? unit.items : [],
     })
   }
 
-  addQuiz(lesson, quiz, order = null) {
-    lesson.items.push({
-      order: order ?? lesson.items.length + 1,
-      content: quiz,
+  addLessonMaterial(unit, id, lessonMaterial, type, order = null) {
+    unit.items.push({
+      id,
+      title: lessonMaterial.title,
+      content: lessonMaterial.content,
+      type,
+      order: order ?? unit.items.length + 1,
     })
   }
 

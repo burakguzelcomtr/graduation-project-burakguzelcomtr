@@ -1,6 +1,9 @@
 class quizManager {
   addQuestionToQuiz(quiz, question) {
-    quiz.questions.push(question)
+    if (quiz.type !== 'quiz') {
+      throw new Error('Provided material is not a quiz')
+    }
+    quiz.content.push(question)
   }
 }
 module.exports = quizManager
