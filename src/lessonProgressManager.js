@@ -74,7 +74,7 @@ class LessonProgressManager {
     if (!unitProgress) {
       return false
     }
-    return unit.items.every(item => unitProgress.items.some(p => p.itemId === item.id && p.completedAt))
+    return unit.items.every(item => unitProgress.items.some(p => p.id === item.id && p.completedAt))
   }
 
   isLessonComplete(lesson, progress) {

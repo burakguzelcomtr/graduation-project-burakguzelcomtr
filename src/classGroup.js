@@ -8,6 +8,10 @@ class ClassGroup {
     this.section = section
   }
 
+  setTeacher(teacher) {
+    this.teacher = teacher
+  }
+
   get details() {
     return `
         # Classroom ${this.grade}/${this.section}

@@ -5,13 +5,6 @@ class Lesson {
     this.grade = grade
     this.units = units
   }
-
-  getLessonByGrade(grade) {
-    if (this.grade === grade) {
-      return this
-    }
-    return null
-  }
 }
 
 module.exports = Lesson

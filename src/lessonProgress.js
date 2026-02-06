@@ -3,7 +3,7 @@ class LessonProgress {
     this.id = id
     this.lessonId = lessonId
     this.studentId = studentId
-    this.units = [] // { unitId, startedAt, completedAt, items: [{ itemId, itemType, startedAt, completedAt, score? }] }
+    this.units = [] // { unitId, startedAt, completedAt, items: [{ id, type, startedAt, completedAt, score? }] }
     this.startedAt = null
     this.completedAt = null
   }
@@ -18,7 +18,7 @@ class LessonProgress {
     this.completedAt = new Date()
   }
 
-  getOrCreateUnit(unitId) {
+  getUnit(unitId) {
     let unit = this.units.find(u => u.unitId === unitId)
     if (!unit) {
       unit = { unitId, startedAt: null, completedAt: null, items: [] }
@@ -31,7 +31,7 @@ class LessonProgress {
     if (!this.startedAt) {
       this.startLesson()
     }
-    const unit = this.getOrCreateUnit(unitId)
+    const unit = this.getUnit(unitId)
     if (!unit.startedAt) {
       unit.startedAt = new Date()
     }
@@ -42,26 +42,28 @@ class LessonProgress {
     if (!this.startedAt) {
       throw new Error('Lesson has not been started yet')
     }
-    const unit = this.getOrCreateUnit(unitId)
+    const unit = this.getUnit(unitId)
     if (!unit.completedAt) {
       unit.completedAt = new Date()
     }
     return unit
   }
 
-  getOrCreateItem(unitId, itemId, itemType) {
-    const unit = this.getOrCreateUnit(unitId)
-    let item = unit.items.find(i => i.itemId === itemId)
+  getItem(unitId, itemId, itemType) {
+    const unit = this.getUnit(unitId)
+    let item = unit.items.find(i => i.id === itemId)
     if (!item) {
-      item = { itemId, itemType, startedAt: null, completedAt: null, score: null }
+      item = { id: itemId, type: itemType, startedAt: null, completedAt: null, score: null }
       unit.items.push(item)
+    } else if (!item.type && itemType) {
+      item.type = itemType
     }
     return item
   }
 
   startItem(unitId, itemId, itemType) {
     this.startUnit(unitId)
-    const item = this.getOrCreateItem(unitId, itemId, itemType)
+    const item = this.getItem(unitId, itemId, itemType)
     if (!item.startedAt) {
       item.startedAt = new Date()
     }
@@ -69,7 +71,14 @@ class LessonProgress {
   }
 
   completeItem(unitId, itemId, score = null) {
-    const item = this.getOrCreateItem(unitId, itemId)
+    const unit = this.units.find(u => u.unitId === unitId)
+    if (!unit) {
+      throw new Error('Unit has not been started yet')
+    }
+    const item = unit.items.find(i => i.id === itemId)
+    if (!item) {
+      throw new Error('Item has not been started yet')
+    }
     item.completedAt = new Date()
     if (score !== null) {
       item.score = score

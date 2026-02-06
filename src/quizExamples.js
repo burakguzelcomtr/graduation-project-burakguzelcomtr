@@ -35,6 +35,7 @@ const quizExamples = [
   }),
 
   new QuizQuestion({
+    id: generateId(),
     text: 'Select all that are mammals.',
     options: ['Shark', 'Dolphin', 'Eagle', 'Tiger'],
     type: 'multiple-answers',
@@ -42,6 +43,7 @@ const quizExamples = [
   }),
 
   new QuizQuestion({
+    id: generateId(),
     text: 'Rate your agreement: "I enjoy learning math."',
     options: [['Strongly disagree', 'Disagree', 'Neutral', 'Agree', 'Strongly agree']],
     type: 'multiple-dropdown',
@@ -49,6 +51,7 @@ const quizExamples = [
   }),
 
   new QuizQuestion({
+    id: generateId(),
     text: 'Match the inventor to their invention.',
     options: {
       left: ['Thomas Edison', 'Alexander Fleming', 'Wright Brothers'],
@@ -63,6 +66,7 @@ const quizExamples = [
   }),
 
   new QuizQuestion({
+    id: generateId(),
     text: 'What is 12 × 8?',
     options: [],
     type: 'numerical',

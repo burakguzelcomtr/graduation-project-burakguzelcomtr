@@ -1,9 +1,9 @@
 class Unit {
-  constructor(id, title) {
+  constructor(id, title, items = []) {
     this.id = id
     this.title = title
-    this.items = [] // { itemId, itemType: 'topic' | 'quiz', content }
+    this.items = items // { id, type: 'topic' | 'quiz', content }
   }
 }
 
-export default Unit
+module.exports = Unit
