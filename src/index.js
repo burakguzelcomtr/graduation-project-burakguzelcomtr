@@ -1,4 +1,4 @@
-const generateId = require('./id-generator')
+/* const generateId = require('./id-generator')
 const Student = require('./student')
 const Teacher = require('./teacher')
 const ClassGroupManager = require('./class-group-manager')
@@ -7,9 +7,9 @@ const QuizManager = require('./quiz-manager')
 const QuizProgressManager = require('./quiz-progress-manager')
 const quizExamples = require('./quiz-examples')
 const LessonProgressManager = require('./lesson-progress-manager')
-const LessonMaterial = require('./lesson-material')
+const LessonMaterial = require('./lesson-material') */
 
-const lessonManager = new LessonManager()
+/* const lessonManager = new LessonManager()
 const quizManager = new QuizManager()
 const quizProgressManager = new QuizProgressManager()
 const classGroupManager = new ClassGroupManager()
@@ -77,7 +77,7 @@ lessonManager.addLessonMaterialToUnit({
 // Import example questions from separate file and add them to the quiz
 
 quizExamples.forEach(q => quizManager.addQuestionToQuiz({ quiz: mathQuiz, question: q }))
-
+ */
 /* console.log(classGroup3A.details)
 console.log(classGroup4B.details)
 console.log('Students of Mr. X:', classGroup3A.listStudentsByTeacher({ teacher: MrX }))
@@ -95,16 +95,14 @@ console.log('Math Lesson Unit 1 Items:', mathLessonFor3rdGradeUnit1.items)
   console.log(
   '3rd Grade Lessons:',
   lessonManager.getLessonsByGrade({ grade: 3 }).map(lesson => [{ id: lesson.id, title: lesson.title }])
-)
- */
-
+) 
 const firstItem = mathLessonFor3rdGradeUnit1.items[0]
 const secondItem = mathLessonFor3rdGradeUnit1.items[1]
 const quizItem = mathLessonFor3rdGradeUnit1.items[2]
 const firstItemMaterial = LessonMaterial.getLessonMaterialById({ lessonMaterialId: firstItem.lessonMaterialId })
 const secondItemMaterial = LessonMaterial.getLessonMaterialById({ lessonMaterialId: secondItem.lessonMaterialId })
 const quizItemMaterial = LessonMaterial.getLessonMaterialById({ lessonMaterialId: quizItem.lessonMaterialId })
-
+ */
 const progressTrackingSimulation = async () => {
   lessonProgressManager.startItem({
     lesson: mathLessonFor3rdGrade,
@@ -205,18 +203,18 @@ const progressTrackingSimulation = async () => {
   console.log('Quiz Status:', quizProgress.status)
   console.log('Quiz Passed:', quizProgress.passed)
 
-  /* 
-  await new Promise(resolve => {
-    setTimeout(resolve, 5000)
-  }) // Simulate time taken to complete the item
-  lessonProgressManager.completeItem({
-    lesson: mathLessonFor3rdGrade,
-    student: Burak,
-    unitId: mathLessonFor3rdGradeUnit1.id,
-    itemId: quizItem.id,
-    score: 85,
-  }) */
-
+ 
+await new Promise(resolve => {
+  setTimeout(resolve, 5000)
+}) // Simulate time taken to complete the item
+lessonProgressManager.completeItem({
+  lesson: mathLessonFor3rdGrade,
+  student: Burak,
+  unitId: mathLessonFor3rdGradeUnit1.id,
+  itemId: quizItem.id,
+  score: 85,
+})  
+ 
   console.log(
     `${Burak.name}'s Lesson Progress:`,
     JSON.stringify(lessonProgressManager.getLessonProgress({ lesson: mathLessonFor3rdGrade, student: Burak }), null, 2)
@@ -251,4 +249,26 @@ const progressTrackingSimulation = async () => {
   )
 }
 
-progressTrackingSimulation()
+//progressTrackingSimulation()
+ 
+
+const axios = require('axios')
+async function main () {
+  await axios.post('http://localhost:3000/students', {
+    name: 'Burak',
+    surname: 'Guzel',
+    grade: 3,
+    section: 'A'
+  })
+  
+  await axios.post('http://localhost:3000/students', {
+    name: 'WhoAmI',
+    surname: 'Unknown',
+    grade: 3,
+    section: 'B'
+  })
+  const allStudents = await axios.get('http://localhost:3000/students')
+  console.log('Students:', allStudents.data)
+}
+
+main()

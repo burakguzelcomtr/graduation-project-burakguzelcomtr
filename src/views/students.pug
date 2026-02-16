@@ -1,0 +1,10 @@
+extends layout
+
+block content
+    h1 Students List
+    if students && students.length
+        ul
+            each s in students
+                li #{s.name} #{s.surname} — Grade: #{s.grade} / Section: #{s.section}
+    else
+        p No students found.
