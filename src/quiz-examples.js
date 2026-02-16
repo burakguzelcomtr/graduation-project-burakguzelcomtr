@@ -1,5 +1,5 @@
-const QuizQuestion = require('./quizQuestion')
-const generateId = require('./idGenerator')
+const QuizQuestion = require('./quiz-question')
+const generateId = require('./id-generator')
 
 const quizExamples = [
   new QuizQuestion({
@@ -14,18 +14,19 @@ const quizExamples = [
     id: generateId(),
     text: 'The boiling point of water is 100°C at sea level.',
     options: ['True', 'False'],
-    type: 'true-false',
+    type: 'single-choice',
     correctAnswer: 'True',
   }),
 
   new QuizQuestion({
     id: generateId(),
     text: 'The largest ocean on Earth is ____.',
-    options: [],
-    type: 'fill-in-the-blank',
+    options: ['Atlantic', 'Indian', 'Pacific', 'Arctic'],
+    type: 'multiple-choice',
     correctAnswer: 'Pacific',
   }),
 
+  /*
   new QuizQuestion({
     id: generateId(),
     text: 'Fill the blanks: The capital of Italy is ____ and the capital of Germany is ____.',
@@ -72,6 +73,7 @@ const quizExamples = [
     type: 'numerical',
     correctAnswer: 96,
   }),
+  */
 ]
 
 module.exports = quizExamples

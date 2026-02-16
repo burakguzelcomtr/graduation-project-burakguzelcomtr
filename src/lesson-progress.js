@@ -18,7 +18,7 @@ class LessonProgress {
     this.completedAt = new Date()
   }
 
-  getUnit(unitId) {
+  getUnit({ unitId }) {
     let unit = this.units.find(u => u.unitId === unitId)
     if (!unit) {
       unit = { unitId, startedAt: null, completedAt: null, items: [] }
@@ -27,30 +27,30 @@ class LessonProgress {
     return unit
   }
 
-  startUnit(unitId) {
+  startUnit({ unitId }) {
     if (!this.startedAt) {
       this.startLesson()
     }
-    const unit = this.getUnit(unitId)
+    const unit = this.getUnit({ unitId })
     if (!unit.startedAt) {
       unit.startedAt = new Date()
     }
     return unit
   }
 
-  completeUnit(unitId) {
+  completeUnit({ unitId }) {
     if (!this.startedAt) {
       throw new Error('Lesson has not been started yet')
     }
-    const unit = this.getUnit(unitId)
+    const unit = this.getUnit({ unitId })
     if (!unit.completedAt) {
       unit.completedAt = new Date()
     }
     return unit
   }
 
-  getItem(unitId, itemId, itemType) {
-    const unit = this.getUnit(unitId)
+  getItem({ unitId, itemId, itemType }) {
+    const unit = this.getUnit({ unitId })
     let item = unit.items.find(i => i.id === itemId)
     if (!item) {
       item = { id: itemId, type: itemType, startedAt: null, completedAt: null, score: null }
@@ -61,16 +61,16 @@ class LessonProgress {
     return item
   }
 
-  startItem(unitId, itemId, itemType) {
-    this.startUnit(unitId)
-    const item = this.getItem(unitId, itemId, itemType)
+  startItem({ unitId, itemId, itemType }) {
+    this.startUnit({ unitId })
+    const item = this.getItem({ unitId, itemId, itemType })
     if (!item.startedAt) {
       item.startedAt = new Date()
     }
     return item
   }
 
-  completeItem(unitId, itemId, score = null) {
+  completeItem({ unitId, itemId, score = null }) {
     const unit = this.units.find(u => u.unitId === unitId)
     if (!unit) {
       throw new Error('Unit has not been started yet')

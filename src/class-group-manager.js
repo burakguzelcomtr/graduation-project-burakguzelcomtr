@@ -1,22 +1,22 @@
-const ClassGroup = require('./classGroup')
+const ClassGroup = require('./class-group')
 
 class ClassGroupManager {
-  createClassGroup(grade, section) {
-    return new ClassGroup(grade, section)
+  createClassGroup({ grade, section }) {
+    return new ClassGroup({ grade, section })
   }
 
-  addStudentToClassGroup(student, classGroup) {
+  addStudentToClassGroup({ student, classGroup }) {
     if (classGroup.grade !== student.grade || classGroup.section !== student.section) {
       throw new Error('No matching classroom found')
     }
     classGroup.students.push(student)
   }
 
-  assignTeacherToClassGroup(teacher, classGroup) {
+  assignTeacherToClassGroup({ teacher, classGroup }) {
     if (classGroup.grade !== teacher.grade || classGroup.section !== teacher.section) {
       throw new Error('No matching classroom found')
     }
-    classGroup.setTeacher(teacher)
+    classGroup.setTeacher({ teacher })
   }
 }
 

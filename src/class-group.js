@@ -3,12 +3,12 @@ class ClassGroup {
 
   teacher = null
 
-  constructor(grade, section) {
+  constructor({ grade, section }) {
     this.grade = grade
     this.section = section
   }
 
-  setTeacher(teacher) {
+  setTeacher({ teacher }) {
     this.teacher = teacher
   }
 
@@ -24,7 +24,7 @@ class ClassGroup {
         `
   }
 
-  listStudentsByTeacher(teacher) {
+  listStudentsByTeacher({ teacher }) {
     if (!this.teacher) {
       return 'No teacher assigned to this class group.'
     }
