@@ -1,4 +1,4 @@
-class Question {
+class QuizQuestion {
   constructor({ id = null, text, type, options = [], correctAnswer = null, requiresApproval = false } = {}) {
     this.id = id
     this.text = text
@@ -9,4 +9,4 @@ class Question {
   }
 }
 
-module.exports = Question
+module.exports = QuizQuestion

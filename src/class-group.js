@@ -3,9 +3,13 @@ class ClassGroup {
 
   teacher = null
 
-  constructor(grade, section) {
+  constructor({ grade, section }) {
     this.grade = grade
     this.section = section
+  }
+
+  setTeacher({ teacher }) {
+    this.teacher = teacher
   }
 
   get details() {
@@ -20,7 +24,7 @@ class ClassGroup {
         `
   }
 
-  listStudentsByTeacher(teacher) {
+  listStudentsByTeacher({ teacher }) {
     if (!this.teacher) {
       return 'No teacher assigned to this class group.'
     }
@@ -29,10 +33,6 @@ class ClassGroup {
       throw new Error('Only the assigned teacher can view the students.')
     }
     return this.students.map(student => `${student.name} ${student.surname}`).join(', ')
-  }
-
-  set details(_) {
-    throw new Error('You cannot edit classroom details directly.')
   }
 }
 
