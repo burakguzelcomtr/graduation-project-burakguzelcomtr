@@ -1,6 +1,8 @@
 class ClassGroup {
   students = []
 
+  static list = []
+
   teacher = null
 
   constructor({ grade, section }) {
@@ -8,7 +10,13 @@ class ClassGroup {
     this.section = section
   }
 
-  setTeacher({ teacher }) {
+  static createClassGroup({ grade, section }) {
+    const newClassGroup = new ClassGroup({ grade, section })
+    ClassGroup.list.push(newClassGroup)
+    return newClassGroup
+  }
+
+  setTeacher(teacher) {
     this.teacher = teacher
   }
 
@@ -24,7 +32,7 @@ class ClassGroup {
         `
   }
 
-  listStudentsByTeacher({ teacher }) {
+  listStudentsByTeacher(teacher) {
     if (!this.teacher) {
       return 'No teacher assigned to this class group.'
     }

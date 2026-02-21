@@ -1,0 +1,10 @@
+extends layout
+
+block content
+    h1 Units List
+    if units && units.length
+        ul
+            each u in units
+                li #{u.title}
+    else
+        p No units found.
