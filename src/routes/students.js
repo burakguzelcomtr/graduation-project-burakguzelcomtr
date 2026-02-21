@@ -1,21 +1,29 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express')
 
-const generateId = require('../id-generator')
-const Student = require('../student')
+const router = express.Router()
+
+const StudentManager = require('../student-manager')
+
+const studentManager = new StudentManager()
 
 /* GET student listing. */
-router.get('/', function(req, res, next) { 
-  res.send(Student.list)
-})
-
-router.post('/', function(req, res, next) {
-  const { name, surname, grade, section } = req.body
-  if (!name || !surname || !grade || !section) {
-    return res.status(400).json({ error: 'Missing required fields' })
+router.get('/', (req, res) => {
+  try {
+    res.send(studentManager.getStudents())
+  } catch (error) {
+    res.status(500).send({ error: error.message })
   }
-  const newStudent = Student.createStudent({ name, surname, grade, section }) 
-  res.send(newStudent)
 })
 
-module.exports = router;
+/* POST create a new student. */
+router.post('/', (req, res) => {
+  try {
+    const { name, surname, grade, section } = req.body
+    const newStudent = studentManager.createStudent({ name, surname, grade, section })
+    res.send(newStudent)
+  } catch (error) {
+    res.status(500).send({ error: error.message })
+  }
+})
+
+module.exports = router

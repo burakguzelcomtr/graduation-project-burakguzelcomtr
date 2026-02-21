@@ -1,21 +1,29 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express')
 
-const generateId = require('../id-generator')
-const Teacher = require('../teacher')
+const router = express.Router()
+
+const TeacherManager = require('../teacher-manager')
+
+const teacherManager = new TeacherManager()
 
 /* GET teacher listing. */
-router.get('/', function(req, res, next) { 
-  res.send(Teacher.list)
-})
-
-router.post('/', function(req, res, next) {
-  const { name, surname, grade, section } = req.body
-  if (!name || !surname || !grade || !section) {
-    return res.status(400).json({ error: 'Missing required fields' })
+router.get('/', (req, res) => {
+  try {
+    res.send(teacherManager.getTeachers())
+  } catch (error) {
+    res.status(500).send({ error: error.message })
   }
-  const newTeacher = Teacher.createTeacher({ name, surname, grade, section }) 
-  res.send(newTeacher)
 })
 
-module.exports = router;
+/* POST create a new teacher. */
+router.post('/', (req, res) => {
+  try {
+    const { name, surname, grade, section } = req.body
+    const newTeacher = teacherManager.createTeacher({ name, surname, grade, section })
+    res.send(newTeacher)
+  } catch (error) {
+    res.status(500).send({ error: error.message })
+  }
+})
+
+module.exports = router
