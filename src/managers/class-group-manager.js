@@ -1,12 +1,13 @@
-const ClassGroup = require('./class-group')
+const ClassGroup = require('../models/class-group')
 
 class ClassGroupManager {
   getClassGroups() {
-    return ClassGroup.list
+    return ClassGroup.find().lean()
   }
+ 
 
-  getClassGroupById(id) {
-    const classGroup = ClassGroup.list.find(classGroupItem => classGroupItem.id === id)
+  async getClassGroupById(id) {
+    const classGroup = await ClassGroup.findById(id).lean()
     if (!classGroup) {
       const error = new Error('Class group not found')
       error.status = 404
@@ -15,14 +16,14 @@ class ClassGroupManager {
     return classGroup
   }
 
-  createClassGroup({ grade, section }) {
+  async createClassGroup({ grade, section }) {
     if (!grade || !section) {
       const error = new Error('Missing required fields')
       error.status = 400
       throw error
     }
 
-    return ClassGroup.createClassGroup({ grade, section })
+    return ClassGroup.create({ grade, section })
   }
 
   addStudentToClassGroup({ student, classGroup }) {

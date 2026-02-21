@@ -253,6 +253,7 @@ const axios = require('axios')
 const BASE_URL = 'http://localhost:3000'
 
 async function main() {
+  /*
   const burak = await axios.post(`${BASE_URL}/students`, {
     name: 'Burak',
     surname: 'Guzel',
@@ -278,7 +279,7 @@ async function main() {
     grade: 3,
     section: 'A',
   })
-  console.log('Created teacher:', mrX.data)
+  console.log('Created teacher:', mrX)
 
   const mrsY = await axios.post(`${BASE_URL}/teachers`, {
     name: 'Mrs',
@@ -328,6 +329,14 @@ async function main() {
 
   const updatedLesson = await axios.get(`${BASE_URL}/lessons`)
   console.log('Updated Lessons with units:', updatedLesson.data)
+  */
+
+  // create class group
+  const classGroup3A = await axios.post(`${BASE_URL}/class-groups`, {
+    grade: 3,
+    section: 'A',
+  })
+  console.log('Created Class Group:', classGroup3A.data)
 }
 
 main().catch(err => console.error('Error:', err.response?.data ?? err.message))
