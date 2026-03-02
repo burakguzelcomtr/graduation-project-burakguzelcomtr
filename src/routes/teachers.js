@@ -2,24 +2,23 @@ const express = require('express')
 
 const router = express.Router()
 
-const TeacherManager = require('../teacher-manager')
-
-const teacherManager = new TeacherManager()
+const User = require('../models/user')
 
 /* GET teacher listing. */
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
   try {
-    res.send(teacherManager.getTeachers())
+    const teachers = await User.find({ role: 'teacher' }).lean()
+    res.send(teachers)
   } catch (error) {
     res.status(500).send({ error: error.message })
   }
 })
 
 /* POST create a new teacher. */
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
   try {
     const { name, surname, grade, section } = req.body
-    const newTeacher = teacherManager.createTeacher({ name, surname, grade, section })
+    const newTeacher = await User.create({ name, surname, grade, section, role: 'teacher' })
     res.send(newTeacher)
   } catch (error) {
     res.status(500).send({ error: error.message })
