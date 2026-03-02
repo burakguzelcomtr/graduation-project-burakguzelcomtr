@@ -2,7 +2,7 @@ const express = require('express')
 
 const router = express.Router()
 
-const LessonManager = require('../lesson-manager')
+const LessonManager = require('../managers/lesson-manager')
 
 const lessonManager = new LessonManager()
 
