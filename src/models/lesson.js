@@ -1,6 +1,5 @@
 const mongoose = require('mongoose')
 const autopopulate = require('mongoose-autopopulate')
-const { populate } = require('./unit')
 
 const lessonSchema = new mongoose.Schema({
   title: {
@@ -17,7 +16,6 @@ const lessonSchema = new mongoose.Schema({
       autopopulate: {
         maxDepth: 2,
         select: 'grade section campus teacher', // Only include these fields when populating class groups
-        populate: { path: 'teacher', select: 'name email' }, // When populating teacher, only include name and email
       },
     },
   ],

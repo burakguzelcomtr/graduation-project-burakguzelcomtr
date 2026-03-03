@@ -19,6 +19,13 @@ const classGroupSchema = new mongoose.Schema({
     ref: 'User',
     autopopulate: { maxDepth: 1, select: 'name surname' },
   },
+  students: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      autopopulate: { maxDepth: 1, select: 'name surname studentId' },
+    },
+  ],
 })
 classGroupSchema.index({ grade: 1, section: 1, campus: 1 }, { unique: true }) // Ensure unique grade+section+campus combinations for class groups
 classGroupSchema.plugin(autopopulate)

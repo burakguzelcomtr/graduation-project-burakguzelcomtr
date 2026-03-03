@@ -14,6 +14,17 @@ router.get('/', async (req, res) => {
   }
 })
 
+/* GET students by class group. */
+router.get('/class-group/:classGroupId', async (req, res) => {
+  try {
+    const { classGroupId } = req.params
+    const students = await User.find({ classGroup: classGroupId, role: 'student' })
+    res.send(students)
+  } catch (error) {
+    res.status(500).send({ error: error.message })
+  }
+})
+
 /* GET student by id. */
 router.get('/:id', async (req, res) => {
   try {
@@ -28,16 +39,6 @@ router.get('/:id', async (req, res) => {
   }
 })
 
-/* GET students by class group. */
-router.get('/class-group/:classGroupId', async (req, res) => {
-  try {
-    const { classGroupId } = req.params
-    const students = await User.find({ classGroup: classGroupId, role: 'student' })
-    res.send(students)
-  } catch (error) {
-    res.status(500).send({ error: error.message })
-  }
-})
 /* POST create a new student. */
 router.post('/', async (req, res) => {
   try {

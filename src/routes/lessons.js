@@ -7,7 +7,7 @@ const LessonManager = require('../managers/lesson-manager')
 const lessonManager = new LessonManager()
 
 /* GET lesson listing. */
-router.get('/', async(req, res) => {
+router.get('/', async (req, res) => {
   try {
     const lessons = await lessonManager.getLessons()
     res.send(lessons)

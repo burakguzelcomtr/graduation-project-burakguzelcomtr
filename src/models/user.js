@@ -50,4 +50,10 @@ userSchema.plugin(autopopulate)
 // Ensure only one teacher exists per grade+section+campus. Students may share grade+section+campus.
 userSchema.index({ grade: 1, section: 1, campus: 1 }, { unique: true, partialFilterExpression: { role: 'teacher' } })
 
+userSchema.post('index', error => {
+  if (error) {
+    console.error('Error building indexes for User schema:', error)
+  }
+})
+
 module.exports = mongoose.model('User', userSchema)
