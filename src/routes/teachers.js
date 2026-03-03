@@ -7,8 +7,25 @@ const User = require('../models/user')
 /* GET teacher listing. */
 router.get('/', async (req, res) => {
   try {
-    const teachers = await User.find({ role: 'teacher' }).lean()
+    const teachers = await User.find({ role: 'teacher' })
+    if (!teachers || teachers.length === 0) {
+      return res.status(404).send({ error: 'No teachers found' })
+    }
     res.send(teachers)
+  } catch (error) {
+    res.status(500).send({ error: error.message })
+  }
+})
+
+/* GET teacher by id. */
+router.get('/:id', async (req, res) => {
+  try {
+    const { id } = req.params
+    const teacher = await User.findOne({ _id: id, role: 'teacher' })
+    if (!teacher) {
+      return res.status(404).send({ error: 'Teacher not found' })
+    }
+    res.send(teacher)
   } catch (error) {
     res.status(500).send({ error: error.message })
   }
@@ -17,9 +34,22 @@ router.get('/', async (req, res) => {
 /* POST create a new teacher. */
 router.post('/', async (req, res) => {
   try {
-    const { name, surname, grade, section } = req.body
-    const newTeacher = await User.create({ name, surname, grade, section, role: 'teacher' })
+    const { name, surname, grade, section, campus, classGroup } = req.body
+    const newTeacher = await User.create({ name, surname, grade, campus, section, role: 'teacher', classGroup })
     res.send(newTeacher)
+  } catch (error) {
+    res.status(500).send({ error: error.message })
+  }
+})
+
+router.delete('/:id', async (req, res) => {
+  try {
+    const { id } = req.params
+    const deletedTeacher = await User.findOneAndDelete({ _id: id, role: 'teacher' })
+    if (!deletedTeacher) {
+      return res.status(404).send({ error: 'Teacher not found' })
+    }
+    res.send(deletedTeacher)
   } catch (error) {
     res.status(500).send({ error: error.message })
   }

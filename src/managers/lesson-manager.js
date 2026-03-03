@@ -1,38 +1,36 @@
-const Lesson = require('./lesson')
-const Unit = require('./unit')
-const LessonMaterial = require('./lesson-material')
-const generateId = require('./id-generator')
+const Lesson = require('../models/lesson')
+const Unit = require('../models/unit')
 
 class LessonManager {
-  getLessons() {
-    return Lesson.lessons
+  async getLessons() {
+    return await Lesson.find()
   }
 
-  createLesson({ id, title, grade }) {
-    if (!title || !grade) {
+  async createLesson({ title, description, classGroups, order }) {
+    if (!title || !classGroups || classGroups.length === 0) {
       const error = new Error('Missing required fields')
       error.status = 400
       throw error
     }
 
-    const lesson = new Lesson({ id, title, grade })
-    Lesson.addLesson({ lesson })
-    return lesson
+    const createdLesson = await Lesson.create({ title, description, classGroups, order })
+    console.log('Created lesson:', createdLesson)
+    return createdLesson
   }
 
-  createUnit({ id, title, items = [] }) {
+  createUnit({ title, items = [] }) {
     if (!title) {
       const error = new Error('Missing required fields')
       error.status = 400
       throw error
     }
 
-    const unit = new Unit({ id, title, items })
+    const unit = new Unit({ title, items })
     Unit.list.push(unit)
     return unit
   }
 
-  createLessonMaterial({ id = generateId(), title, type, content, passingScorePercent = null }) {
+  createLessonMaterial({ title, type, content, passingScorePercent = null }) {
     if (!title || !type) {
       const error = new Error('Missing required fields')
       error.status = 400
@@ -52,10 +50,30 @@ class LessonManager {
     return LessonMaterial.lessonMaterials
   }
 
-  addUnitToLesson({ lesson, unit, order = null }) {
-    const unitReference = unit
-    unitReference.order = order ?? lesson.units.length + 1
-    lesson.units.push(unitReference)
+  assignUnitToLesson({ lessonId, unitId, order = null }) {
+    const lesson = this.getLessonById(lessonId)
+    if (!lesson) {
+      const error = new Error('Lesson not found')
+      error.status = 404
+      throw error
+    }
+    unit = Unit.list.find(existingUnit => existingUnit.id === unitId)
+    if (!unit) {
+      const error = new Error('Unit not found')
+      error.status = 404
+      throw error
+    }
+    if (lesson.hasUnit({ unitId })) {
+      const error = new Error('Unit already assigned to this lesson')
+      error.status = 400
+      throw error
+    }
+    units = lesson.units
+    units.push({
+      id: unitId,
+      order: order ?? units.length + 1,
+    })
+    return lesson
   }
 
   addLessonMaterialToUnit({ unit, id, lessonMaterialId, order = null }) {
@@ -71,32 +89,7 @@ class LessonManager {
     })
   }
 
-  assignUnitToLesson({ lessonId, unitId }) {
-    const lesson = this.getLessonById(lessonId)
-    if (!lesson) {
-      const error = new Error('Lesson not found')
-      error.status = 404
-      throw error
-    }
-
-    const unit = Unit.list.find(existingUnit => existingUnit.id === unitId)
-    if (!unit) {
-      const error = new Error('Unit not found')
-      error.status = 404
-      throw error
-    }
-
-    if (lesson.hasUnit({ unitId })) {
-      const error = new Error('Unit already assigned to this lesson')
-      error.status = 400
-      throw error
-    }
-
-    lesson.units.push(unit)
-    return lesson
-  }
-  
-  getLessonById ( lessonId ) {
+  getLessonById(lessonId) {
     return Lesson.lessons.find(lesson => lesson.id === lessonId) ?? null
   }
 

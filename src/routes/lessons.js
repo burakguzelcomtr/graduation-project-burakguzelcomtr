@@ -2,25 +2,25 @@ const express = require('express')
 
 const router = express.Router()
 
-const generateId = require('../id-generator')
-const LessonManager = require('../lesson-manager')
+const LessonManager = require('../managers/lesson-manager')
 
 const lessonManager = new LessonManager()
 
 /* GET lesson listing. */
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
   try {
-    res.send(lessonManager.getLessons())
+    const lessons = await lessonManager.getLessons()
+    res.send(lessons)
   } catch (error) {
     res.status(500).send({ error: error.message })
   }
 })
 
 /* POST create a new lesson. */
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
   try {
-    const { title, grade } = req.body
-    const createdLesson = lessonManager.createLesson({ id: generateId(), title, grade })
+    const { title, description, classGroups, order } = req.body
+    const createdLesson = await lessonManager.createLesson({ title, description, classGroups, order })
     res.send(createdLesson)
   } catch (error) {
     res.status(500).send({ error: error.message })
@@ -50,4 +50,14 @@ router.post('/:lessonId/units', (req, res) => {
   }
 })
 
+router.post('/:lessonId/units/:unitId/lesson-materials', (req, res) => {
+  try {
+    const { lessonId, unitId } = req.params
+    const { lessonMaterialId } = req.body
+    const lesson = lessonManager.assignLessonMaterialToUnit({ lessonId, unitId, lessonMaterialId })
+    res.send(lesson)
+  } catch (error) {
+    res.status(500).send({ error: error.message })
+  }
+})
 module.exports = router

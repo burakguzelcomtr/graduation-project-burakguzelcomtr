@@ -16,14 +16,14 @@ class ClassGroupManager {
     return classGroup
   }
 
-  async createClassGroup({ grade, section }) {
-    if (!grade || !section) {
+  async createClassGroup({ grade, section, campus }) {
+    if (!grade || !section || !campus) {
       const error = new Error('Missing required fields')
       error.status = 400
       throw error
     }
 
-    return ClassGroup.create({ grade, section })
+    return ClassGroup.create({ grade, section, campus })
   }
 
   addStudentToClassGroup({ student, classGroup }) {
