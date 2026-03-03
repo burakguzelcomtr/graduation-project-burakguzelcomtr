@@ -6,6 +6,11 @@ const questionSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  quiz: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Quiz',
+    required: true,
+  },
   answers: [
     {
       type: String,

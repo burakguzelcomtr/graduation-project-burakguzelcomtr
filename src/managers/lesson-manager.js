@@ -2,19 +2,19 @@ const Lesson = require('../models/lesson')
 const Unit = require('../models/unit')
 
 class LessonManager {
-  getLessons() {
-    return Lesson.lessons
+  async getLessons() {
+    return await Lesson.find()
   }
 
-  createLesson({ title, description, classGroup, order }) {
-    if (!title || !classGroup) {
+  async createLesson({ title, description, classGroups, order }) {
+    if (!title || !classGroups || classGroups.length === 0) {
       const error = new Error('Missing required fields')
       error.status = 400
       throw error
     }
 
-    const createdLesson = Lesson.create({ title, description, classGroup, order })
-
+    const createdLesson = await Lesson.create({ title, description, classGroups, order })
+    console.log('Created lesson:', createdLesson)
     return createdLesson
   }
 
@@ -25,7 +25,7 @@ class LessonManager {
       throw error
     }
 
-    const unit = new Unit({ id, title, items })
+    const unit = new Unit({ title, items })
     Unit.list.push(unit)
     return unit
   }

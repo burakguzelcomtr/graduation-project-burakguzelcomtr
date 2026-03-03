@@ -1,25 +1,26 @@
 const express = require('express')
 
 const router = express.Router()
- 
+
 const LessonManager = require('../managers/lesson-manager')
 
 const lessonManager = new LessonManager()
 
 /* GET lesson listing. */
-router.get('/', (req, res) => {
+router.get('/', async(req, res) => {
   try {
-    res.send(lessonManager.getLessons())
+    const lessons = await lessonManager.getLessons()
+    res.send(lessons)
   } catch (error) {
     res.status(500).send({ error: error.message })
   }
 })
 
 /* POST create a new lesson. */
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
   try {
-    const { title, description, classGroup, order } = req.body
-    const createdLesson = lessonManager.createLesson({ title, description, classGroup, order })
+    const { title, description, classGroups, order } = req.body
+    const createdLesson = await lessonManager.createLesson({ title, description, classGroups, order })
     res.send(createdLesson)
   } catch (error) {
     res.status(500).send({ error: error.message })

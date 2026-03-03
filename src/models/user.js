@@ -10,39 +10,44 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  studentId: {
+    type: String,
+    required() {
+      return this.role === 'student'
+    }, // only required for students
+  },
   grade: {
     type: Number,
-    required: true,
+    required() {
+      return this.role !== 'admin'
+    }, // not required for admin users, but required for students and teachers
   },
   section: {
     type: String,
-    required: true,
+    required() {
+      return this.role !== 'admin'
+    }, // not required for admin users, but required for students and teachers
+  },
+  campus: {
+    type: String,
+    required() {
+      return this.role !== 'admin'
+    }, // not required for admin users, but required for students and teachers
   },
   role: {
     type: String,
     enum: ['student', 'teacher', 'admin'],
     default: 'student',
   },
+  classGroup: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'ClassGroup',
+    autopopulate: { maxDepth: 2, select: 'grade section campus teacher' },
+  },
 })
 userSchema.plugin(autopopulate)
 
-// Ensure only one teacher exists per grade+section. Students may share grade+section.
-userSchema.index({ grade: 1, section: 1 }, { unique: true, partialFilterExpression: { role: 'teacher' } })
+// Ensure only one teacher exists per grade+section+campus. Students may share grade+section+campus.
+userSchema.index({ grade: 1, section: 1, campus: 1 }, { unique: true, partialFilterExpression: { role: 'teacher' } })
 
-// Log index build errors so failures don't stay silent
-userSchema.post('index', function (error) {
-  if (error) console.error('User index error:', error)
-})
-
-class User {
-  constructor({ name, surname, grade, section, role = 'student' }) {
-    this.name = name
-    this.surname = surname
-    this.grade = grade
-    this.section = section
-    this.role = role
-  }
-}
-
-userSchema.loadClass(User)
 module.exports = mongoose.model('User', userSchema)

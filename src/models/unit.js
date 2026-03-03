@@ -14,6 +14,21 @@ const unitSchema = new mongoose.Schema({
     ref: 'Lesson',
     autopopulate: { maxDepth: 1 },
   },
+  items: [
+    {
+      itemType: {
+        type: String,
+        enum: ['Topic', 'Quiz'],
+        required: true,
+      },
+      item: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        refPath: 'items.itemType',
+        autopopulate: { maxDepth: 1 },
+      },
+    },
+  ],
   order: {
     type: Number,
   },
