@@ -1,46 +1,37 @@
 const ClassGroup = require('../models/class-group')
 
 class ClassGroupManager {
-  getClassGroups() {
-    return ClassGroup.find().lean()
+  static async getClassGroups() {
+    const classGroups = await ClassGroup.find()
+    return classGroups
   }
- 
 
-  async getClassGroupById(id) {
-    const classGroup = await ClassGroup.findById(id).lean()
+  static async getClassGroupById(id) {
+    const classGroup = await ClassGroup.findById(id)
     if (!classGroup) {
-      const error = new Error('Class group not found')
-      error.status = 404
-      throw error
+      throw new Error('Class group not found')
     }
     return classGroup
   }
 
-  async createClassGroup({ grade, section, campus }) {
+  static async createClassGroup({ grade, section, campus }) {
     if (!grade || !section || !campus) {
-      const error = new Error('Missing required fields')
-      error.status = 400
-      throw error
+      throw new Error('Missing required fields')
     }
-
     return ClassGroup.create({ grade, section, campus })
   }
 
-  addStudentToClassGroup({ student, classGroup }) {
+  static async addStudentToClassGroup({ student, classGroup }) {
     if (classGroup.grade !== student.grade || classGroup.section !== student.section) {
-      const error = new Error('No matching classroom found')
-      error.status = 400
-      throw error
+      throw new Error('No matching classroom found')
     }
 
     classGroup.students.push(student)
   }
 
-  assignTeacherToClassGroup({ teacher, classGroup }) {
+  static async assignTeacherToClassGroup({ teacher, classGroup }) {
     if (classGroup.grade !== teacher.grade || classGroup.section !== teacher.section) {
-      const error = new Error('No matching classroom found')
-      error.status = 400
-      throw error
+      throw new Error('No matching classroom found')
     }
 
     classGroup.setTeacher(teacher)

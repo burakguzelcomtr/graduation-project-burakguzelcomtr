@@ -15,7 +15,7 @@ const lessonSchema = new mongoose.Schema({
       ref: 'ClassGroup',
       autopopulate: {
         maxDepth: 2,
-        select: 'grade section campus teacher', // Only include these fields when populating class groups
+        select: 'grade section campus teacher',
       },
     },
   ],

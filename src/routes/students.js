@@ -31,7 +31,8 @@ router.get('/:id', async (req, res) => {
     const { id } = req.params
     const student = await User.findOne({ _id: id, role: 'student' })
     if (!student) {
-      return res.status(404).send({ error: 'Student not found' })
+      res.status(404).send({ error: 'Student not found' })
+      return
     }
     res.send(student)
   } catch (error) {

@@ -42,7 +42,7 @@ const userSchema = new mongoose.Schema({
   classGroup: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'ClassGroup',
-    autopopulate: { maxDepth: 2, select: 'grade section campus teacher' },
+    autopopulate: { maxDepth: 1, select: '-students' },
   },
 })
 userSchema.plugin(autopopulate)

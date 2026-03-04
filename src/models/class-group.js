@@ -23,7 +23,7 @@ const classGroupSchema = new mongoose.Schema({
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      autopopulate: { maxDepth: 1, select: 'name surname studentId' },
+      autopopulate: { maxDepth: 1, select: '-name' },
     },
   ],
 })

@@ -9,7 +9,7 @@ const lessonManager = new LessonManager()
 /* GET lesson listing. */
 router.get('/', async (req, res) => {
   try {
-    const lessons = await lessonManager.getLessons()
+    const lessons = await LessonManager.getLessons()
     res.send(lessons)
   } catch (error) {
     res.status(500).send({ error: error.message })
@@ -20,21 +20,21 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     const { title, description, classGroups, order } = req.body
-    const createdLesson = await lessonManager.createLesson({ title, description, classGroups, order })
+    const createdLesson = await LessonManager.createLesson({ title, description, classGroups, order })
     res.send(createdLesson)
   } catch (error) {
-    res.status(500).send({ error: error.message })
+    res.status(error.status || 500).send({ error: error.message })
   }
 })
 
 /* GET lesson by id. */
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params
-    const lesson = lessonManager.getLessonById(id)
+    const lesson = await LessonManager.getLessonById(id)
     res.send(lesson)
   } catch (error) {
-    res.status(500).send({ error: error.message })
+    res.status(error.status || 500).send({ error: error.message })
   }
 })
 

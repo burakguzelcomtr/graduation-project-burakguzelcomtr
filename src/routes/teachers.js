@@ -9,7 +9,7 @@ router.get('/', async (req, res) => {
   try {
     const teachers = await User.find({ role: 'teacher' })
     if (!teachers || teachers.length === 0) {
-      return res.status(404).send({ error: 'No teachers found' })
+      res.status(404).send({ error: 'No teachers found' })
     }
     res.send(teachers)
   } catch (error) {
@@ -23,7 +23,7 @@ router.get('/:id', async (req, res) => {
     const { id } = req.params
     const teacher = await User.findOne({ _id: id, role: 'teacher' })
     if (!teacher) {
-      return res.status(404).send({ error: 'Teacher not found' })
+      res.status(404).send({ error: 'Teacher not found' })
     }
     res.send(teacher)
   } catch (error) {
@@ -47,7 +47,7 @@ router.delete('/:id', async (req, res) => {
     const { id } = req.params
     const deletedTeacher = await User.findOneAndDelete({ _id: id, role: 'teacher' })
     if (!deletedTeacher) {
-      return res.status(404).send({ error: 'Teacher not found' })
+      res.status(404).send({ error: 'Teacher not found' })
     }
     res.send(deletedTeacher)
   } catch (error) {

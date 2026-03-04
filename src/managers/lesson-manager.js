@@ -2,11 +2,12 @@ const Lesson = require('../models/lesson')
 const Unit = require('../models/unit')
 
 class LessonManager {
-  async getLessons() {
-    return await Lesson.find()
+  static async getLessons() {
+    const lessons = await Lesson.find()
+    return lessons
   }
 
-  async createLesson({ title, description, classGroups, order }) {
+  static async createLesson({ title, description, classGroups, order }) {
     if (!title || !classGroups || classGroups.length === 0) {
       const error = new Error('Missing required fields')
       error.status = 400
@@ -16,6 +17,19 @@ class LessonManager {
     const createdLesson = await Lesson.create({ title, description, classGroups, order })
     console.log('Created lesson:', createdLesson)
     return createdLesson
+  }
+
+  static async getLessonById(lessonId) {
+    const lesson = await Lesson.findById(lessonId)
+    if (!lesson) {
+      throw new Error('Lesson not found')
+    }
+    return lesson
+  }
+
+  static async getLessonsByGrade({ grade }) {
+    const lessons = await Lesson.find({ 'classGroups.grade': grade })
+    return lessons
   }
 
   createUnit({ title, items = [] }) {
@@ -87,14 +101,6 @@ class LessonManager {
       lessonMaterialId,
       order: order ?? unit.items.length + 1,
     })
-  }
-
-  getLessonById(lessonId) {
-    return Lesson.lessons.find(lesson => lesson.id === lessonId) ?? null
-  }
-
-  getLessonsByGrade({ grade }) {
-    return Lesson.getLessonsByGrade({ grade })
   }
 }
 
