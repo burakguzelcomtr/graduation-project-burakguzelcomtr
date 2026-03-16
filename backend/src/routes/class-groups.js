@@ -4,12 +4,10 @@ const router = express.Router()
 
 const ClassGroupManager = require('../managers/class-group-manager')
 
-const classGroupManager = new ClassGroupManager()
-
 /* GET class group listing. */
 router.get('/', async (req, res) => {
   try {
-    const classGroups = await classGroupManager.getClassGroups()
+    const classGroups = await ClassGroupManager.getClassGroups()
     res.send(classGroups)
   } catch (error) {
     res.status(500).send({ error: error.message })
@@ -20,7 +18,7 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params
-    const classGroup = await classGroupManager.getClassGroupById(id)
+    const classGroup = await ClassGroupManager.getClassGroupById(id)
     res.send(classGroup)
   } catch (error) {
     res.status(500).send({ error: error.message })
@@ -30,11 +28,14 @@ router.get('/:id', async (req, res) => {
 /* POST create a new class group. */
 router.post('/', async (req, res) => {
   try {
-    const { grade, section } = req.body
-    const classGroup = await classGroupManager.createClassGroup({ grade, section })
+    const { grade, section, campus } = req.body
+    console.log(grade, section, campus)
+    const classGroup = await ClassGroupManager.createClassGroup({ grade, section, campus })
     res.send(classGroup)
   } catch (error) {
-    res.status(500).send({ error: error.message })
+    res
+      .status(500)
+      .send({ error: error.message, campus: req.body.campus, grade: req.body.grade, section: req.body.section })
   }
 })
 

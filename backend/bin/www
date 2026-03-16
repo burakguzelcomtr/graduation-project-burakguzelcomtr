@@ -7,6 +7,7 @@
 var app = require('../src/app')
 var debug = require('debug')('app:server')
 var http = require('http')
+var os = require('os')
 
 /**
  * Get port from environment and store in Express.
@@ -83,4 +84,28 @@ function onListening() {
   var addr = server.address()
   var bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port
   debug('Listening on ' + bind)
+
+  // Friendly startup message with Local and Network URLs (like Vite)
+  try {
+    var portNum = (typeof addr === 'string') ? addr : addr.port
+    var localHost = 'localhost'
+    var networkIP = (function getLocalIP() {
+      var ifaces = os.networkInterfaces()
+      for (var name in ifaces) {
+        for (var i = 0; i < ifaces[name].length; i++) {
+          var iface = ifaces[name][i]
+          if (iface.family === 'IPv4' && !iface.internal) return iface.address
+        }
+      }
+      return localHost
+    })()
+
+    console.log('\n  Server ready:')
+    console.log('')
+    console.log('  \u2794  Local:   http://' + localHost + ':' + portNum + '/')
+    console.log('  \u2794  Network: http://' + networkIP + ':' + portNum + '/')
+    console.log('')
+  } catch (e) {
+    // ignore logging errors
+  }
 }

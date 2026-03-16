@@ -32,19 +32,22 @@ class LessonManager {
     return lessons
   }
 
-  createUnit({ title, items = [] }) {
+  static async createUnit({ title, items = [] }) {
     if (!title) {
       const error = new Error('Missing required fields')
       error.status = 400
       throw error
     }
-
-    const unit = new Unit({ title, items })
-    Unit.list.push(unit)
-    return unit
+    const createdUnit = await Unit.create({ title, items })
+    return createdUnit
   }
 
-  createLessonMaterial({ title, type, content, passingScorePercent = null }) {
+  static async getUnitsByGrade({ grade }) {
+    const units = await Unit.find({ 'lessons.classGroups.grade': grade })
+    return units
+  }
+
+  static async createLessonMaterial({ title, type, content, passingScorePercent = null }) {
     if (!title || !type) {
       const error = new Error('Missing required fields')
       error.status = 400
@@ -54,17 +57,13 @@ class LessonManager {
     const lessonMaterial = new LessonMaterial({ id, title, type, content, order: null, passingScorePercent })
     LessonMaterial.addLessonMaterial({ lessonMaterial })
     return lessonMaterial
-  }
+  } 
 
-  getUnits() {
-    return Unit.list
-  }
-
-  getLessonMaterials() {
+  static async getLessonMaterials() {
     return LessonMaterial.lessonMaterials
   }
 
-  assignUnitToLesson({ lessonId, unitId, order = null }) {
+  static async assignUnitToLesson({ lessonId, unitId, order = null }) {
     const lesson = this.getLessonById(lessonId)
     if (!lesson) {
       const error = new Error('Lesson not found')

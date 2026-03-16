@@ -3,7 +3,7 @@
 
 <template>
   <main>
-    <Suspense>Home
+    <Suspense>Home View
     </Suspense>
   </main>
 </template>
