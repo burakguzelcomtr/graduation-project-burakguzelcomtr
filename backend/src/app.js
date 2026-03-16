@@ -9,8 +9,6 @@ const session = require('express-session')
 const mongoose = require('mongoose')
 const MongoStore = require('connect-mongo').default
 require('./database-connection')
- 
-/*docker run -p 3000:3000 -p 35729:35729 -e MONGODB_CONNECTION_STRING="mongodb+srv://burakguzel_db_user:tvP1WPMWNzwwSeQ6@learnpass.flijyly.mongodb.net/?appName=Learnpass"  cicd102 */
 
 const indexRouter = require('./routes/index')
 const studentsRouter = require('./routes/students')
