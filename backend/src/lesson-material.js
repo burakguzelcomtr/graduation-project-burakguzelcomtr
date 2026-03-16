@@ -8,7 +8,7 @@ class LessonMaterial {
     this.content = content
     this.order = order
     this.passingScorePercent = passingScorePercent
-  }
+  } 
 
   static addLessonMaterial({ lessonMaterial }) {
     LessonMaterial.lessonMaterials.push(lessonMaterial)

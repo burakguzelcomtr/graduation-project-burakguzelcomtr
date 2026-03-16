@@ -253,8 +253,10 @@ const axios = require('axios')
 const BASE_URL = 'http://localhost:3000'
 
 async function main() {
-  /*
-  const burak = await axios.post(`${BASE_URL}/students`, {
+  
+const burak = await axios.post(`${BASE_URL}/students`, {
+    studentId: 'S12345',
+    campus: 'Main',
     name: 'Burak',
     surname: 'Guzel',
     grade: 3,
@@ -329,7 +331,7 @@ async function main() {
 
   const updatedLesson = await axios.get(`${BASE_URL}/lessons`)
   console.log('Updated Lessons with units:', updatedLesson.data)
-  */
+ 
 
   // create class group
   const classGroup3A = await axios.post(`${BASE_URL}/class-groups`, {

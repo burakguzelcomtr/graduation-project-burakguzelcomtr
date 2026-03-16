@@ -1,10 +1,16 @@
+require('dotenv').config()
 const createError = require('http-errors')
 const express = require('express')
 const path = require('path')
 const cookieParser = require('cookie-parser')
 const logger = require('morgan')
-require('dotenv').config()
+const cors = require('cors')
+const session = require('express-session')
+const mongoose = require('mongoose')
+const MongoStore = require('connect-mongo').default
 require('./database-connection')
+ 
+/*docker run -p 3000:3000 -p 35729:35729 -e MONGODB_CONNECTION_STRING="mongodb+srv://burakguzel_db_user:tvP1WPMWNzwwSeQ6@learnpass.flijyly.mongodb.net/?appName=Learnpass"  cicd102 */
 
 const indexRouter = require('./routes/index')
 const studentsRouter = require('./routes/students')
@@ -19,6 +25,7 @@ const app = express()
 // view engine setup
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'pug')
+
 
 app.use(logger('dev'))
 app.use(express.json())

@@ -2,6 +2,7 @@
 logs
 *.log
 npm-debug.log*
+data
 
 # Dependency directories
 node_modules/
@@ -21,3 +22,5 @@ node_modules/
 .env.test.local
 .env.production.local
 .env.local
+.env.dev
+package-lock.json
