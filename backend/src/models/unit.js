@@ -18,14 +18,17 @@ const unitSchema = new mongoose.Schema({
     {
       itemType: {
         type: String,
-        enum: ['Topic', 'Quiz'],
+        enum: ['topic', 'quiz'],
         required: true,
       },
       item: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
-        refPath: 'items.itemType',
+        ref: 'LessonMaterial',
         autopopulate: { maxDepth: 1 },
+      },
+      order: {
+        type: Number,
       },
     },
   ],

@@ -30,7 +30,4 @@ const classGroupSchema = new mongoose.Schema({
 classGroupSchema.index({ grade: 1, section: 1, campus: 1 }, { unique: true }) // Ensure unique grade+section+campus combinations for class groups
 classGroupSchema.plugin(autopopulate)
 
-class ClassGroup {}
-
-classGroupSchema.loadClass(ClassGroup)
 module.exports = mongoose.model('ClassGroup', classGroupSchema)

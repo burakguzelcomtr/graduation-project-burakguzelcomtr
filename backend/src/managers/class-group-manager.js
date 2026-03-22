@@ -34,7 +34,7 @@ class ClassGroupManager {
       throw new Error('No matching classroom found')
     }
 
-    classGroup.setTeacher(teacher)
+    return ClassGroup.findByIdAndUpdate(classGroup.id, { teacher: teacher.id ?? teacher }, { new: true })
   }
 }
 

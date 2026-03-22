@@ -9,11 +9,11 @@ router.get('/', async (req, res) => {
   try {
     const teachers = await User.find({ role: 'teacher' })
     if (!teachers || teachers.length === 0) {
-      res.status(404).send({ error: 'No teachers found' })
+      return res.status(404).send({ error: 'No teachers found' })
     }
-    res.send(teachers)
+    return res.send(teachers)
   } catch (error) {
-    res.status(500).send({ error: error.message })
+    return res.status(500).send({ error: error.message })
   }
 })
 
@@ -23,11 +23,11 @@ router.get('/:id', async (req, res) => {
     const { id } = req.params
     const teacher = await User.findOne({ _id: id, role: 'teacher' })
     if (!teacher) {
-      res.status(404).send({ error: 'Teacher not found' })
+      return res.status(404).send({ error: 'Teacher not found' })
     }
-    res.send(teacher)
+    return res.send(teacher)
   } catch (error) {
-    res.status(500).send({ error: error.message })
+    return res.status(500).send({ error: error.message })
   }
 })
 
@@ -36,9 +36,9 @@ router.post('/', async (req, res) => {
   try {
     const { name, surname, grade, section, campus, classGroup } = req.body
     const newTeacher = await User.create({ name, surname, grade, campus, section, role: 'teacher', classGroup })
-    res.send(newTeacher)
+    return res.send(newTeacher)
   } catch (error) {
-    res.status(500).send({ error: error.message })
+    return res.status(500).send({ error: error.message })
   }
 })
 
@@ -47,11 +47,11 @@ router.delete('/:id', async (req, res) => {
     const { id } = req.params
     const deletedTeacher = await User.findOneAndDelete({ _id: id, role: 'teacher' })
     if (!deletedTeacher) {
-      res.status(404).send({ error: 'Teacher not found' })
+      return res.status(404).send({ error: 'Teacher not found' })
     }
-    res.send(deletedTeacher)
+    return res.send(deletedTeacher)
   } catch (error) {
-    res.status(500).send({ error: error.message })
+    return res.status(500).send({ error: error.message })
   }
 })
 

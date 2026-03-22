@@ -2,7 +2,8 @@ const express = require('express')
 
 const router = express.Router()
 
-const LessonManager = require('../managers/lesson-manager') 
+const LessonManager = require('../managers/lesson-manager')
+const LessonMaterialManager = require('../managers/lesson-material-manager')
 
 /* GET lesson listing. */
 router.get('/', async (req, res) => {
@@ -36,26 +37,43 @@ router.get('/:id', async (req, res) => {
   }
 })
 
-/* POST assign a unit to a lesson. */
-router.post('/:lessonId/units', (req, res) => {
+/* GET lesson by id with units. */
+router.get('/:id/with-units', async (req, res) => {
   try {
-    const { lessonId } = req.params
-    const { unitId } = req.body
-    const lesson = lessonManager.assignUnitToLesson({ lessonId, unitId })
+    const { id } = req.params
+    const lesson = await LessonManager.getLessonWithUnits(id)
     res.send(lesson)
   } catch (error) {
-    res.status(500).send({ error: error.message })
+    res.status(error.status || 500).send({ error: error.message })
   }
 })
 
-router.post('/:lessonId/units/:unitId/lesson-materials', (req, res) => {
+/* POST assign a unit to a lesson. */
+router.post('/:lessonId/units', async (req, res) => {
   try {
-    const { lessonId, unitId } = req.params
-    const { lessonMaterialId } = req.body
-    const lesson = lessonManager.assignLessonMaterialToUnit({ lessonId, unitId, lessonMaterialId })
+    const { lessonId } = req.params
+    const { unitId, order } = req.body
+    const lesson = await LessonManager.assignUnitToLesson({ lessonId, unitId, order })
     res.send(lesson)
   } catch (error) {
-    res.status(500).send({ error: error.message })
+    res.status(error.status || 500).send({ error: error.message })
   }
 })
+
+router.post('/:lessonId/units/:unitId/lesson-materials', async (req, res) => {
+  try {
+    const { lessonId, unitId } = req.params
+    const { lessonMaterialId, order } = req.body
+    const unit = await LessonMaterialManager.assignLessonMaterialToUnit({
+      lessonId,
+      unitId,
+      lessonMaterialId,
+      order,
+    })
+    res.send(unit)
+  } catch (error) {
+    res.status(error.status || 500).send({ error: error.message })
+  }
+})
+
 module.exports = router

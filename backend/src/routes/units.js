@@ -1,16 +1,16 @@
 const express = require('express')
 const LessonManager = require('../managers/lesson-manager')
 
-const router = express.Router() 
+const router = express.Router()
 
 /* GET unit listing. */
-router.get('/:lessonId', async (req, res) => {
+router.get('/', async (req, res) => {
   try {
-    const { lessonId } = req.params
-    const getUnits = await LessonManager.getUnitsByGrade({ lessonId } || {} )
-    res.send(getUnits)
+    const { lessonId } = req.query
+    const units = lessonId ? await LessonManager.getUnitsByLesson({ lessonId }) : await LessonManager.getUnits()
+    res.send(units)
   } catch (error) {
-    res.status(500).send({ error: error.message })
+    res.status(error.status || 500).send({ error: error.message })
   }
 })
 

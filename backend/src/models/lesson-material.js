@@ -1,31 +1,38 @@
 const mongoose = require('mongoose')
 const autopopulate = require('mongoose-autopopulate')
 
-const quizSchema = new mongoose.Schema({
+const lessonMaterialSchema = new mongoose.Schema({
   title: {
     type: String,
     required: true,
   },
-  description: {
+  type: {
+    type: String,
+    enum: ['topic', 'quiz'],
+    required: true,
+  },
+  content: {
     type: String,
   },
   unit: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Unit',
-    required: true,
+    autopopulate: { maxDepth: 1 },
   },
-  // question includes question ids from questions collection
   questions: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Question',
       autopopulate: { maxDepth: 1 },
+      required() {
+        return this.type === 'quiz'
+      },
     },
   ],
-  content: {
-    type: String,
-  },
   order: {
+    type: Number,
+  },
+  passingScorePercent: {
     type: Number,
   },
   createdAt: {
@@ -38,6 +45,6 @@ const quizSchema = new mongoose.Schema({
   },
 })
 
-quizSchema.plugin(autopopulate)
+lessonMaterialSchema.plugin(autopopulate)
 
-module.exports = mongoose.model('Quiz', quizSchema)
+module.exports = mongoose.model('LessonMaterial', lessonMaterialSchema)

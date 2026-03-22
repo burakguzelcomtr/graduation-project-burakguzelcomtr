@@ -2,24 +2,24 @@ const express = require('express')
 
 const router = express.Router()
 
-const LessonManager = require('../managers/lesson-manager')
+const LessonMaterialManager = require('../managers/lesson-material-manager')
 
-const lessonManager = new LessonManager()
-
-/* GET lesson material listing. */
-router.get('/', (req, res) => {
+/* GET lesson materials listing. */
+router.get('/', async (req, res) => {
   try {
-    res.send(lessonManager.getLessonMaterials())
+    const { unitId } = req.query
+    const lessonMaterials = await LessonMaterialManager.getLessonMaterials({ unitId })
+    res.send(lessonMaterials)
   } catch (error) {
-    res.status(500).send({ error: error.message })
+    res.status(error.status || 500).send({ error: error.message })
   }
 })
 
 /* POST create a new lesson material. */
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
   try {
     const { title, type, content, passingScorePercent } = req.body
-    const lessonMaterial = lessonManager.createLessonMaterial({
+    const lessonMaterial = await LessonMaterialManager.createLessonMaterial({
       title,
       type,
       content,
@@ -28,7 +28,38 @@ router.post('/', (req, res) => {
 
     res.send(lessonMaterial)
   } catch (error) {
-    res.status(500).send({ error: error.message })
+    res.status(error.status || 500).send({ error: error.message })
+  }
+})
+
+/* PATCH update a lesson material. */
+router.patch('/:id', async (req, res) => {
+  try {
+    const { id } = req.params
+    const { title, type, content, passingScorePercent, order } = req.body
+    const lessonMaterial = await LessonMaterialManager.updateLessonMaterial({
+      lessonMaterialId: id,
+      title,
+      type,
+      content,
+      passingScorePercent,
+      order,
+    })
+
+    res.send(lessonMaterial)
+  } catch (error) {
+    res.status(error.status || 500).send({ error: error.message })
+  }
+})
+
+/* DELETE a lesson material. */
+router.delete('/:id', async (req, res) => {
+  try {
+    const { id } = req.params
+    const deletedLessonMaterial = await LessonMaterialManager.deleteLessonMaterial(id)
+    res.send(deletedLessonMaterial)
+  } catch (error) {
+    res.status(error.status || 500).send({ error: error.message })
   }
 })
 
