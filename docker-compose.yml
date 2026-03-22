@@ -11,7 +11,7 @@ services:
     volumes:
       - ./backend/src:/app/src
     env_file:
-      - backend/.env 
+      - backend/.env
   frontend:
     image: learnpass-frontend
     build:
@@ -28,4 +28,5 @@ services:
     ports:
       - 27017:27017
     volumes:
-      - ./data:/data/db
+      - ./data:/data/db 
+    command: mongod --quiet

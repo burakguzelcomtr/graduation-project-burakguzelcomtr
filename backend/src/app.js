@@ -19,11 +19,28 @@ const classGroupsRouter = require('./routes/class-groups')
 const lessonMaterialsRouter = require('./routes/lesson-materials')
 
 const app = express()
+const connectionPromise = MongoStore.create({
+  clientPromise: mongoose.connection.asPromise().then(() => mongoose.connection.getClient()),
+  stringify: false,
+})
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'pug')
 
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 1000 * 60 * 60 * 24, // 1 day
+    },
+    store: connectionPromise,
+  })
+)
+app.use(cors())
 app.use(logger('dev'))
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
