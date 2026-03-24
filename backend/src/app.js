@@ -10,24 +10,33 @@ const mongoose = require('mongoose')
 const MongoStore = require('connect-mongo').default
 require('./database-connection')
 
+const passport = require('passport')
+const User = require('./models/user')
+
 const indexRouter = require('./routes/index')
 const studentsRouter = require('./routes/students')
 const teachersRouter = require('./routes/teachers')
+const accountsRouter = require('./routes/accounts')
 const lessonsRouter = require('./routes/lessons')
 const unitsRouter = require('./routes/units')
 const classGroupsRouter = require('./routes/class-groups')
 const lessonMaterialsRouter = require('./routes/lesson-materials')
 
+// use static authenticate method of model in LocalStrategy
+passport.use(User.createStrategy())
+
+// use static serialize and deserialize of model for passport session support
+passport.serializeUser(User.serializeUser())
+passport.deserializeUser(User.deserializeUser())
+
 const app = express()
+// view engine setup
+app.set('views', path.join(__dirname, 'views'))
+app.set('view engine', 'pug')
 const connectionPromise = MongoStore.create({
   clientPromise: mongoose.connection.asPromise().then(() => mongoose.connection.getClient()),
   stringify: false,
 })
-
-// view engine setup
-app.set('views', path.join(__dirname, 'views'))
-app.set('view engine', 'pug')
-
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
@@ -40,6 +49,8 @@ app.use(
     store: connectionPromise,
   })
 )
+
+app.use(passport.session())
 app.use(cors())
 app.use(logger('dev'))
 app.use(express.json())
@@ -50,6 +61,7 @@ app.use(express.static(path.join(__dirname, 'public')))
 app.use('/', indexRouter)
 app.use('/students', studentsRouter)
 app.use('/teachers', teachersRouter)
+app.use('/accounts', accountsRouter)
 app.use('/lessons', lessonsRouter)
 app.use('/units', unitsRouter)
 app.use('/class-groups', classGroupsRouter)
@@ -70,5 +82,4 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500)
   res.render('error')
 })
-
 module.exports = app
