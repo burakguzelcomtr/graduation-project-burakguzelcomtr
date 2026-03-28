@@ -5,46 +5,51 @@ const router = express.Router()
 const LessonManager = require('../managers/lesson-manager')
 const LessonMaterialManager = require('../managers/lesson-material-manager')
 
-/* GET lesson listing. */
+/* GET lesson listing.
+   ?classGroupId=X  → only lessons assigned to that class group
+   ?type=main       → only lessons matching the given type
+   ?withUnits=true  → include units per lesson
+*/
 router.get('/', async (req, res) => {
   try {
-    const lessons = await LessonManager.getLessons()
-    res.send(lessons)
+    const { classGroupId, withUnits, type } = req.query
+    let lessons = []
+
+    if (withUnits === 'true') {
+      lessons = await LessonManager.getLessonsWithUnits({ classGroupId, type })
+    } else {
+      lessons = await LessonManager.getLessons({ classGroupId, type })
+    }
+
+    return res.send(lessons)
   } catch (error) {
-    res.status(500).send({ error: error.message })
+    return res.status(error.status || 500).send({ error: error.message })
   }
 })
 
 /* POST create a new lesson. */
 router.post('/', async (req, res) => {
   try {
-    const { title, description, classGroups, order } = req.body
-    const createdLesson = await LessonManager.createLesson({ title, description, classGroups, order })
-    res.send(createdLesson)
+    const { title, description, classGroups, type, order } = req.body
+    const createdLesson = await LessonManager.createLesson({ title, description, classGroups, type, order })
+    return res.send(createdLesson)
   } catch (error) {
-    res.status(error.status || 500).send({ error: error.message })
+    return res.status(error.status || 500).send({ error: error.message })
   }
 })
 
-/* GET lesson by id. */
+/* GET lesson by id. ?withUnits=true includes units. */
 router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params
+    if (req.query.withUnits === 'true') {
+      const lesson = await LessonManager.getLessonWithUnits(id)
+      return res.send(lesson)
+    }
     const lesson = await LessonManager.getLessonById(id)
-    res.send(lesson)
+    return res.send(lesson)
   } catch (error) {
-    res.status(error.status || 500).send({ error: error.message })
-  }
-})
-
-/* GET lesson by id with units. */
-router.get('/:id/with-units', async (req, res) => {
-  try {
-    const { id } = req.params
-    const lesson = await LessonManager.getLessonWithUnits(id)
-    res.send(lesson)
-  } catch (error) {
-    res.status(error.status || 500).send({ error: error.message })
+    return res.status(error.status || 500).send({ error: error.message })
   }
 })
 

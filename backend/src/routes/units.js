@@ -8,9 +8,9 @@ router.get('/', async (req, res) => {
   try {
     const { lessonId } = req.query
     const units = lessonId ? await LessonManager.getUnitsByLesson({ lessonId }) : await LessonManager.getUnits()
-    res.send(units)
+    return res.send(units)
   } catch (error) {
-    res.status(error.status || 500).send({ error: error.message })
+    return res.status(error.status || 500).send({ error: error.message })
   }
 })
 
@@ -19,13 +19,13 @@ router.post('/', async (req, res) => {
   try {
     const { title } = req.body
     const newUnit = await LessonManager.createUnit({ title })
-    res.send({
+    return res.send({
       id: newUnit.id,
       title: newUnit.title,
       items: newUnit.items,
     })
   } catch (error) {
-    res.status(500).send({ error: error.message })
+    return res.status(error.status || 500).send({ error: error.message })
   }
 })
 

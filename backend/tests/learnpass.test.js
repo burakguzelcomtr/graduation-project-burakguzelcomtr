@@ -3,6 +3,7 @@
 /* eslint-disable no-undef */
 const request = require('supertest')
 const mongoose = require('mongoose')
+const ClassGroup = require('../src/models/class-group')
 const Lesson = require('../src/models/lesson')
 const Question = require('../src/models/question')
 const Unit = require('../src/models/unit')
@@ -14,10 +15,17 @@ const app = require('../src/app')
 
 describe('LearnPass', () => {
   beforeEach(async () => {
+    await ClassGroup.deleteMany()
     await Lesson.deleteMany()
     await Question.deleteMany()
     await Unit.deleteMany()
     await LessonMaterial.deleteMany()
+  })
+
+  afterAll(async () => {
+    if (mongoose.connection.readyState !== 0) {
+      await mongoose.connection.close()
+    }
   })
 
   it('can create a lesson', async () => {
@@ -122,7 +130,7 @@ describe('LearnPass', () => {
     const lesson = await Lesson.create({ title: 'Chemistry' })
     await Unit.create({ title: 'Atoms', lesson: lesson._id, order: 1 })
 
-    const actualOutput = await request(app).get(`/lessons/${lesson._id}/with-units`)
+    const actualOutput = await request(app).get(`/lessons/${lesson._id}?withUnits=true`)
 
     expect(actualOutput.status).toBe(200)
     expect(actualOutput.body).toMatchObject({
@@ -167,6 +175,27 @@ describe('LearnPass', () => {
     expect(actualOutput.body).toEqual([
       expect.objectContaining({ _id: lessonUnit._id.toString(), title: 'Motion', order: 1 }),
     ])
+  })
+
+  it('can filter lessons by class group and type through the route', async () => {
+    const classGroup = await ClassGroup.create({ grade: 4, section: 'A', campus: 'Main Campus' })
+    const otherClassGroup = await ClassGroup.create({ grade: 4, section: 'B', campus: 'South Campus' })
+    const mainLesson = await Lesson.create({ title: 'Main Lesson', type: 'main', classGroups: [classGroup._id], order: 1 })
+
+    await Lesson.create({ title: 'Premun Lesson', type: 'premun', classGroups: [classGroup._id], order: 2 })
+    await Lesson.create({ title: 'Other Class Lesson', type: 'main', classGroups: [otherClassGroup._id], order: 3 })
+    await Unit.create({ title: 'Main Unit', lesson: mainLesson._id, order: 1 })
+
+    const actualOutput = await request(app).get(`/lessons?classGroupId=${classGroup._id}&type=main&withUnits=true`)
+
+    expect(actualOutput.status).toBe(200)
+    expect(actualOutput.body).toHaveLength(1)
+    expect(actualOutput.body[0]).toMatchObject({
+      _id: mainLesson._id.toString(),
+      title: 'Main Lesson',
+      type: 'main',
+    })
+    expect(actualOutput.body[0].units).toEqual([expect.objectContaining({ title: 'Main Unit', order: 1 })])
   })
 
   it('rejects unit creation when title is missing', async () => {

@@ -5,7 +5,6 @@ const request = require('supertest')
 const mongoose = require('mongoose')
 const User = require('../src/models/user')
 const ClassGroup = require('../src/models/class-group')
-const ClassGroupManager = require('../src/managers/class-group-manager')
 
 const app = require('../src/app')
 
@@ -28,6 +27,29 @@ describe('User Routes', () => {
       campus,
     }
   }
+
+  const createTeacherInput = (overrides = {}) => ({
+    name: 'Test',
+    surname: 'Teacher',
+    grade: 7,
+    section: 'A',
+    campus: 'Main Campus',
+    email: `teacher-${new mongoose.Types.ObjectId()}@example.com`,
+    password: 'Secret123!',
+    ...overrides,
+  })
+
+  const createStudentInput = (overrides = {}) => ({
+    name: 'Test',
+    surname: 'Student',
+    studentId: '1234',
+    grade: 3,
+    section: 'A',
+    campus: 'Main Campus',
+    email: `student-${new mongoose.Types.ObjectId()}@example.com`,
+    password: 'Secret123!',
+    ...overrides,
+  })
 
   it('can create a class group', async () => {
     const classGroupInput = createClassGroupInput(5, 'A', 'North Campus')
@@ -79,7 +101,7 @@ describe('User Routes', () => {
   it('returns an error when creating a class group with missing fields', async () => {
     const actualOutput = await request(app).post('/class-groups').send({ grade: 5 })
 
-    expect(actualOutput.status).toBe(500)
+    expect(actualOutput.status).toBe(400)
     expect(actualOutput.body).toMatchObject({ error: 'Missing required fields' })
   })
 
@@ -100,23 +122,13 @@ describe('User Routes', () => {
   it('returns an error when class group is not found', async () => {
     const actualOutput = await request(app).get(`/class-groups/${new mongoose.Types.ObjectId()}`)
 
-    expect(actualOutput.status).toBe(500)
+    expect(actualOutput.status).toBe(404)
     expect(actualOutput.body).toMatchObject({ error: 'Class group not found' })
   })
 
   it('can create a teacher', async () => {
     const classGroup = await ClassGroup.create({ grade: 7, section: 'C', campus: 'West Campus' })
-
-    const expectedOutput = {
-      name: 'Ayse',
-      surname: 'Demir',
-      grade: 7,
-      section: 'C',
-      campus: 'West Campus',
-      role: 'teacher',
-    }
-
-    const actualOutput = await request(app).post('/teachers').send({
+    const teacherInput = createTeacherInput({
       name: 'Ayse',
       surname: 'Demir',
       grade: 7,
@@ -125,21 +137,34 @@ describe('User Routes', () => {
       classGroup: classGroup._id,
     })
 
+    const expectedOutput = {
+      name: teacherInput.name,
+      surname: teacherInput.surname,
+      grade: teacherInput.grade,
+      section: teacherInput.section,
+      campus: teacherInput.campus,
+      role: 'teacher',
+    }
+
+    const actualOutput = await request(app).post('/teachers').send(teacherInput)
+
+    expect(actualOutput.status).toBe(200)
     expect(actualOutput.body).toMatchObject(expectedOutput)
     expect(actualOutput.body._id).toBeDefined()
   })
 
   it('can retrieve a teacher by id', async () => {
     const classGroup = await ClassGroup.create({ grade: 8, section: 'A', campus: 'Central Campus' })
-
-    const teacher = await request(app).post('/teachers').send({
-      name: 'Test',
-      surname: 'Kaya',
+    const teacherInput = createTeacherInput({
       grade: 8,
       section: 'A',
       campus: 'Central Campus',
       classGroup: classGroup._id,
+      name: 'Test',
+      surname: 'Kaya',
     })
+
+    const teacher = await request(app).post('/teachers').send(teacherInput)
 
     const expectedOutput = {
       _id: teacher.body._id,
@@ -157,23 +182,23 @@ describe('User Routes', () => {
     const firstClassGroup = await ClassGroup.create({ grade: 3, section: 'A', campus: 'Main Campus' })
     const secondClassGroup = await ClassGroup.create({ grade: 3, section: 'B', campus: 'South Campus' })
 
-    await request(app).post('/teachers').send({
+    await request(app).post('/teachers').send(createTeacherInput({
       name: 'Test',
       surname: 'User',
       grade: 3,
       section: 'A',
       campus: 'Main Campus',
       classGroup: firstClassGroup._id,
-    })
+    }))
 
-    await request(app).post('/teachers').send({
+    await request(app).post('/teachers').send(createTeacherInput({
       name: 'Test',
       surname: 'User2',
       grade: 3,
       section: 'B',
       campus: 'South Campus',
       classGroup: secondClassGroup._id,
-    })
+    }))
 
     const actualOutput = await request(app).get('/teachers')
 
@@ -203,7 +228,7 @@ describe('User Routes', () => {
   it('can retrieve a list of students', async () => {
     const classGroup = await ClassGroup.create({ grade: 3, section: 'A', campus: 'Main Campus' })
 
-    await request(app).post('/students').send({
+    await request(app).post('/students').send(createStudentInput({
       name: 'Burak',
       surname: 'Guzel',
       studentId: '1234',
@@ -211,9 +236,9 @@ describe('User Routes', () => {
       section: 'A',
       campus: 'Main Campus',
       classGroup: classGroup._id,
-    })
+    }))
 
-    await request(app).post('/students').send({
+    await request(app).post('/students').send(createStudentInput({
       name: 'Who',
       surname: 'Am I',
       studentId: '4567',
@@ -221,7 +246,7 @@ describe('User Routes', () => {
       section: 'A',
       campus: 'Main Campus',
       classGroup: classGroup._id,
-    })
+    }))
 
     const actualOutput = await request(app).get('/students')
 
@@ -237,7 +262,7 @@ describe('User Routes', () => {
   it('can retrieve a student by id', async () => {
     const classGroup = await ClassGroup.create({ grade: 3, section: 'A', campus: 'Main Campus' })
 
-    const student = await request(app).post('/students').send({
+    const student = await request(app).post('/students').send(createStudentInput({
       name: 'Burak',
       surname: 'Guzel',
       studentId: '1234',
@@ -245,7 +270,7 @@ describe('User Routes', () => {
       section: 'A',
       campus: 'Main Campus',
       classGroup: classGroup._id,
-    })
+    }))
 
     const actualOutput = await request(app).get(`/students/${student.body._id}`)
 
@@ -269,7 +294,7 @@ describe('User Routes', () => {
     const firstClassGroup = await ClassGroup.create({ grade: 3, section: 'A', campus: 'Main Campus' })
     const secondClassGroup = await ClassGroup.create({ grade: 3, section: 'B', campus: 'Main Campus' })
 
-    await request(app).post('/students').send({
+    await request(app).post('/students').send(createStudentInput({
       name: 'Who',
       surname: 'Am I',
       studentId: '4567',
@@ -277,9 +302,9 @@ describe('User Routes', () => {
       section: 'A',
       campus: 'Main Campus',
       classGroup: firstClassGroup._id,
-    })
+    }))
 
-    await request(app).post('/students').send({
+    await request(app).post('/students').send(createStudentInput({
       name: 'Burak',
       surname: 'Guzel',
       studentId: '1234',
@@ -287,7 +312,7 @@ describe('User Routes', () => {
       section: 'B',
       campus: 'Main Campus',
       classGroup: secondClassGroup._id,
-    })
+    }))
 
     const actualOutput = await request(app).get(`/students/class-group/${firstClassGroup._id}`)
 
@@ -304,14 +329,14 @@ describe('User Routes', () => {
   it('can delete a teacher', async () => {
     const classGroup = await ClassGroup.create({ grade: 4, section: 'B', campus: 'Main Campus' })
 
-    const teacher = await request(app).post('/teachers').send({
+    const teacher = await request(app).post('/teachers').send(createTeacherInput({
       name: 'Test',
       surname: 'User',
       grade: 4,
       section: 'B',
       campus: 'Main Campus',
       classGroup: classGroup._id,
-    })
+    }))
 
     const actualOutput = await request(app).delete(`/teachers/${teacher.body._id}`)
 
@@ -333,76 +358,5 @@ describe('User Routes', () => {
 
     expect(actualOutput.status).toBe(404)
     expect(actualOutput.body).toMatchObject({ error: 'Teacher not found' })
-  })
-
-  it('can add a student to a class group with class group manager', async () => {
-    const classGroup = await ClassGroup.create({ grade: 3, section: 'A', campus: 'Main Campus' })
-    const student = await User.create({
-      name: 'Test',
-      surname: 'Student',
-      studentId: '123',
-      grade: 3,
-      section: 'A',
-      campus: 'Main Campus',
-      role: 'student',
-    })
-
-    await ClassGroupManager.addStudentToClassGroup({ student, classGroup })
-
-    const assignedStudentId = classGroup.students[0]._id
-      ? classGroup.students[0]._id.toString()
-      : classGroup.students[0].toString()
-
-    expect(classGroup.students).toHaveLength(1)
-    expect(assignedStudentId).toBe(student._id.toString())
-  })
-
-  it('rejects adding a mismatched student to a class group', async () => {
-    const classGroup = await ClassGroup.create({ grade: 6, section: 'A', campus: 'Mismatch Campus' })
-    const student = await User.create({
-      name: 'Wrong',
-      surname: 'Student',
-      studentId: 'ST-5002',
-      grade: 7,
-      section: 'B',
-      campus: 'Mismatch Campus',
-      role: 'student',
-    })
-
-    await expect(ClassGroupManager.addStudentToClassGroup({ student, classGroup })).rejects.toThrow(
-      'No matching classroom found'
-    )
-  })
-
-  it('can assign a teacher to a class group with class group manager', async () => {
-    const classGroup = await ClassGroup.create({ grade: 5, section: 'D', campus: 'Test Campus' })
-    const teacher = await User.create({
-      name: 'Manager',
-      surname: 'Teacher',
-      grade: 5,
-      section: 'D',
-      campus: 'Test Campus',
-      role: 'teacher',
-    })
-
-    const updatedClassGroup = await ClassGroupManager.assignTeacherToClassGroup({ teacher, classGroup })
-
-    expect((updatedClassGroup.teacher._id ?? updatedClassGroup.teacher).toString()).toBe(teacher._id.toString())
-  })
-
-  it('rejects assigning a mismatched teacher to a class group', async () => {
-    const classGroup = await ClassGroup.create({ grade: 3, section: 'D', campus: 'Assign Mismatch Campus' })
-    const teacher = await User.create({
-      name: 'Mismatch',
-      surname: 'Teacher',
-      grade: 3,
-      section: 'C',
-      campus: 'Assign Mismatch Campus',
-      role: 'teacher',
-    })
-
-    await expect(ClassGroupManager.assignTeacherToClassGroup({ teacher, classGroup })).rejects.toThrow(
-      'No matching classroom found'
-    )
   })
 })

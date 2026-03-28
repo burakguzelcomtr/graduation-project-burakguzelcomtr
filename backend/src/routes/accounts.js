@@ -1,14 +1,20 @@
 const express = require('express')
 
 const router = express.Router()
-const User = require('../models/user')
+const passport = require('passport')
 
-router.get('/session', (req, res) => {
-  if (req.isAuthenticated()) {
-    res.json({ authenticated: true, user: req.user })
-  } else {
-    res.json({ authenticated: false })
-  }
+router.get('/session', async function (req, res, next) {
+  res.send(req.user)
+})
+
+router.post('/session', passport.authenticate('local', { failWithError: true }), function (req, res) {
+  res.send(req.user)
+})
+
+router.delete('/session', function (req, res) {
+  req.logout(() => {
+    res.sendStatus(200)
+  })
 })
 
 module.exports = router

@@ -21,6 +21,7 @@ const lessonsRouter = require('./routes/lessons')
 const unitsRouter = require('./routes/units')
 const classGroupsRouter = require('./routes/class-groups')
 const lessonMaterialsRouter = require('./routes/lesson-materials')
+ 
 
 // use static authenticate method of model in LocalStrategy
 passport.use(User.createStrategy())
@@ -50,6 +51,7 @@ app.use(
   })
 )
 
+app.use(passport.initialize())
 app.use(passport.session())
 app.use(cors())
 app.use(logger('dev'))
@@ -66,7 +68,6 @@ app.use('/lessons', lessonsRouter)
 app.use('/units', unitsRouter)
 app.use('/class-groups', classGroupsRouter)
 app.use('/lesson-materials', lessonMaterialsRouter)
-
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404))

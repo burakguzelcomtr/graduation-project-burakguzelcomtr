@@ -1,4 +1,5 @@
 const ClassGroup = require('../models/class-group')
+const User = require('../models/user')
 
 class ClassGroupManager {
   static async getClassGroups() {
@@ -9,32 +10,31 @@ class ClassGroupManager {
   static async getClassGroupById(id) {
     const classGroup = await ClassGroup.findById(id)
     if (!classGroup) {
-      throw new Error('Class group not found')
+      const error = new Error('Class group not found')
+      error.status = 404
+      throw error
     }
     return classGroup
   }
 
   static async createClassGroup({ grade, section, campus }) {
     if (!grade || !section || !campus) {
-      throw new Error('Missing required fields')
+      const error = new Error('Missing required fields')
+      error.status = 400
+      throw error
     }
     return ClassGroup.create({ grade, section, campus })
   }
 
-  static async addStudentToClassGroup({ student, classGroup }) {
-    if (classGroup.grade !== student.grade || classGroup.section !== student.section) {
-      throw new Error('No matching classroom found')
-    }
+  static async getStudentsInClassGroup(classGroupId) {
+    await this.getClassGroupById(classGroupId)
 
-    classGroup.students.push(student)
-  }
-
-  static async assignTeacherToClassGroup({ teacher, classGroup }) {
-    if (classGroup.grade !== teacher.grade || classGroup.section !== teacher.section) {
-      throw new Error('No matching classroom found')
-    }
-
-    return ClassGroup.findByIdAndUpdate(classGroup.id, { teacher: teacher.id ?? teacher }, { new: true })
+    return User.find({
+      classGroup: classGroupId,
+      role: 'student',
+    })
+      .setOptions({ autopopulate: false })
+      .select('-classGroup')
   }
 }
 

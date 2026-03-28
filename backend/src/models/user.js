@@ -1,6 +1,8 @@
 const mongoose = require('mongoose')
 const autopopulate = require('mongoose-autopopulate')
-const passportLocalMongoose = require('passport-local-mongoose')
+const passportLocalMongooseModule = require('passport-local-mongoose')
+
+const passportLocalMongoose = passportLocalMongooseModule.default || passportLocalMongooseModule
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -52,6 +54,7 @@ const userSchema = new mongoose.Schema({
   },
 })
 userSchema.plugin(autopopulate)
+userSchema.plugin(passportLocalMongoose, { usernameField: 'email' })
 
 // Ensure only one teacher exists per grade+section+campus. Students may share grade+section+campus.
 userSchema.index({ grade: 1, section: 1, campus: 1 }, { unique: true, partialFilterExpression: { role: 'teacher' } })

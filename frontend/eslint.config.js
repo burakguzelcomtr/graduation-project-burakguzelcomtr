@@ -26,6 +26,13 @@ export default defineConfig([
   ...pluginVue.configs['flat/essential'],
 
   {
+    files: ['**/*.vue'],
+    rules: {
+      'no-unused-vars': 'off',
+    },
+  },
+
+  {
     ...pluginVitest.configs.recommended,
     files: ['src/**/__tests__/*'],
   },

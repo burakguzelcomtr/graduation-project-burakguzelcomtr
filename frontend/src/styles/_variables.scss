@@ -1,0 +1,19 @@
+// Brand colours
+$primary:       #e07b39;
+$primary-dark:  #c05c1a;
+$primary-darker:#a04a12;
+$bg-dark:       #0d2044;
+$bg-brown:      #5c3317;
+$bg-card:       #fff8f0;
+$text-dark:     #1a202c;
+$text-muted:    #718096;
+
+// Typography
+$font-main: 'Fredoka', sans-serif;
+
+// Bootstrap overrides – set before bootstrap import
+$font-family-base: $font-main;
+$primary:          $primary;
+$body-bg:          #f5f7fa;
+$border-radius:    8px;
+$border-radius-lg: 12px;

@@ -19,9 +19,20 @@ router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params
     const classGroup = await ClassGroupManager.getClassGroupById(id)
-    res.send(classGroup)
+    return res.send(classGroup)
   } catch (error) {
-    res.status(500).send({ error: error.message })
+    return res.status(error.status || 500).send({ error: error.message })
+  }
+})
+
+/* Get students in a class group. */
+router.get('/:id/students', async (req, res) => {
+  try {
+    const { id } = req.params
+    const students = await ClassGroupManager.getStudentsInClassGroup(id)
+    res.send(students)
+  } catch (error) {
+    res.status(error.status || 500).send({ error: error.message })
   }
 })
 
@@ -29,12 +40,11 @@ router.get('/:id', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     const { grade, section, campus } = req.body
-    console.log(grade, section, campus)
     const classGroup = await ClassGroupManager.createClassGroup({ grade, section, campus })
-    res.send(classGroup)
+    return res.send(classGroup)
   } catch (error) {
-    res
-      .status(500)
+    return res
+      .status(error.status || 500)
       .send({ error: error.message, campus: req.body.campus, grade: req.body.grade, section: req.body.section })
   }
 })

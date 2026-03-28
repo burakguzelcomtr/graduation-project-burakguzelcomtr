@@ -43,17 +43,11 @@ router.get('/:id', async (req, res) => {
 /* POST create a new student. */
 router.post('/', async (req, res) => {
   try {
-    const { name, surname, studentId, grade, section, campus, classGroup } = req.body
-    const newStudent = await User.create({
-      name,
-      surname,
-      studentId,
-      grade,
-      campus,
-      section,
-      role: 'student',
-      classGroup,
-    })
+    const { name, surname, studentId, grade, section, campus, classGroup, email, password } = req.body
+    const newStudent = await User.register(
+      new User({ name, surname, email, studentId, grade, campus, section, role: 'student', classGroup }),
+      password
+    )
     res.send(newStudent)
   } catch (error) {
     res.status(500).send({ error: error.message })

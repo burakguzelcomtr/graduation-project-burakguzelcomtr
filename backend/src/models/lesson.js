@@ -15,10 +15,15 @@ const lessonSchema = new mongoose.Schema({
       ref: 'ClassGroup',
       autopopulate: {
         maxDepth: 2,
-        select: 'grade section campus teacher',
+        select: 'grade section campus',
       },
     },
   ],
+  type: {
+    type: String,
+    enum: ['main', 'premun'],
+    default: 'main',
+  },
   order: {
     type: Number,
   },
