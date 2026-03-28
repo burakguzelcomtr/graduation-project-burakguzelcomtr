@@ -1,0 +1,32 @@
+services:
+  api:
+    image: learnpass-api
+    build:
+      context: backend
+      dockerfile: Dockerfile
+    depends_on:
+      - mongodb
+    ports:
+      - 3000:3000
+    volumes:
+      - ./backend/src:/app/src
+    env_file:
+      - backend/.env
+  frontend:
+    image: learnpass-frontend
+    build:
+      context: frontend
+      dockerfile: Dockerfile
+    ports:
+      - 5173:5173
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public 
+
+  mongodb:
+    image: mongo
+    ports:
+      - 27017:27017
+    volumes:
+      - ./data:/data/db 
+    command: mongod --quiet

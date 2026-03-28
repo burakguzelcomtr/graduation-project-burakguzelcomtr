@@ -1,0 +1,169 @@
+<script setup>
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+
+const router = useRouter()
+const auth = useAuthStore()
+
+const email = ref('')
+const password = ref('')
+const error = ref('')
+const loading = ref(false)
+
+async function handleLogin() {
+  error.value = ''
+  loading.value = true
+  try {
+    await auth.login(email.value, password.value)
+    router.push('/dashboard')
+  } catch (e) {
+    error.value = e.message
+  } finally {
+    loading.value = false
+  }
+}
+</script>
+
+<template lang="pug">
+.lp-login
+  .lp-login__card
+    .lp-login__logo
+      span.lp-login__logo-icon 🌍
+      span.lp-login__logo-name LearnPass
+
+    form(@submit.prevent="handleLogin")
+      .lp-login__field
+        label Email Address
+        input(v-model="email" type="email" placeholder="your-email@learnpass.com" required)
+      .lp-login__field
+        label Password
+        input(v-model="password" type="password" placeholder="***************" required)
+
+      p.lp-login__error(v-if="error") {{ error }}
+
+      button.lp-login__submit(type="submit" :disabled="loading") {{ loading ? 'Signing in...' : 'Log In' }}
+
+    router-link.lp-login__back(to="/") ← Back to home
+</template>
+
+<style lang="scss" scoped>
+.lp-login {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem;
+  background: #0d2044;
+  font-family: 'Fredoka', sans-serif;
+
+  &__card {
+    width: 100%;
+    max-width: 480px;
+    padding: 2.8rem 3rem;
+    border: 2px solid #e07b39;
+    border-radius: 16px;
+    background: #fff8f0;
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.35);
+  }
+
+  &__logo {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 0.3rem;
+    margin-bottom: 2rem;
+  }
+
+  &__logo-icon {
+    font-size: 3.5rem;
+  }
+
+  &__logo-name {
+    color: #c05c1a;
+    font-size: 1.8rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1.2rem;
+
+    label {
+      margin-bottom: 0.4rem;
+      color: #e07b39;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    input {
+      padding: 0.75rem 1rem;
+      border: 1.5px dashed #e07b39;
+      border-radius: 6px;
+      outline: none;
+      background: #eef2ff;
+      color: #1a202c;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 1rem;
+      transition: border-color 0.2s, background 0.2s;
+
+      &:focus {
+        border-style: solid;
+        border-color: #c05c1a;
+        background: #e8ecff;
+      }
+
+      &::placeholder {
+        color: #a0aec0;
+      }
+    }
+  }
+
+  &__error {
+    margin: -0.4rem 0 0.8rem;
+    color: #c53030;
+    font-size: 0.9rem;
+  }
+
+  &__submit {
+    width: 100%;
+    margin-top: 0.4rem;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 8px;
+    background: #c05c1a;
+    color: #fff;
+    font-family: 'Fredoka', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+
+    &:hover:not(:disabled) {
+      background: #a04a12;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+  }
+
+  &__back {
+    display: block;
+    margin-top: 1.4rem;
+    color: #c05c1a;
+    font-size: 0.9rem;
+    text-align: center;
+    text-decoration: none;
+    opacity: 0.8;
+
+    &:hover {
+      opacity: 1;
+      text-decoration: underline;
+    }
+  }
+}
+</style>

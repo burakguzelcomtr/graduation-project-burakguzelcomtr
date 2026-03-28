@@ -1,0 +1,10 @@
+extends layout
+
+block content
+    h1 Lessons List
+    if lessons && lessons.length
+        ul
+            each l in lessons
+                li #{l.title} — Grade: #{l.grade}
+    else
+        p No lessons found.

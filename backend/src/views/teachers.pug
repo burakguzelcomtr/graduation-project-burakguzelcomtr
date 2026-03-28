@@ -1,0 +1,10 @@
+extends layout
+
+block content
+    h1 Teachers List
+    if teachers && teachers.length
+        ul
+            each t in teachers
+                li #{t.name} #{t.surname} — Grade: #{t.grade} / Section: #{t.section}
+    else
+        p No teachers found.

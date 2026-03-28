@@ -1,0 +1,46 @@
+{
+	"name": "template-node",
+	"version": "0.0.0",
+	"private": true,
+	"description": "Node + PlantUML Starter Template",
+	"license": "MIT",
+	"scripts": {
+		"start": "node ./bin/www",
+		"dev": "nodemon ./bin/www",
+		"devIndex": "nodemon src/index.js",
+		"eslint:check": "npx eslint .",
+		"eslint:fix": "npx eslint --fix .",
+		"test": "jest",
+		"test:watch": "jest --watchAll",
+		"test:coverage": "jest --coverage --runInBand"
+	},
+	"devDependencies": {
+		"eslint": "^8.19.0",
+		"eslint-config-airbnb-base": "^15.0.0",
+		"eslint-config-prettier": "^8.5.0",
+		"eslint-plugin-import": "^2.26.0",
+		"eslint-plugin-prettier": "^4.2.1",
+		"jest": "^30.3.0",
+		"nodemon": "^3.1.14",
+		"prettier": "^2.7.1",
+		"supertest": "^7.2.2"
+	},
+	"dependencies": {
+		"axios": "^1.13.5",
+		"connect-mongo": "^6.0.0",
+		"cookie-parser": "~1.4.4",
+		"cors": "^2.8.6",
+		"debug": "~2.6.9",
+		"dotenv": "^17.3.1",
+		"express": "^4.22.1",
+		"express-session": "^1.19.0",
+		"http-errors": "~1.6.3",
+		"mongoose": "^9.2.1",
+		"mongoose-autopopulate": "^1.2.1",
+		"morgan": "^1.10.1",
+		"passport": "^0.7.0",
+		"passport-local-mongoose": "^9.0.1",
+		"pug": "^2.0.4",
+		"uuid": "^13.0.0"
+	}
+}
