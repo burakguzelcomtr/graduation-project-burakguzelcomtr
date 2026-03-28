@@ -195,7 +195,7 @@ const avatarText = computed(() => `${props.user?.name?.[0] ?? ''}${props.user?.s
 
   &__box-label { 
     color: $primary;
-    font-size: 21px;
+    font-size: 16px;
     font-weight: 700;
     letter-spacing: 0.04em;
     text-transform: uppercase;
