@@ -133,13 +133,14 @@ nav.lp-sidebar(:class="{ 'lp-sidebar--collapsed': collapsed }")
   &__link {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 12px;
     overflow: hidden;
-    padding: 0.55rem 0.7rem;
+    padding: 12px 16px;
     border-radius: 8px;
     color: #4a5568;
-    font-size: 0.92rem;
-    font-weight: 500;
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: .5px;
     text-decoration: none;
     transition: background 0.15s, color 0.15s;
 
@@ -153,13 +154,13 @@ nav.lp-sidebar(:class="{ 'lp-sidebar--collapsed': collapsed }")
       border-left: 3px solid #b85e22;
       background: #de7534;
       color: #fff;
-      font-weight: 700;
+      font-weight: 600;
     }
   }
 
   &__icon {
-    width: 22px;
-    height: 22px;
+    width: 32px;
+    height: 36px;
     flex-shrink: 0;
   }
 
@@ -299,9 +300,8 @@ nav.lp-sidebar(:class="{ 'lp-sidebar--collapsed': collapsed }")
     .lp-sidebar__link {
       justify-content: center;
       gap: 0;
-
-      &--active {
-        padding-left: 0.55rem;
+      padding: 8px;
+      &--active { 
         border-left: none;
       }
     }

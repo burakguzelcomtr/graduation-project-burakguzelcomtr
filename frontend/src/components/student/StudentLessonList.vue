@@ -53,7 +53,7 @@ function getUnitActionModifier(unit) {
     .lp-lesson-list__header
       h3.lp-lesson-list__title {{ lessonTitle(lesson) }}
       span.lp-lesson-list__count {{ lessonUnitCount(lesson) }} units
-    p.lp-lesson-list__empty(v-if="!(lesson.units && lesson.units.length)") No units have been added to this lesson yet.
+    p.lp-lesson-list__empty(v-if="!(lesson.units && lesson.units.length)") No units found in this lesson.
     .lp-lesson-list__items(v-else)
       .lp-lesson-list__item(
         v-for="(unit, unitIndex) in lesson.units"
@@ -63,7 +63,6 @@ function getUnitActionModifier(unit) {
         .lp-lesson-list__num {{ getUnitNum(unit, unitIndex) }}
         .lp-lesson-list__info
           .lp-lesson-list__name {{ getUnitName(unit) }}
-          .lp-lesson-list__sub Unit {{ getUnitNum(unit, unitIndex) }}
           .lp-lesson-list__meta
             span.lp-lesson-list__status(:class="`lp-lesson-list__status--${getUnitStatusModifier(unit)}`") {{ getUnitStatus(unit) === 'completed' ? '✔ Completed' : '⬛ Not Started' }}
         button.lp-lesson-list__action(:class="`lp-lesson-list__action--${getUnitActionModifier(unit)}`") {{ getUnitStatus(unit) === 'completed' ? 'Review' : 'Start' }}

@@ -1,6 +1,9 @@
 <script setup>
 import { computed } from 'vue'
 import GradeLabel from '@/components/GradeLabel.vue'
+import IconUnits from '../icons/IconUnits.vue'
+import IconBook from '../icons/IconBook.vue'
+import IconBadge from '../icons/IconBadge.vue'
 
 const props = defineProps({
   user: {
@@ -49,19 +52,23 @@ const avatarText = computed(() => `${props.user?.name?.[0] ?? ''}${props.user?.s
 
   .lp-summary-card__boxes
     .lp-summary-card__box
-      .lp-summary-card__box-icon 📚
+      .lp-summary-card__box-icon
+        IconUnits
       .lp-summary-card__box-num {{ totalUnits }}
       .lp-summary-card__box-label TOTAL UNITS
     .lp-summary-card__box
-      .lp-summary-card__box-icon 📋
+      .lp-summary-card__box-icon
+        IconBook
       .lp-summary-card__box-num {{ completedUnits }}
       .lp-summary-card__box-label COMPLETED UNITS
     .lp-summary-card__box
-      .lp-summary-card__box-icon 🏅
+      .lp-summary-card__box-icon
+        IconBadge
       .lp-summary-card__box-num {{ badgesEarned }}
       .lp-summary-card__box-label BADGES EARNED
     .lp-summary-card__box
-      .lp-summary-card__box-icon ⭐
+      .lp-summary-card__box-icon
+        IconBadge
       .lp-summary-card__box-num {{ courseProgress }}%
       .lp-summary-card__box-label COURSE PROGRESS
 
@@ -82,10 +89,12 @@ const avatarText = computed(() => `${props.user?.name?.[0] ?? ''}${props.user?.s
 </template>
 
 <style lang="scss" scoped>
+@use '@/styles/variables' as *;
+
 .lp-summary-card {
   padding: 1.3rem 1.4rem;
   border-radius: 14px;
-  background: #fff;
+  background: $bg-card;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
 
   &__profile {
@@ -159,28 +168,34 @@ const avatarText = computed(() => `${props.user?.name?.[0] ?? ''}${props.user?.s
 
   &__box {
     padding: 0.9rem 0.75rem;
-    border: 1px solid #ffe0b2;
+    border: 1px dashed #ffe0b2;
     border-radius: 10px;
-    background: #fff3e0;
-    text-align: center;
+    background: $bg-yellow;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
   }
 
-  &__box-icon {
-    margin-bottom: 0.3rem;
-    font-size: 1.6rem;
+  &__box-icon { 
+    svg {
+      
+    width: 64px;
+    height: 64px;
+    }
   }
 
   &__box-num {
-    color: #de7534;
-    font-size: 1.4rem;
+    color: $text-dark;
+    font-size: 32px;
     font-weight: 800;
     line-height: 1;
   }
 
-  &__box-label {
-    margin-top: 0.2rem;
-    color: #de7534;
-    font-size: 0.62rem;
+  &__box-label { 
+    color: $primary;
+    font-size: 21px;
     font-weight: 700;
     letter-spacing: 0.04em;
     text-transform: uppercase;
@@ -188,7 +203,7 @@ const avatarText = computed(() => `${props.user?.name?.[0] ?? ''}${props.user?.s
 
   &__grade-title {
     margin: 0 0 0.7rem;
-    color: #de7534;
+    color: $primary;
     font-size: 1rem;
     font-weight: 700;
   }

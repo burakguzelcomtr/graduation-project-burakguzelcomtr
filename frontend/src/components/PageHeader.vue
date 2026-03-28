@@ -11,6 +11,7 @@ defineProps({
     h1.lp-page-header__title {{ title }}
     p.lp-page-header__subtitle(v-if="subtitle") {{ subtitle }}
   .lp-page-header__side(v-if="$slots.default")
+    img.animated_badge(src="/assets/img/students-width-baloons.svg" alt="Header decoration" width="160")
     slot
 </template>
 
@@ -68,6 +69,13 @@ defineProps({
 
   &__side {
     flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    .animated_badge { animation:
+      lp-header-slide-up 700ms cubic-bezier(.22, .9, .35, 1) 150ms forwards,
+      lp-header-float-side2 24600ms ease-in-out 900ms infinite;
+    }
   }
 }
 
@@ -90,6 +98,26 @@ defineProps({
 
   50% {
     transform: translateY(0) translateX(15px);
+  }
+
+  100% {
+    transform: translateY(0) translateX(0);
+  }
+}
+
+@keyframes lp-header-float-side2 {
+  0% {
+    transform: translateY(0) translateX(0);
+  }
+
+  25% {
+    transform: translateY(5px) translateX(18px);
+  }
+  50% {
+    transform: translateY(0) translateX(0);
+  }
+  75% {
+    transform: translateY(-5px) translateX(18px);
   }
 
   100% {
