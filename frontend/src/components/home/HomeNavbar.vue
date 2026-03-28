@@ -10,10 +10,10 @@ header.lp-home-nav
     .container
         .row
             .col-6
-        span.lp-home-nav__brand-icon 🌍
-        span.lp-home-nav__brand-name LearnPass
+              span.lp-home-nav__brand-icon 🌍
+              span.lp-home-nav__brand-name LearnPass
             .col-6.text-end
-        button.lp-home-nav__login(@click="$emit('loginClick')") {{ loggedIn ? 'Go to Dashboard' : 'Login' }} →
+              button.lp-home-nav__login(@click="$emit('loginClick')") {{ loggedIn ? 'Go to Dashboard' : 'Login' }} →
 </template>
 
 <style lang="scss" scoped>
@@ -21,7 +21,9 @@ header.lp-home-nav
 
 .lp-home-nav {
   position: absolute;
-  top: 0; left: 0; right: 0;
+  top: 0;
+  left: 0;
+  right: 0;
   z-index: 10;
   display: flex;
   align-items: center;

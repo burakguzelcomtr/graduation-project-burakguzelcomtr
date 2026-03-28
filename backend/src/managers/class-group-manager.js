@@ -1,5 +1,4 @@
 const ClassGroup = require('../models/class-group')
-const User = require('../models/user')
 
 class ClassGroupManager {
   static async getClassGroups() {
@@ -24,17 +23,6 @@ class ClassGroupManager {
       throw error
     }
     return ClassGroup.create({ grade, section, campus })
-  }
-
-  static async getStudentsInClassGroup(classGroupId) {
-    await this.getClassGroupById(classGroupId)
-
-    return User.find({
-      classGroup: classGroupId,
-      role: 'student',
-    })
-      .setOptions({ autopopulate: false })
-      .select('-classGroup')
   }
 }
 

@@ -3,59 +3,6 @@ const ClassGroup = require('../models/class-group')
 const Unit = require('../models/unit')
 
 class LessonManager {
-  static buildLessonTypeFilter(type) {
-    if (!type) {
-      return null
-    }
-
-    if (type === 'main') {
-      return {
-        $or: [
-          { type: 'main' },
-          { lessonType: 'main' },
-          {
-            $and: [{ type: { $exists: false } }, { lessonType: { $exists: false } }],
-          },
-        ],
-      }
-    }
-
-    return {
-      $or: [{ type }, { lessonType: type }],
-    }
-  }
-
-  static async buildLessonFilter({ classGroupId, type } = {}) {
-    const filters = []
-    const typeFilter = this.buildLessonTypeFilter(type)
-
-    if (typeFilter) {
-      filters.push(typeFilter)
-    }
-
-    if (classGroupId) {
-      const classGroup = await ClassGroup.findById(classGroupId).select('grade')
-
-      if (classGroup?.grade != null) {
-        filters.push({
-          $or: [{ classGroups: classGroupId }, { grade: classGroup.grade }],
-        })
-      } else {
-        filters.push({ classGroups: classGroupId })
-      }
-    }
-
-    if (filters.length === 0) {
-      return {}
-    }
-
-    if (filters.length === 1) {
-      return filters[0]
-    }
-
-    return { $and: filters }
-  }
-
   static async getLessonById(lessonId) {
     const lesson = await Lesson.findById(lessonId)
     if (!lesson) {
@@ -80,8 +27,38 @@ class LessonManager {
   }
 
   static async getLessons({ classGroupId, type } = {}) {
-    const filter = await this.buildLessonFilter({ classGroupId, type })
-    return Lesson.find(filter).sort({ order: 1, createdAt: 1 })
+    const filters = []
+
+    if (type) {
+      filters.push({ type })
+    }
+
+    if (classGroupId) {
+      const classGroup = await ClassGroup.findById(classGroupId).select('grade')
+
+      if (classGroup?.grade != null) {
+        filters.push({
+          $or: [{ classGroups: classGroupId }, { grade: classGroup.grade }],
+        })
+      } else {
+        filters.push({ classGroups: classGroupId })
+      }
+    }
+
+    if (filters.length === 0) {
+      return Lesson.find().sort({ order: 1, createdAt: 1 })
+    }
+
+    if (filters.length === 1) {
+      return Lesson.find(filters[0]).sort({ order: 1, createdAt: 1 })
+    }
+
+    return Lesson.find({ $and: filters }).sort({ order: 1, createdAt: 1 })
+  }
+
+  static async getLessonsWithUnits({ classGroupId, type } = {}) {
+    const lessons = await this.getLessons({ classGroupId, type })
+    return Promise.all(lessons.map(lesson => this.buildLessonWithUnits(lesson)))
   }
 
   static async createLesson({ title, description, classGroups = [], type = 'main', order }) {
@@ -119,16 +96,6 @@ class LessonManager {
 
   static async getLessonsByClassGroup({ classGroupId, type } = {}) {
     return this.getLessons({ classGroupId, type })
-  }
-
-  static async getLessonsWithUnits({ classGroupId, type } = {}) {
-    const lessons = await this.getLessons({ classGroupId, type })
-    return Promise.all(lessons.map(lesson => this.buildLessonWithUnits(lesson)))
-  }
-
-  static async getLessonsWithUnitsByClassGroup({ classGroupId, type } = {}) {
-    const lessons = await this.getLessonsByClassGroup({ classGroupId, type })
-    return Promise.all(lessons.map(lesson => this.buildLessonWithUnits(lesson)))
   }
 
   static async assignUnitToLesson({ lessonId, unitId, order = null }) {

@@ -9,14 +9,14 @@ defineEmits(['loginClick'])
 section.lp-home-hero
     .container
         .row
-      .lp-home-hero__overlay.col-12
-      .lp-home-hero__content.col-12.mx-auto
-                h1
-                    Your Passport to
-                    br
-                    a Better World.
-                p  Through engaging tasks and unique English diplomacy courses, LearnPass teaches primary students to find their voice, solve global issues, and build a brighter future. 
-        button.lp-home-hero__button(@click="$emit('loginClick')") {{ loggedIn ? 'Go to Dashboard' : 'Login' }} →
+          .lp-home-hero__overlay.col-12
+          .lp-home-hero__content.col-12.mx-auto
+            h1
+                Your Passport to
+                br
+                a Better World.
+            p  Through engaging tasks and unique English diplomacy courses, LearnPass teaches primary students to find their voice, solve global issues, and build a brighter future. 
+            button.lp-home-hero__button(@click="$emit('loginClick')") {{ loggedIn ? 'Go to Dashboard' : 'Login' }} →
 </template>
 
 <style lang="scss" scoped>
@@ -44,7 +44,7 @@ section.lp-home-hero
     max-width: 680px;
     padding: 0 1.5rem;
 
-   
+
 
     p {
       font-size: 1rem;
@@ -65,7 +65,9 @@ section.lp-home-hero
     cursor: pointer;
     transition: opacity 0.2s;
 
-    &:hover { opacity: 0.9; }
+    &:hover {
+      opacity: 0.9;
+    }
   }
 }
 </style>
