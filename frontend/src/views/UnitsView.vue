@@ -62,7 +62,7 @@ const currentLesson = computed(() => lessonCards.value[0]?.units?.[0]?.title ?? 
     .lp-units-view__empty(v-if="!lessonCards.length")
       p No lessons have been assigned to your class yet.
 
-    StudentLessonList(v-else :lesson-cards="lessonCards")
+    StudentLessonList(v-else :lesson-cards="lessonCards" lesson-route-name="lesson-detail")
 </template>
 
 <style lang="scss" scoped>

@@ -4,7 +4,8 @@ import api from '@/lib/api'
 export const useLessonsStore = defineStore('lessons', {
   state: () => ({
     mainLessons: {},
-    premunLessons: {}
+    premunLessons: {},
+    lesson: null
   }),
 
   actions: {
@@ -44,6 +45,19 @@ export const useLessonsStore = defineStore('lessons', {
 
       this.premunLessons[classGroupId] = res.data ?? []
       return this.premunLessons[classGroupId]
+    },
+
+    async getLessonById(lessonId) {
+      if (!lessonId) return null
+
+      const res = await api.get(`/lessons/${lessonId}`, {
+        params: {
+          withUnits: 'true'
+        }
+      })
+
+      this.lesson = res.data ?? null
+      return this.lesson
     },
 
     resetCache() {

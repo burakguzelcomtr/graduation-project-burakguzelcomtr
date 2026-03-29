@@ -13,7 +13,13 @@ class LessonManager {
     return lesson
   }
 
-  static async buildLessonWithUnits(lesson) {
+  static async getLessonWithUnits(lessonOrId) {
+    let lesson = lessonOrId
+
+    if (typeof lessonOrId?.toObject !== 'function') {
+      lesson = await this.getLessonById(lessonOrId)
+    }
+
     const units = await Unit.find({ lesson: lesson.id }).sort({ order: 1, createdAt: 1 })
     return {
       ...lesson.toObject(),
@@ -21,9 +27,9 @@ class LessonManager {
     }
   }
 
-  static async getLessonWithUnits(lessonId) {
-    const lesson = await this.getLessonById(lessonId)
-    return this.buildLessonWithUnits(lesson)
+  static async getLessonsWithUnits({ classGroupId, type = 'main' } = {}) {
+    const lessons = await this.getLessons({ classGroupId, type })
+    return Promise.all(lessons.map(lesson => this.getLessonWithUnits(lesson)))
   }
 
   static async getLessons({ classGroupId, type } = {}) {
@@ -54,11 +60,6 @@ class LessonManager {
     }
 
     return Lesson.find({ $and: filters }).sort({ order: 1, createdAt: 1 })
-  }
-
-  static async getLessonsWithUnits({ classGroupId, type } = {}) {
-    const lessons = await this.getLessons({ classGroupId, type })
-    return Promise.all(lessons.map(lesson => this.buildLessonWithUnits(lesson)))
   }
 
   static async createLesson({ title, description, classGroups = [], type = 'main', order }) {
@@ -92,10 +93,6 @@ class LessonManager {
   static async getUnitsByLesson({ lessonId }) {
     await this.getLessonById(lessonId)
     return Unit.find({ lesson: lessonId }).sort({ order: 1, createdAt: 1 })
-  }
-
-  static async getLessonsByClassGroup({ classGroupId, type } = {}) {
-    return this.getLessons({ classGroupId, type })
   }
 
   static async assignUnitToLesson({ lessonId, unitId, order = null }) {

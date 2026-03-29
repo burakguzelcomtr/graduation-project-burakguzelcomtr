@@ -31,6 +31,20 @@ router.get('/:id', async (req, res) => {
   }
 })
 
+// GET teacher by class group
+router.get('/class-group/:classGroupId', async (req, res) => {
+  try {
+    const { classGroupId } = req.params
+    const teacher = await User.find({ classGroup: classGroupId, role: 'teacher' })
+    if (!teacher || teacher.length === 0) {
+      return res.status(404).send({ error: 'No teachers found for this class group' })
+    }
+    res.send(teacher)
+  } catch (error) {
+    res.status(500).send({ error: error.message })
+  }
+})
+
 /* POST create a new teacher. */
 router.post('/', async (req, res) => {
   try {

@@ -4,6 +4,10 @@ defineProps({
     type: Array,
     default: () => [],
   },
+  lessonRouteName: {
+    type: String,
+    default: '',
+  },
 })
 
 // Helpers to support both the previously-mapped shape and the raw API lesson/unit objects
@@ -15,8 +19,12 @@ function lessonUnitCount(lesson) {
   return (lesson.units ?? []).length
 }
 
+function getLessonId(lesson, lessonIndex) {
+  return lesson._id ?? `lesson-${lessonIndex}`
+}
+
 function getUnitId(unit, lesson, unitIndex) {
-  return unit._id ?? unit.id ?? `${lesson._id ?? lesson.id ?? lesson.title ?? 'lesson'}-${unitIndex}`
+  return unit._id ?? `${lesson._id ?? 'lesson'}-${unitIndex}`
 }
 
 function getUnitName(unit) {
@@ -48,10 +56,14 @@ function getUnitActionModifier(unit) {
 .lp-lesson-list
   .lp-lesson-list__card(
     v-for="(lesson, lessonIndex) in lessonCards"
-    :key="lesson._id ?? lesson.id ?? `lesson-${lessonIndex}`"
+    :key="lesson._id ?? `lesson-${lessonIndex}`"
   )
     .lp-lesson-list__header
-      h3.lp-lesson-list__title {{ lessonTitle(lesson) }}
+      router-link.lp-lesson-list__title.lp-lesson-list__title--link(
+        v-if="lessonRouteName"
+        :to="{ name: lessonRouteName, params: { lessonId: getLessonId(lesson, lessonIndex) } }"
+      ) {{ lessonTitle(lesson) }}
+      h3.lp-lesson-list__title(v-else) {{ lessonTitle(lesson) }}
       span.lp-lesson-list__count {{ lessonUnitCount(lesson) }} units
     p.lp-lesson-list__empty(v-if="!(lesson.units && lesson.units.length)") No units found in this lesson.
     .lp-lesson-list__items(v-else)
@@ -93,6 +105,14 @@ function getUnitActionModifier(unit) {
     color: #de7534;
     font-size: 1.05rem;
     font-weight: 700;
+
+    &--link {
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
   }
 
   &__count {

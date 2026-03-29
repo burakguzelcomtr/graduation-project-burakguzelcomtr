@@ -25,17 +25,6 @@ router.get('/:id', async (req, res) => {
   }
 })
 
-/* Get students in a class group. */
-router.get('/:id/students', async (req, res) => {
-  try {
-    const { id } = req.params
-    const students = await ClassGroupManager.getStudentsInClassGroup(id)
-    res.send(students)
-  } catch (error) {
-    res.status(error.status || 500).send({ error: error.message })
-  }
-})
-
 /* POST create a new class group. */
 router.post('/', async (req, res) => {
   try {

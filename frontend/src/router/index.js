@@ -27,6 +27,12 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: '/lesson/:lessonId',
+      name: 'lesson-detail',
+      component: () => import('../views/LessonDetailView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
       path: '/premun',
       name: 'premun',
       component: () => import('../views/PremunHub.vue'),

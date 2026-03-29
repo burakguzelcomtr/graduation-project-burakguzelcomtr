@@ -2,6 +2,7 @@
 defineProps({
   title: { type: String, required: true },
   subtitle: { type: String, default: '' },
+  showDecoration: { type: Boolean, default: true },
 })
 </script>
 
@@ -10,8 +11,10 @@ defineProps({
   .lp-page-header__main
     h1.lp-page-header__title {{ title }}
     p.lp-page-header__subtitle(v-if="subtitle") {{ subtitle }}
+    .lp-page-header__meta(v-if="$slots.meta")
+      slot(name="meta")
   .lp-page-header__side(v-if="$slots.default")
-    img.animated_badge(src="/assets/img/students-width-baloons.svg" alt="Header decoration" width="160")
+    img.animated_badge(v-if="showDecoration" src="/assets/img/students-width-baloons.svg" alt="Header decoration" width="160")
     slot
 </template>
 
@@ -65,6 +68,10 @@ defineProps({
     margin: 0.35rem 0 0;
     color: #fff;
     font-size: 0.92rem;
+  }
+
+  &__meta {
+    margin-top: 1rem;
   }
 
   &__side {
