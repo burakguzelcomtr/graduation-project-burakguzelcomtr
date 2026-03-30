@@ -7,6 +7,7 @@ const User = require('../models/user')
 /* GET student listing. */
 router.get('/', async (req, res) => {
   try {
+    // TODO: Implement pagination and filtering by class group
     const students = await User.find({ role: 'student' })
     res.send(students)
   } catch (error) {

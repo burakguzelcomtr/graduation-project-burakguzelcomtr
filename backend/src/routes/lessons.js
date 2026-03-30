@@ -12,14 +12,10 @@ const LessonMaterialManager = require('../managers/lesson-material-manager')
 */
 router.get('/', async (req, res) => {
   try {
-    const { classGroupId, withUnits, type } = req.query
+    const { classGroupId, withUnits, type = 'main' } = req.query
     let lessons = []
 
-    if (withUnits === 'true') {
-      lessons = await LessonManager.getLessonsWithUnits({ classGroupId, type })
-    } else {
-      lessons = await LessonManager.getLessons({ classGroupId, type })
-    }
+    lessons = await LessonManager.getLessons({ classGroupId, type, withUnits })
 
     return res.send(lessons)
   } catch (error) {
@@ -42,11 +38,8 @@ router.post('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params
-    if (req.query.withUnits === 'true') {
-      const lesson = await LessonManager.getLessonWithUnits(id)
-      return res.send(lesson)
-    }
-    const lesson = await LessonManager.getLessonById(id)
+    const { withUnits } = req.query
+    const lesson = await LessonManager.getLessonById({ id, withUnits })
     return res.send(lesson)
   } catch (error) {
     return res.status(error.status || 500).send({ error: error.message })
@@ -67,6 +60,7 @@ router.post('/:lessonId/units', async (req, res) => {
 
 router.post('/:lessonId/units/:unitId/lesson-materials', async (req, res) => {
   try {
+    // TODO : express params
     const { lessonId, unitId } = req.params
     const { lessonMaterialId, order } = req.body
     const unit = await LessonMaterialManager.assignLessonMaterialToUnit({

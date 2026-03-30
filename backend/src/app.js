@@ -21,7 +21,6 @@ const lessonsRouter = require('./routes/lessons')
 const unitsRouter = require('./routes/units')
 const classGroupsRouter = require('./routes/class-groups')
 const lessonMaterialsRouter = require('./routes/lesson-materials')
- 
 
 // use static authenticate method of model in LocalStrategy
 passport.use(User.createStrategy())

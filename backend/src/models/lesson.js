@@ -1,41 +1,37 @@
 const mongoose = require('mongoose')
 const autopopulate = require('mongoose-autopopulate')
 
-const lessonSchema = new mongoose.Schema({
-  title: {
-    type: String,
-    required: true,
-  },
-  description: {
-    type: String,
-  },
-  classGroups: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'ClassGroup',
-      autopopulate: {
-        maxDepth: 2,
-        select: 'grade section campus',
-      },
+const lessonSchema = new mongoose.Schema(
+  {
+    title: {
+      type: String,
+      required: true,
     },
-  ],
-  type: {
-    type: String,
-    enum: ['main', 'premun'],
-    default: 'main',
+    description: {
+      type: String,
+    },
+    classGroups: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'ClassGroup',
+        autopopulate: {
+          maxDepth: 2,
+          select: 'grade section campus',
+        },
+      },
+      // TODO : add index for classGroups to optimize queries filtering by class group, e.g. find lessons for a specific campus-grade-section combination. Use recht.
+    ],
+    type: {
+      type: String,
+      enum: ['main', 'premun'],
+      default: 'main',
+    },
+    order: {
+      type: Number,
+    },
   },
-  order: {
-    type: Number,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now,
-  },
-})
+  { timestamps: true }
+)
 
 lessonSchema.plugin(autopopulate)
 

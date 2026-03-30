@@ -1,4 +1,5 @@
 const express = require('express')
+const createError = require('http-errors')
 
 const router = express.Router()
 
@@ -10,7 +11,7 @@ router.get('/', async (req, res) => {
     const classGroups = await ClassGroupManager.getClassGroups()
     res.send(classGroups)
   } catch (error) {
-    res.status(500).send({ error: error.message })
+    throw createError.InternalServerError(error.message)
   }
 })
 
@@ -19,9 +20,12 @@ router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params
     const classGroup = await ClassGroupManager.getClassGroupById(id)
-    return res.send(classGroup)
+    if (!classGroup) {
+      throw createError.NotFound('Class group not found')
+    }
+    res.send(classGroup)
   } catch (error) {
-    return res.status(error.status || 500).send({ error: error.message })
+    throw createError.InternalServerError(error.message)
   }
 })
 
@@ -29,12 +33,39 @@ router.get('/:id', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     const { grade, section, campus } = req.body
+    if (!grade || !section || !campus) {
+      throw createError.BadRequest('Grade, section and campus are required to create a class group')
+    }
     const classGroup = await ClassGroupManager.createClassGroup({ grade, section, campus })
-    return res.send(classGroup)
+    res.send(classGroup)
   } catch (error) {
-    return res
-      .status(error.status || 500)
-      .send({ error: error.message, campus: req.body.campus, grade: req.body.grade, section: req.body.section })
+    throw createError.InternalServerError(error.message)
+  }
+})
+
+/* DELETE a class group. */
+router.delete('/:id', async (req, res) => {
+  try {
+    const { id } = req.params
+    await ClassGroupManager.deleteClassGroup(id)
+    res.sendStatus(200)
+  } catch (error) {
+    throw createError.InternalServerError(error.message)
+  }
+})
+
+/* UPDATE a class group. */
+router.patch('/:id', async (req, res) => {
+  try {
+    const { id } = req.params
+    const { grade, section, campus } = req.body
+    if (!grade && !section && !campus) {
+      throw createError.BadRequest('At least one of grade, section or campus must be provided for update')
+    }
+    const updatedClassGroup = await ClassGroupManager.updateClassGroup(id, { grade, section, campus })
+    res.send(updatedClassGroup)
+  } catch (error) {
+    throw createError.InternalServerError(error.message)
   }
 })
 

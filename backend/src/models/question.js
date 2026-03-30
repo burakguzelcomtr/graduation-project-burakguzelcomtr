@@ -1,45 +1,37 @@
 const mongoose = require('mongoose')
 const autopopulate = require('mongoose-autopopulate')
 
-const questionSchema = new mongoose.Schema({
-  question: {
-    type: String,
-    required: true,
-  },
-  quiz: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'LessonMaterial',
-    required: true,
-  },
-  answers: [
-    {
+const questionSchema = new mongoose.Schema(
+  {
+    question: {
       type: String,
       required: true,
     },
-  ],
-  correctAnswers: [
-    {
-      type: String,
+    quiz: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'LessonMaterial',
       required: true,
     },
-  ],
-  type: {
-    type: String,
-    required: true,
-    enum: ['multiple-choice', 'true-false', 'short-answer'],
+    answers: [
+      {
+        type: String,
+        required: true,
+      },
+    ],
+    correctAnswers: [
+      {
+        type: String,
+        required: true,
+      },
+    ],
+    type: {
+      type: String,
+      required: true,
+      enum: ['multiple-choice', 'true-false', 'short-answer'],
+    },
   },
-  order: {
-    type: Number,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now,
-  },
-})
+  { timestamps: true }
+)
 
 questionSchema.plugin(autopopulate)
 

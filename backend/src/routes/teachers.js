@@ -6,6 +6,7 @@ const User = require('../models/user')
 
 /* GET teacher listing. */
 router.get('/', async (req, res) => {
+  // TODO: Implement pagination and filtering by class group
   try {
     const teachers = await User.find({ role: 'teacher' })
     if (!teachers || teachers.length === 0) {
@@ -37,7 +38,7 @@ router.get('/class-group/:classGroupId', async (req, res) => {
     const { classGroupId } = req.params
     const teacher = await User.find({ classGroup: classGroupId, role: 'teacher' })
     if (!teacher || teacher.length === 0) {
-      return res.status(404).send({ error: 'No teachers found for this class group' })
+      res.status(404).send({ error: 'No teachers found for this class group' })
     }
     res.send(teacher)
   } catch (error) {
