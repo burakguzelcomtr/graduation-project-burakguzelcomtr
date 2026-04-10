@@ -2,12 +2,12 @@ const User = require('../models/user')
 
 class UserManager {
   static async getStudents() {
-    const users = await User.find({ role: 'student' })
+    const users = await User.Student.find()
     return users
   }
 
   static async getTeachers() {
-    const users = await User.find({ role: 'teacher' })
+    const users = await User.Teacher.find()
     return users
   }
 }

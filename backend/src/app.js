@@ -11,7 +11,7 @@ const MongoStore = require('connect-mongo').default
 require('./database-connection')
 
 const passport = require('passport')
-const User = require('./models/user')
+const Account = require('./models/account')
 
 const indexRouter = require('./routes/index')
 const studentsRouter = require('./routes/students')
@@ -23,11 +23,11 @@ const classGroupsRouter = require('./routes/class-groups')
 const lessonMaterialsRouter = require('./routes/lesson-materials')
 
 // use static authenticate method of model in LocalStrategy
-passport.use(User.createStrategy())
+passport.use(Account.createStrategy())
 
 // use static serialize and deserialize of model for passport session support
-passport.serializeUser(User.serializeUser())
-passport.deserializeUser(User.deserializeUser())
+passport.serializeUser(Account.serializeUser())
+passport.deserializeUser(Account.deserializeUser())
 
 const app = express()
 // view engine setup
