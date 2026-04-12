@@ -49,10 +49,10 @@ router.post('/', async (req, res) => {
   session.startTransaction()
   try {
     const { name, surname, studentId, grade, section, campus, classGroup, email, password } = req.body
-    const [newStudent] = await User.Student.create(
-      [{ name, surname, studentId, grade, campus, section, classGroup }],
-      { session }
-    )
+    const [newStudent] = await User.Student.create([{ name, surname, studentId, grade, campus, section, classGroup }], {
+      session,
+    })
+    // eslint-disable-next-line no-underscore-dangle
     const account = new Account({ email, user: newStudent._id })
     await account.setPassword(password)
     await account.save({ session })

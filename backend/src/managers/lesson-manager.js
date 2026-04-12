@@ -3,12 +3,15 @@ const ClassGroup = require('../models/class-group')
 const Unit = require('../models/unit')
 
 class LessonManager {
-  static async getLessonById(lessonId) {
+  static async getLessonById(lessonId, withUnits = false) {
     const lesson = await Lesson.findById(lessonId)
     if (!lesson) {
       const error = new Error('Lesson not found')
       error.status = 404
       throw error
+    }
+    if (withUnits) {
+      return this.getLessonWithUnits(lesson)
     }
     return lesson
   }
@@ -32,7 +35,7 @@ class LessonManager {
     return Promise.all(lessons.map(lesson => this.getLessonWithUnits(lesson)))
   }
 
-  static async getLessons({ classGroupId, type } = {}) {
+  static async getLessons({ classGroupId, type, withUnits = false } = {}) {
     const filters = []
 
     if (type) {
@@ -57,6 +60,10 @@ class LessonManager {
 
     if (filters.length === 1) {
       return Lesson.find(filters[0]).sort({ order: 1, createdAt: 1 })
+    }
+
+    if (withUnits) {
+      return this.getLessonsWithUnits({ classGroupId, type })
     }
 
     return Lesson.find({ $and: filters }).sort({ order: 1, createdAt: 1 })
@@ -88,6 +95,23 @@ class LessonManager {
     }
     const createdUnit = await Unit.create({ title, items })
     return createdUnit
+  }
+
+  static async updateUnit({ unitId, title, items }) {
+    const unit = await this.getUnitById(unitId)
+    if (!unit) {
+      const error = new Error('Unit not found')
+      error.status = 404
+      throw error
+    }
+    if (title) {
+      unit.title = title
+    }
+    if (items) {
+      unit.items = items
+    }
+    await unit.save()
+    return unit
   }
 
   static async getUnitsByLesson({ lessonId }) {

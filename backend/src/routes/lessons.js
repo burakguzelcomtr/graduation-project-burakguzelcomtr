@@ -38,8 +38,8 @@ router.post('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params
-    const { withUnits } = req.query
-    const lesson = await LessonManager.getLessonById({ id, withUnits })
+    const withUnits = req.query.withUnits === 'true'
+    const lesson = await LessonManager.getLessonById(id, withUnits)
     return res.send(lesson)
   } catch (error) {
     return res.status(error.status || 500).send({ error: error.message })

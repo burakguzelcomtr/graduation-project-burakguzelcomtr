@@ -38,7 +38,7 @@ const studentSchema = new mongoose.Schema({
   campus: {
     type: String,
     required: true,
-  }
+  },
 })
 
 const teacherSchema = new mongoose.Schema({
@@ -60,8 +60,6 @@ const teacherSchema = new mongoose.Schema({
 userSchema.index({ grade: 1, section: 1, campus: 1 }, { unique: true, partialFilterExpression: { role: 'teacher' } })
 
 const adminSchema = new mongoose.Schema({})
-
-
 
 const User = mongoose.model('User', userSchema)
 const Student = User.discriminator('student', studentSchema)
