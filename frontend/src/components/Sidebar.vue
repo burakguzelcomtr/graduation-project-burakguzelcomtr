@@ -3,9 +3,11 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { commonNavItems, studentNavItems, teacherNavItems } from '@/data/navItems.js'
+import { useUserStore } from '@/stores/user'
 
 const router = useRouter()
 const auth = useAuthStore()
+const user = useUserStore()
 const collapsed = ref(false)
 
 async function handleLogout() {
@@ -29,7 +31,7 @@ nav.lp-sidebar(:class="{ 'lp-sidebar--collapsed': collapsed }")
         span.lp-sidebar__label {{ item.label }}
       span.lp-sidebar__tooltip {{ item.label }}
 
-    template(v-if="auth.user?.role === 'student'")
+    template(v-if="user.profile?.role === 'student'")
       li.lp-sidebar__item(v-for="item in studentNavItems" :key="item.to")
         router-link.lp-sidebar__link(:to="item.to" active-class="lp-sidebar__link--active")
           component.lp-sidebar__icon(:is="item.icon" v-if="item.icon")
@@ -37,19 +39,20 @@ nav.lp-sidebar(:class="{ 'lp-sidebar--collapsed': collapsed }")
           span.lp-sidebar__label {{ item.label }}
         span.lp-sidebar__tooltip {{ item.label }}
 
-    template(v-if="auth.user?.role === 'teacher'")
+    template(v-if="user.profile?.role === 'teacher'")
       li.lp-sidebar__item(v-for="item in teacherNavItems" :key="item.to")
         router-link.lp-sidebar__link(:to="item.to" active-class="lp-sidebar__link--active")
-          span.lp-sidebar__emoji {{ item.emoji }}
+          component.lp-sidebar__icon(:is="item.icon" v-if="item.icon")
+          span.lp-sidebar__emoji(v-else) {{ item.emoji }}
           span.lp-sidebar__label {{ item.label }}
         span.lp-sidebar__tooltip {{ item.label }}
 
   .lp-sidebar__footer
-    .lp-sidebar__user(v-if="auth.user")
-      .lp-sidebar__avatar {{ auth.user.name?.[0] }}{{ auth.user.surname?.[0] }}
+    .lp-sidebar__user(v-if="user.profile")
+      .lp-sidebar__avatar {{ user.profile.name?.[0] }}{{ user.profile.surname?.[0] }}
       .lp-sidebar__user-info
-        .lp-sidebar__user-name {{ auth.user.name }} {{ auth.user.surname }}
-        .lp-sidebar__user-role {{ auth.user.role }}
+        .lp-sidebar__user-name {{ user.profile.name }} {{ user.profile.surname }}
+        .lp-sidebar__user-role {{ user.profile.role }}
     button.lp-sidebar__logout(@click="handleLogout") Sign Out
 </template>
 
@@ -58,7 +61,7 @@ nav.lp-sidebar(:class="{ 'lp-sidebar--collapsed': collapsed }")
   position: sticky;
   top: 0;
   display: flex;
-  width: 230px;
+  width: 260px;
   min-width: 230px;
   height: 100vh;
   flex-shrink: 0;

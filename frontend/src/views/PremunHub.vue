@@ -1,17 +1,17 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue'
-import { useAuthStore } from '@/stores/auth'
+import { computed, onMounted, ref } from 'vue' 
+import { useUserStore } from '@/stores/user'
 import { useLessonsStore } from '@/stores/lessons'
 import PageHeader from '@/components/PageHeader.vue'
 import StudentLessonList from '@/components/student/StudentLessonList.vue'
 import StudentProgressSummary from '@/components/student/StudentProgressSummary.vue'
-
-const auth = useAuthStore()
+ 
+const user = useUserStore()
 const lessonsStore = useLessonsStore()
 const badgesEarned = 0
 const loading = ref(false)
 
-const classGroupId = computed(() => auth.user?.classGroup?._id ?? auth.user?.classGroup ?? null)
+const classGroupId = computed(() => user.profile?.classGroup?._id ?? user.profile?.classGroup ?? null)
 
 onMounted(async () => {
   if (!classGroupId.value) {
@@ -59,7 +59,7 @@ const currentLesson = computed(() => mainLessonCards.value[0]?.units?.[0]?.title
 
   template(v-else)
     PageHeader(
-      title="PREMUN Hubx"
+      title="PREMUN Hub"
     )
       StudentProgressSummary(
         :current-lesson="currentLesson"

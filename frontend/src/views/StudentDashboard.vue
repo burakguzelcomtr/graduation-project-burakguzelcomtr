@@ -1,6 +1,6 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
-import { useAuthStore } from '@/stores/auth'
+import { useUserStore } from '@/stores/user'
 import { useLessonsStore } from '@/stores/lessons'
 
 import PageHeader from '@/components/PageHeader.vue'
@@ -9,12 +9,12 @@ import StudentLessonList from '@/components/student/StudentLessonList.vue'
 import StudentProgressSummary from '@/components/student/StudentProgressSummary.vue'
 import StudentSummaryCard from '@/components/student/StudentSummaryCard.vue'
 
-const auth = useAuthStore()
+const user = useUserStore()
 const lessonsStore = useLessonsStore()
 const badgesEarned = 0
 const loading = ref(false)
 
-const classGroupId = computed(() => auth.user?.classGroup ?? null)
+const classGroupId = computed(() => user.profile?.classGroup ?? null)
 
 onMounted(async () => {
 	if (!classGroupId.value) {
@@ -53,7 +53,7 @@ const courseProgress = computed(() => 0)
 
 	template(v-else)
 		PageHeader(
-			:title="`Welcome back\n${auth.user.name} ${auth.user.surname ?? ''}`"
+			:title="`Welcome back\n${user.profile.name} ${user.profile.surname ?? ''}`"
 		)
 			StudentProgressSummary(
 				:current-lesson="currentUnitData?.title ?? '—'"
@@ -73,7 +73,7 @@ const courseProgress = computed(() => 0)
 
 		.lp-student-dashboard__grid(v-else)
 			StudentSummaryCard(
-				:user="auth.user"
+				:user="user.profile"
 				:badges-earned="badgesEarned"
 				:total-units="totalUnits"
 				:completed-units="completedUnits"

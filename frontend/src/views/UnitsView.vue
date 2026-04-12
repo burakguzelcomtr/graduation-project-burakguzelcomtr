@@ -5,13 +5,15 @@ import { useLessonsStore } from '@/stores/lessons'
 import PageHeader from '@/components/PageHeader.vue'
 import StudentLessonList from '@/components/student/StudentLessonList.vue'
 import StudentProgressSummary from '@/components/student/StudentProgressSummary.vue'
+import { useUserStore } from '@/stores/user'
 
 const auth = useAuthStore()
+const user = useUserStore()
 const lessonsStore = useLessonsStore()
 const badgesEarned = 0
 const loading = ref(false)
 
-const classGroupId = computed(() => auth.user?.classGroup ?? null)
+const classGroupId = computed(() => user.profile?.classGroup ?? null)
 
 onMounted(async () => {
   if (!classGroupId.value) {

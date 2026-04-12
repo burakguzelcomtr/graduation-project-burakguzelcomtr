@@ -47,11 +47,14 @@ const router = createRouter({
   ],
 })
 
+let sessionFetched = false
+
 router.beforeEach(async (to) => {
   const auth = useAuthStore()
 
-  if (auth.user === null && to.meta.requiresAuth) {
+  if (!sessionFetched) {
     await auth.fetchSession()
+    sessionFetched = true
   }
 
   if (to.meta.requiresAuth && !auth.user) {

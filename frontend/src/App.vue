@@ -3,12 +3,16 @@ import { RouterView, useRoute } from 'vue-router'
 import { computed, onMounted } from 'vue'
 import Sidebar from './components/Sidebar.vue'
 import { useAuthStore } from '@/stores/auth'
+import { useUserStore } from '@/stores/user'
 
 const route = useRoute()
 const auth = useAuthStore()
+const userStore = useUserStore()
 const showSidebar = computed(() => route.path !== '/' && route.path !== '/login' && route.path !== '/404')
 
-onMounted(() => auth.fetchSession())
+onMounted(() => {
+  userStore.watchAuth()
+})
 </script>
 
 <template lang="pug">

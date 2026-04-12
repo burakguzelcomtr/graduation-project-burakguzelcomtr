@@ -25,7 +25,7 @@ defineProps({
             p.lp-lesson-units__meta {{ unit.items?.length ?? 0 }} lesson items
 
       .lp-lesson-units__body
-        p.lp-lesson-units__description {{ unit.description || 'No description has been added for this unit yet.' }}
+        p.lp-lesson-units__description {{ unit.description || '' }}
 
         .lp-lesson-units__items(v-if="unit.items?.length")
           .lp-lesson-units__row(
