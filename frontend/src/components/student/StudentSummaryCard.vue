@@ -50,27 +50,31 @@ const avatarText = computed(() => `${props.user?.name?.[0] ?? ''}${props.user?.s
       span.lp-summary-card__badges-num {{ badgesEarned }}
       span.lp-summary-card__badges-label BADGES
 
-  .lp-summary-card__boxes
-    .lp-summary-card__box
-      .lp-summary-card__box-icon
-        IconUnits
-      .lp-summary-card__box-num {{ totalUnits }}
-      .lp-summary-card__box-label TOTAL UNITS
-    .lp-summary-card__box
-      .lp-summary-card__box-icon
-        IconBook
-      .lp-summary-card__box-num {{ completedUnits }}
-      .lp-summary-card__box-label COMPLETED UNITS
-    .lp-summary-card__box
-      .lp-summary-card__box-icon
-        IconBadge
-      .lp-summary-card__box-num {{ badgesEarned }}
-      .lp-summary-card__box-label BADGES EARNED
-    .lp-summary-card__box
-      .lp-summary-card__box-icon
-        IconBadge
-      .lp-summary-card__box-num {{ courseProgress }}%
-      .lp-summary-card__box-label COURSE PROGRESS
+  .lp-summary-card__boxes.row
+    .lp-summary-card__box-col.col-6
+      .lp-summary-card__box
+        .lp-summary-card__box-icon
+          IconUnits
+        .lp-summary-card__box-num {{ totalUnits }}
+        .lp-summary-card__box-label TOTAL UNITS
+    .lp-summary-card__box-col.col-6
+      .lp-summary-card__box
+        .lp-summary-card__box-icon
+          IconBook
+        .lp-summary-card__box-num {{ completedUnits }}
+        .lp-summary-card__box-label COMPLETED UNITS
+    .lp-summary-card__box-col.col-6
+      .lp-summary-card__box
+        .lp-summary-card__box-icon
+          IconBadge
+        .lp-summary-card__box-num {{ badgesEarned }}
+        .lp-summary-card__box-label BADGES EARNED
+    .lp-summary-card__box-col.col-6
+      .lp-summary-card__box
+        .lp-summary-card__box-icon
+          IconBadge
+        .lp-summary-card__box-num {{ courseProgress }}%
+        .lp-summary-card__box-label COURSE PROGRESS
 
   .lp-summary-card__grade
     h4.lp-summary-card__grade-title
@@ -85,14 +89,14 @@ const avatarText = computed(() => `${props.user?.name?.[0] ?? ''}${props.user?.s
           span {{ completedUnits }} units completed
           span {{ totalUnits }} total units
       .lp-summary-card__grade-trophy 🏆
-    router-link.lp-summary-card__continue(:to="continueRoute") {{ continueLabel }}
+    router-link.lp-summary-card__continue.btn(:to="continueRoute") {{ continueLabel }}
 </template>
 
 <style lang="scss" scoped>
 @use '@/styles/variables' as *;
 
 .lp-summary-card {
-  padding: 1.3rem 1.4rem;
+  padding: 20.8px 22.4px;
   border-radius: 14px;
   background: $bg-card;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
@@ -100,8 +104,8 @@ const avatarText = computed(() => `${props.user?.name?.[0] ?? ''}${props.user?.s
   &__profile {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 1.2rem;
+    gap: 12px;
+    margin-bottom: 19.2px;
   }
 
   &__avatar {
@@ -114,7 +118,7 @@ const avatarText = computed(() => `${props.user?.name?.[0] ?? ''}${props.user?.s
     border-radius: 50%;
     background: #de7534;
     color: #fff;
-    font-size: 1rem;
+    font-size: 16px;
     font-weight: 700;
   }
 
@@ -124,13 +128,13 @@ const avatarText = computed(() => `${props.user?.name?.[0] ?? ''}${props.user?.s
 
   &__name {
     color: #2d3748;
-    font-size: 1rem;
+    font-size: 16px;
     font-weight: 700;
   }
 
   &__role {
     color: #a0aec0;
-    font-size: 0.75rem;
+    font-size: 12px;
   }
 
   &__badges {
@@ -147,27 +151,27 @@ const avatarText = computed(() => `${props.user?.name?.[0] ?? ''}${props.user?.s
 
   &__badges-num {
     color: #fff;
-    font-size: 1.1rem;
+    font-size: 17.6px;
     font-weight: 800;
     line-height: 1;
   }
 
   &__badges-label {
     color: #fff;
-    font-size: 0.5rem;
+    font-size: 8px;
     font-weight: 700;
     letter-spacing: 0.04em;
   }
 
   &__boxes {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.75rem;
-    margin-bottom: 1.2rem;
+    --bs-gutter-x: 12px;
+    --bs-gutter-y: 12px;
+    margin-bottom: 19.2px;
   }
 
   &__box {
-    padding: 0.9rem 0.75rem;
+    height: 100%;
+    padding: 14.4px 12px;
     border: 1px dashed #ffe0b2;
     border-radius: 10px;
     background: $bg-yellow;
@@ -202,18 +206,18 @@ const avatarText = computed(() => `${props.user?.name?.[0] ?? ''}${props.user?.s
   }
 
   &__grade-title {
-    margin: 0 0 0.7rem;
+    margin: 0 0 11.2px;
     color: $primary;
-    font-size: 1rem;
+    font-size: 16px;
     font-weight: 700;
   }
 
   &__grade-card {
     display: flex;
     align-items: center;
-    gap: 0.9rem;
-    margin-bottom: 1rem;
-    padding: 0.9rem 1rem;
+    gap: 14.4px;
+    margin-bottom: 16px;
+    padding: 14.4px 16px;
     border: 1px solid #ffe0b2;
     border-radius: 10px;
     background: #fff3e0;
@@ -232,7 +236,7 @@ const avatarText = computed(() => `${props.user?.name?.[0] ?? ''}${props.user?.s
 
   &__grade-percent {
     color: #fff;
-    font-size: 0.9rem;
+    font-size: 14.4px;
     font-weight: 800;
   }
 
@@ -243,7 +247,7 @@ const avatarText = computed(() => `${props.user?.name?.[0] ?? ''}${props.user?.s
   &__grade-bar-wrap {
     overflow: hidden;
     height: 8px;
-    margin-bottom: 0.4rem;
+    margin-bottom: 6.4px;
     border-radius: 99px;
     background: #ffd9b0;
   }
@@ -259,22 +263,22 @@ const avatarText = computed(() => `${props.user?.name?.[0] ?? ''}${props.user?.s
     display: flex;
     justify-content: space-between;
     color: #a0aec0;
-    font-size: 0.7rem;
+    font-size: 11.2px;
   }
 
   &__grade-trophy {
     flex-shrink: 0;
-    font-size: 1.6rem;
+    font-size: 25.6px;
   }
 
   &__continue {
     display: block;
     width: 100%;
-    padding: 0.7rem;
-    border-radius: 8px;
+    padding: 11.2px;
     background: #1a202c;
+    border-color: #1a202c;
     color: #fff;
-    font-size: 0.95rem;
+    font-size: 15.2px;
     font-weight: 700;
     text-align: center;
     text-decoration: none;

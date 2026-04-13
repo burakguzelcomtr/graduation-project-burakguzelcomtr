@@ -27,24 +27,27 @@ async function handleLogin() {
 
 <template lang="pug">
 .lp-login
-  .lp-login__card
-    .lp-login__logo
-      span.lp-login__logo-icon 🌍
-      span.lp-login__logo-name LearnPass
+  .container
+    .lp-login__row.row
+      .lp-login__col.col-12.col-md-10.col-lg-8.col-xl-6
+        .lp-login__card
+          .lp-login__logo
+            span.lp-login__logo-icon 🌍
+            span.lp-login__logo-name LearnPass
 
-    form(@submit.prevent="handleLogin")
-      .lp-login__field
-        label Email Address
-        input(v-model="email" type="email" placeholder="your-email@learnpass.com" required)
-      .lp-login__field
-        label Password
-        input(v-model="password" type="password" placeholder="***************" required)
+          form(@submit.prevent="handleLogin")
+            .lp-login__field
+              label Email Address
+              input(v-model="email" type="email" placeholder="your-email@learnpass.com" required)
+            .lp-login__field
+              label Password
+              input(v-model="password" type="password" placeholder="***************" required)
 
-      p.lp-login__error(v-if="error") {{ error }}
+            p.lp-login__error(v-if="error") {{ error }}
 
-      button.lp-login__submit(type="submit" :disabled="loading") {{ loading ? 'Signing in...' : 'Log In' }}
+            button.lp-login__submit.btn(type="submit" :disabled="loading") {{ loading ? 'Signing in...' : 'Log In' }}
 
-    router-link.lp-login__back(to="/") ← Back to home
+          router-link.lp-login__back(to="/") ← Back to home
 </template>
 
 <style lang="scss" scoped>
@@ -53,14 +56,18 @@ async function handleLogin() {
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  padding: 2rem;
+  padding: 32px 0;
   background: #0d2044;
   font-family: 'Fredoka', sans-serif;
+
+  &__row {
+    justify-content: center;
+  }
 
   &__card {
     width: 100%;
     max-width: 480px;
-    padding: 2.8rem 3rem;
+    padding: 44.8px 48px;
     border: 2px solid #e07b39;
     border-radius: 16px;
     background: #fff8f0;
@@ -71,17 +78,17 @@ async function handleLogin() {
     display: flex;
     align-items: center;
     flex-direction: column;
-    gap: 0.3rem;
-    margin-bottom: 2rem;
+    gap: 4.8px;
+    margin-bottom: 32px;
   }
 
   &__logo-icon {
-    font-size: 3.5rem;
+    font-size: 56px;
   }
 
   &__logo-name {
     color: #c05c1a;
-    font-size: 1.8rem;
+    font-size: 28.8px;
     font-weight: 600;
     letter-spacing: 1px;
   }
@@ -89,24 +96,24 @@ async function handleLogin() {
   &__field {
     display: flex;
     flex-direction: column;
-    margin-bottom: 1.2rem;
+    margin-bottom: 19.2px;
 
     label {
-      margin-bottom: 0.4rem;
+      margin-bottom: 6.4px;
       color: #e07b39;
-      font-size: 1rem;
+      font-size: 16px;
       font-weight: 600;
     }
 
     input {
-      padding: 0.75rem 1rem;
+      padding: 12px 16px;
       border: 1.5px dashed #e07b39;
       border-radius: 6px;
       outline: none;
       background: #eef2ff;
       color: #1a202c;
       font-family: 'Fredoka', sans-serif;
-      font-size: 1rem;
+      font-size: 16px;
       transition: border-color 0.2s, background 0.2s;
 
       &:focus {
@@ -122,21 +129,21 @@ async function handleLogin() {
   }
 
   &__error {
-    margin: -0.4rem 0 0.8rem;
+    margin: -6.4px 0 12.8px;
     color: #c53030;
-    font-size: 0.9rem;
+    font-size: 14.4px;
   }
 
   &__submit {
     width: 100%;
-    margin-top: 0.4rem;
-    padding: 0.75rem;
+    margin-top: 6.4px;
+    padding: 12px;
     border: none;
     border-radius: 8px;
     background: #c05c1a;
     color: #fff;
     font-family: 'Fredoka', sans-serif;
-    font-size: 1.1rem;
+    font-size: 17.6px;
     font-weight: 600;
     cursor: pointer;
     transition: background 0.2s;
@@ -153,9 +160,9 @@ async function handleLogin() {
 
   &__back {
     display: block;
-    margin-top: 1.4rem;
+    margin-top: 22.4px;
     color: #c05c1a;
-    font-size: 0.9rem;
+    font-size: 14.4px;
     text-align: center;
     text-decoration: none;
     opacity: 0.8;

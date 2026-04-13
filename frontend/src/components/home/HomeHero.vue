@@ -7,16 +7,17 @@ defineEmits(['loginClick'])
 
 <template lang="pug">
 section.lp-home-hero
+    .lp-home-hero__overlay
     .container
         .row
-          .lp-home-hero__overlay.col-12
-          .lp-home-hero__content.col-12.mx-auto
-            h1
-                Your Passport to
-                br
-                a Better World.
-            p  Through engaging tasks and unique English diplomacy courses, LearnPass teaches primary students to find their voice, solve global issues, and build a brighter future. 
-            button.lp-home-hero__button(@click="$emit('loginClick')") {{ loggedIn ? 'Go to Dashboard' : 'Login' }} →
+          .col-12.col-lg-10.col-xl-8
+            .lp-home-hero__content
+              h1
+                  Your Passport to
+                  br
+                  a Better World.
+              p  Through engaging tasks and unique English diplomacy courses, LearnPass teaches primary students to find their voice, solve global issues, and build a brighter future. 
+              button.lp-home-hero__button.btn(type="button" @click="$emit('loginClick')") {{ loggedIn ? 'Go to Dashboard' : 'Login' }} →
 </template>
 
 <style lang="scss" scoped>
@@ -42,15 +43,15 @@ section.lp-home-hero
     z-index: 1;
     color: #fff;
     max-width: 680px;
-    padding: 0 1.5rem;
+    padding: 0 24px;
 
 
 
     p {
-      font-size: 1rem;
+      font-size: 16px;
       opacity: 0.88;
       line-height: 1.6;
-      margin-bottom: 1.8rem;
+      margin-bottom: 28.8px;
     }
   }
 
@@ -58,9 +59,9 @@ section.lp-home-hero
     background: #fff;
     color: $text-dark;
     border: none;
-    padding: 0.7rem 2rem;
+    padding: 11.2px 32px;
     border-radius: 6px;
-    font-size: 1rem;
+    font-size: 16px;
     font-weight: 600;
     cursor: pointer;
     transition: opacity 0.2s;

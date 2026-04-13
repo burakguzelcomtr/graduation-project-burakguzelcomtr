@@ -1,6 +1,6 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
-import { useAuthStore } from '@/stores/auth'
+import { useUserStore } from '@/stores/user'
 import { useLessonsStore } from '@/stores/lessons'
 
 import PageHeader from '@/components/PageHeader.vue'
@@ -9,12 +9,12 @@ import StudentLessonList from '@/components/student/StudentLessonList.vue'
 import StudentProgressSummary from '@/components/student/StudentProgressSummary.vue'
 import StudentSummaryCard from '@/components/student/StudentSummaryCard.vue'
 
-const auth = useAuthStore()
+const user = useUserStore()
 const lessonsStore = useLessonsStore()
 const badgesEarned = 0
 const loading = ref(false)
 
-const classGroupId = computed(() => auth.user?.classGroup ?? null)
+const classGroupId = computed(() => user.profile?.classGroup ?? null)
 
 onMounted(async () => {
 	if (!classGroupId.value) {
@@ -47,13 +47,13 @@ const courseProgress = computed(() => 0)
 </script>
 
 <template lang="pug">
-.lp-student-dashboard
+section.lp-student-dashboard.container-fluid
 	.lp-student-dashboard__loading(v-if="loading")
 		span Loading your dashboard...
 
 	template(v-else)
 		PageHeader(
-			:title="`Welcome back\n${auth.user.name} ${auth.user.surname ?? ''}`"
+			:title="`Welcome back\n${user.profile.name} ${user.profile.surname ?? ''}`"
 		)
 			StudentProgressSummary(
 				:current-lesson="currentUnitData?.title ?? '—'"
@@ -71,51 +71,46 @@ const courseProgress = computed(() => 0)
 		.lp-student-dashboard__empty(v-if="!lessonCards.length")
 			p No lessons have been assigned to your class yet.
 
-		.lp-student-dashboard__grid(v-else)
-			StudentSummaryCard(
-				:user="auth.user"
-				:badges-earned="badgesEarned"
-				:total-units="totalUnits"
-				:completed-units="completedUnits"
-				:course-progress="courseProgress"
-				continue-route="/units"
-				continue-label="Continue Learning ›"
-			)
+		.lp-student-dashboard__grid.border-gradient(v-else)
+			.row
+				.lp-student-dashboard__col.col-12.col-xl-4
+					StudentSummaryCard(
+						:user="user.profile"
+						:badges-earned="badgesEarned"
+						:total-units="totalUnits"
+						:completed-units="completedUnits"
+						:course-progress="courseProgress"
+						continue-route="/units"
+						continue-label="Continue Learning ›"
+					)
 
-			StudentLessonList(:lesson-cards="lessonCards")
-</template>
+				.lp-student-dashboard__col.col-12.col-xl-8
+					StudentLessonList(:lesson-cards="lessonCards")
+				 
+	</template>
 
 <style lang="scss" scoped>
 .lp-student-dashboard {
-	padding: 1.5rem;
+	padding: 24px 0;
 	font-family: 'Fredoka', sans-serif;
-
 	&__loading {
-		padding: 2rem;
+		padding: 32px;
 		color: #a0aec0;
-		font-size: 0.95rem;
+		font-size: 15.2px;
 	}
 
 	&__empty {
-		padding: 1.5rem;
+		padding: 24px;
 		color: #a0aec0;
-		font-size: 0.95rem;
+		font-size: 15.2px;
 		text-align: center;
 	}
 
-	&__grid {
-		display: grid;
-		grid-template-columns: 1fr 2fr;
-		gap: 1.4rem;
+	&__grid { 
 		align-items: start;
-	}
-}
-
-@media (max-width: 900px) {
-	.lp-student-dashboard {
-		&__grid {
-			grid-template-columns: 1fr;
-		}
+		border-radius: 15px; 
+		padding: 15px;
+		background:#fff;
 	}
 }
 </style>

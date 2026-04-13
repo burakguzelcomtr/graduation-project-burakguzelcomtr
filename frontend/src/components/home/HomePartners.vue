@@ -3,23 +3,26 @@
 
 <template lang="pug">
 section.lp-home-partners
-  .lp-home-partners__marquee
-    span 🇺🇳 United Nations
-    span 🌍 UNESCO
-    span 🎓 EdTech Global
-    span 🤝 Peace Corps
-    span 📘 Oxford Press
-    span 🌐 World Bank
-    span 🏫 IB Schools
-    span 🛡 UNICEF
-    span 🇺🇳 United Nations
-    span 🌍 UNESCO
-    span 🎓 EdTech Global
-    span 🤝 Peace Corps
-    span 📘 Oxford Press
-    span 🌐 World Bank
-    span 🏫 IB Schools
-    span 🛡 UNICEF
+  .container-fluid
+    .row
+      .col-12
+        .lp-home-partners__marquee
+          span 🇺🇳 United Nations
+          span 🌍 UNESCO
+          span 🎓 EdTech Global
+          span 🤝 Peace Corps
+          span 📘 Oxford Press
+          span 🌐 World Bank
+          span 🏫 IB Schools
+          span 🛡 UNICEF
+          span 🇺🇳 United Nations
+          span 🌍 UNESCO
+          span 🎓 EdTech Global
+          span 🤝 Peace Corps
+          span 📘 Oxford Press
+          span 🌐 World Bank
+          span 🏫 IB Schools
+          span 🛡 UNICEF
 </template>
 
 <style lang="scss" scoped>
@@ -27,20 +30,20 @@ section.lp-home-partners
 
 .lp-home-partners {
   background: #f9f4ef;
-  padding: 1.2rem 0;
+  padding: 19.2px 0;
   overflow: hidden;
   border-top: 1px solid #e8ddd5;
   border-bottom: 1px solid #e8ddd5;
 
   &__marquee {
     display: flex;
-    gap: 3rem;
+    gap: 48px;
     white-space: nowrap;
     animation: scroll 22s linear infinite;
 
     span {
       color: $bg-brown;
-      font-size: 0.9rem;
+      font-size: 14.4px;
       font-weight: 600;
       letter-spacing: 0.02em;
     }

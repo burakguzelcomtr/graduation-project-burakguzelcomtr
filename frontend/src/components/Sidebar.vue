@@ -3,9 +3,11 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { commonNavItems, studentNavItems, teacherNavItems } from '@/data/navItems.js'
+import { useUserStore } from '@/stores/user'
 
 const router = useRouter()
 const auth = useAuthStore()
+const user = useUserStore()
 const collapsed = ref(false)
 
 async function handleLogout() {
@@ -18,7 +20,7 @@ async function handleLogout() {
 nav.lp-sidebar(:class="{ 'lp-sidebar--collapsed': collapsed }")
   .lp-sidebar__header
     router-link.lp-sidebar__brand(to="/dashboard") LearnPass
-    button.lp-sidebar__toggle(@click="collapsed = !collapsed")
+    button.lp-sidebar__toggle.btn(type="button" @click="collapsed = !collapsed")
       span {{ collapsed ? '›' : '‹' }}
 
   ul.lp-sidebar__nav
@@ -29,7 +31,7 @@ nav.lp-sidebar(:class="{ 'lp-sidebar--collapsed': collapsed }")
         span.lp-sidebar__label {{ item.label }}
       span.lp-sidebar__tooltip {{ item.label }}
 
-    template(v-if="auth.user?.role === 'student'")
+    template(v-if="user.profile?.role === 'student'")
       li.lp-sidebar__item(v-for="item in studentNavItems" :key="item.to")
         router-link.lp-sidebar__link(:to="item.to" active-class="lp-sidebar__link--active")
           component.lp-sidebar__icon(:is="item.icon" v-if="item.icon")
@@ -37,20 +39,21 @@ nav.lp-sidebar(:class="{ 'lp-sidebar--collapsed': collapsed }")
           span.lp-sidebar__label {{ item.label }}
         span.lp-sidebar__tooltip {{ item.label }}
 
-    template(v-if="auth.user?.role === 'teacher'")
+    template(v-if="user.profile?.role === 'teacher'")
       li.lp-sidebar__item(v-for="item in teacherNavItems" :key="item.to")
         router-link.lp-sidebar__link(:to="item.to" active-class="lp-sidebar__link--active")
-          span.lp-sidebar__emoji {{ item.emoji }}
+          component.lp-sidebar__icon(:is="item.icon" v-if="item.icon")
+          span.lp-sidebar__emoji(v-else) {{ item.emoji }}
           span.lp-sidebar__label {{ item.label }}
         span.lp-sidebar__tooltip {{ item.label }}
 
   .lp-sidebar__footer
-    .lp-sidebar__user(v-if="auth.user")
-      .lp-sidebar__avatar {{ auth.user.name?.[0] }}{{ auth.user.surname?.[0] }}
+    .lp-sidebar__user(v-if="user.profile")
+      .lp-sidebar__avatar {{ user.profile.name?.[0] }}{{ user.profile.surname?.[0] }}
       .lp-sidebar__user-info
-        .lp-sidebar__user-name {{ auth.user.name }} {{ auth.user.surname }}
-        .lp-sidebar__user-role {{ auth.user.role }}
-    button.lp-sidebar__logout(@click="handleLogout") Sign Out
+        .lp-sidebar__user-name {{ user.profile.name }} {{ user.profile.surname }}
+        .lp-sidebar__user-role {{ user.profile.role }}
+    button.lp-sidebar__logout.btn(type="button" @click="handleLogout") Sign Out
 </template>
 
 <style lang="scss" scoped>
@@ -58,20 +61,18 @@ nav.lp-sidebar(:class="{ 'lp-sidebar--collapsed': collapsed }")
   position: sticky;
   top: 0;
   display: flex;
-  width: 230px;
+  width: 260px;
   min-width: 230px;
   height: 100vh;
-  flex-shrink: 0;
+  flex-shrink: 0; 
   box-sizing: border-box;
-  flex-direction: column;
-  overflow-x: hidden;
-  overflow-y: auto;
-  padding: 1rem 0.75rem;
+  flex-direction: column; 
+  padding: 16px 12px;
   border-right: 1px solid #eee;
   background: #fff;
   font-family: 'Fredoka', sans-serif;
-  transition: width 0.25s ease, min-width 0.25s ease;
-
+  transition: width 0.25s ease, min-width 0.25s ease; 
+  z-index: 2;
   &--collapsed {
     width: 64px;
     min-width: 64px;
@@ -82,15 +83,15 @@ nav.lp-sidebar(:class="{ 'lp-sidebar--collapsed': collapsed }")
     align-items: center;
     justify-content: space-between;
     min-height: 36px;
-    margin-bottom: 1.2rem;
-    gap: 0.4rem;
+    margin-bottom: 19.2px;
+    gap: 6.4px;
   }
 
   &__brand {
     overflow: hidden;
     max-width: 160px;
     color: #de7534;
-    font-size: 1.15rem;
+    font-size: 18.4px;
     font-weight: 800;
     text-decoration: none;
     white-space: nowrap;
@@ -108,7 +109,7 @@ nav.lp-sidebar(:class="{ 'lp-sidebar--collapsed': collapsed }")
     border-radius: 8px;
     background: #fff3e0;
     color: #de7534;
-    font-size: 1rem;
+    font-size: 16px;
     font-weight: 700;
     cursor: pointer;
     transition: background 0.15s;
@@ -127,7 +128,7 @@ nav.lp-sidebar(:class="{ 'lp-sidebar--collapsed': collapsed }")
 
   &__item {
     position: relative;
-    margin: 0.15rem 0;
+    margin: 2.4px 0;
   }
 
   &__link {
@@ -150,7 +151,7 @@ nav.lp-sidebar(:class="{ 'lp-sidebar--collapsed': collapsed }")
     }
 
     &--active {
-      padding-left: calc(0.7rem - 3px);
+      padding-left: calc(11.2px - 3px);
       border-left: 3px solid #b85e22;
       background: #de7534;
       color: #fff;
@@ -167,7 +168,7 @@ nav.lp-sidebar(:class="{ 'lp-sidebar--collapsed': collapsed }")
   &__emoji {
     min-width: 22px;
     flex-shrink: 0;
-    font-size: 1rem;
+    font-size: 16px;
     text-align: center;
   }
 
@@ -182,7 +183,7 @@ nav.lp-sidebar(:class="{ 'lp-sidebar--collapsed': collapsed }")
     position: absolute;
     top: 50%;
     left: calc(100% + 6px);
-    z-index: 9999;
+    z-index: 99999;
     display: none;
     padding: 5px 11px;
     transform: translateY(-50%);
@@ -190,7 +191,7 @@ nav.lp-sidebar(:class="{ 'lp-sidebar--collapsed': collapsed }")
     background: #2d3748;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     color: #fff;
-    font-size: 0.8rem;
+    font-size: 12.8px;
     font-weight: 600;
     pointer-events: none;
     white-space: nowrap;
@@ -207,16 +208,16 @@ nav.lp-sidebar(:class="{ 'lp-sidebar--collapsed': collapsed }")
   }
 
   &__footer {
-    margin-top: 0.85rem;
-    padding-top: 0.85rem;
+    margin-top: 13.6px;
+    padding-top: 13.6px;
     border-top: 1px solid #eee;
   }
 
   &__user {
     display: flex;
     align-items: center;
-    gap: 0.6rem;
-    margin-bottom: 0.7rem;
+    gap: 9.6px;
+    margin-bottom: 11.2px;
   }
 
   &__avatar {
@@ -229,7 +230,7 @@ nav.lp-sidebar(:class="{ 'lp-sidebar--collapsed': collapsed }")
     border-radius: 50%;
     background: #de7534;
     color: #fff;
-    font-size: 0.8rem;
+    font-size: 12.8px;
     font-weight: 700;
   }
 
@@ -242,7 +243,7 @@ nav.lp-sidebar(:class="{ 'lp-sidebar--collapsed': collapsed }")
   &__user-name {
     overflow: hidden;
     color: #2d3748;
-    font-size: 0.85rem;
+    font-size: 13.6px;
     font-weight: 600;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -250,7 +251,7 @@ nav.lp-sidebar(:class="{ 'lp-sidebar--collapsed': collapsed }")
 
   &__user-role {
     color: #a0aec0;
-    font-size: 0.72rem;
+    font-size: 11.52px;
     text-transform: capitalize;
   }
 
@@ -258,13 +259,13 @@ nav.lp-sidebar(:class="{ 'lp-sidebar--collapsed': collapsed }")
     width: 100%;
     max-width: 220px;
     overflow: hidden;
-    padding: 0.5rem;
+    padding: 8px;
     border: 1px solid #e2e8f0;
     border-radius: 7px;
     background: transparent;
     color: #718096;
     font-family: 'Fredoka', sans-serif;
-    font-size: 0.88rem;
+    font-size: 14.08px;
     cursor: pointer;
     white-space: nowrap;
     transition: background 0.15s, color 0.15s, border-color 0.15s, max-width 0.25s ease, opacity 0.2s ease, padding 0.25s ease;

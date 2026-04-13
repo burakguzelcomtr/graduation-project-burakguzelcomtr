@@ -3,12 +3,12 @@ import { RouterView, useRoute } from 'vue-router'
 import { computed, onMounted } from 'vue'
 import Sidebar from './components/Sidebar.vue'
 import { useAuthStore } from '@/stores/auth'
+import { useUserStore } from '@/stores/user'
 
 const route = useRoute()
-const auth = useAuthStore()
+const auth = useAuthStore() 
 const showSidebar = computed(() => route.path !== '/' && route.path !== '/login' && route.path !== '/404')
-
-onMounted(() => auth.fetchSession())
+ 
 </script>
 
 <template lang="pug">
@@ -22,7 +22,7 @@ onMounted(() => auth.fetchSession())
 <style lang="scss">
 body {
   margin: 0;
-  background: #fff;
+  background: #f8f9fa;
   font-family: 'Fredoka', 'Segoe UI', sans-serif;
 }
 
@@ -34,9 +34,9 @@ body {
   &__main {
     min-width: 0;
     flex: 1;
-    padding: 0;
-    background: #fff;
+    padding: 0; 
     transition: margin-left 0.25s ease;
+    padding: 15px;
   }
 }
 </style>

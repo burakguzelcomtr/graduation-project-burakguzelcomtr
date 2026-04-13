@@ -11,7 +11,7 @@ const MongoStore = require('connect-mongo').default
 require('./database-connection')
 
 const passport = require('passport')
-const User = require('./models/user')
+const Account = require('./models/account')
 
 const indexRouter = require('./routes/index')
 const studentsRouter = require('./routes/students')
@@ -21,13 +21,14 @@ const lessonsRouter = require('./routes/lessons')
 const unitsRouter = require('./routes/units')
 const classGroupsRouter = require('./routes/class-groups')
 const lessonMaterialsRouter = require('./routes/lesson-materials')
+const usersRouter = require('./routes/users')
 
 // use static authenticate method of model in LocalStrategy
-passport.use(User.createStrategy())
+passport.use(Account.createStrategy())
 
 // use static serialize and deserialize of model for passport session support
-passport.serializeUser(User.serializeUser())
-passport.deserializeUser(User.deserializeUser())
+passport.serializeUser(Account.serializeUser())
+passport.deserializeUser(Account.deserializeUser())
 
 const app = express()
 // view engine setup
@@ -67,6 +68,7 @@ app.use('/lessons', lessonsRouter)
 app.use('/units', unitsRouter)
 app.use('/class-groups', classGroupsRouter)
 app.use('/lesson-materials', lessonMaterialsRouter)
+app.use('/users', usersRouter)
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404))

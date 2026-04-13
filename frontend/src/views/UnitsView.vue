@@ -1,17 +1,17 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
-import { useAuthStore } from '@/stores/auth'
 import { useLessonsStore } from '@/stores/lessons'
 import PageHeader from '@/components/PageHeader.vue'
 import StudentLessonList from '@/components/student/StudentLessonList.vue'
 import StudentProgressSummary from '@/components/student/StudentProgressSummary.vue'
+import { useUserStore } from '@/stores/user'
 
-const auth = useAuthStore()
+const user = useUserStore()
 const lessonsStore = useLessonsStore()
 const badgesEarned = 0
 const loading = ref(false)
 
-const classGroupId = computed(() => auth.user?.classGroup ?? null)
+const classGroupId = computed(() => user.profile?.classGroup ?? null)
 
 onMounted(async () => {
   if (!classGroupId.value) {
@@ -43,7 +43,7 @@ const currentLesson = computed(() => lessonCards.value[0]?.units?.[0]?.title ?? 
 </script>
 
 <template lang="pug">
-.lp-units-view
+section.lp-units-view.container-fluid
   .lp-units-view__loading(v-if="loading")
     span Loading your units...
 
@@ -67,19 +67,19 @@ const currentLesson = computed(() => lessonCards.value[0]?.units?.[0]?.title ?? 
 
 <style lang="scss" scoped>
 .lp-units-view {
-  padding: 1.5rem;
+  padding: 24px 0;
   font-family: 'Fredoka', sans-serif;
 
   &__loading {
-    padding: 2rem;
+    padding: 32px;
     color: #a0aec0;
-    font-size: 0.95rem;
+    font-size: 15.2px;
   }
 
   &__empty {
-    padding: 1.5rem;
+    padding: 24px;
     color: #a0aec0;
-    font-size: 0.95rem;
+    font-size: 15.2px;
     text-align: center;
   }
 }

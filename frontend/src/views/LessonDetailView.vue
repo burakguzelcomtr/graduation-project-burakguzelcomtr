@@ -39,7 +39,7 @@ watch(lessonId, async (id) => {
 </script>
 
 <template lang="pug">
-.lp-lesson-detail
+section.lp-lesson-detail.container-fluid
   .lp-lesson-detail__loading(v-if="loading")
     span Loading lesson...
 
@@ -59,64 +59,72 @@ watch(lessonId, async (id) => {
           :total-units="totalUnits"
         )
 
-      button.lp-lesson-detail__start(type="button") Start
+      button.lp-lesson-detail__start.btn(type="button") Start
 
-    section.lp-lesson-detail__section
-      h2.lp-lesson-detail__heading Description
-      p.lp-lesson-detail__description {{ lesson.description || 'No description has been added for this lesson yet.' }}
+    .lp-lesson-detail__content.row
+      .col-12.col-xl-4
+        section.lp-lesson-detail__section
+          h2.lp-lesson-detail__heading Description
+          p.lp-lesson-detail__description {{ lesson.description || 'No description has been added for this lesson yet.' }}
 
-    section.lp-lesson-detail__section
-      .lp-lesson-detail__section-head
-        h2.lp-lesson-detail__heading Units
-        span.lp-lesson-detail__count {{ totalUnits }} units
+      .col-12.col-xl-8
+        section.lp-lesson-detail__section
+          .lp-lesson-detail__section-head
+            h2.lp-lesson-detail__heading Units
+            span.lp-lesson-detail__count {{ totalUnits }} units
 
-      StudentLessonUnitsAccordion(:units="lesson.units || []")
+          StudentLessonUnitsAccordion(:units="lesson.units || []")
 </template>
 
 <style lang="scss" scoped>
 .lp-lesson-detail {
-  padding: 1.5rem;
+  padding: 24px 0;
   font-family: 'Fredoka', sans-serif;
 
   &__loading,
   &__error,
   &__empty {
-    padding: 2rem;
+    padding: 32px;
     color: #6b7280;
   }
 
   &__start {
-    padding: 0.85rem 1.6rem;
+    padding: 13.6px 25.6px;
     border: none;
     border-radius: 999px;
     background: #fff;
     box-shadow: 0 12px 30px rgba(124, 45, 18, 0.18);
     color: #c2410c;
-    font-size: 0.95rem;
+    font-size: 15.2px;
     font-weight: 800;
     cursor: pointer;
   }
 
   &__section {
-    margin-top: 1.5rem;
-    padding: 1.4rem;
-    border: 1px solid #ffedd5;
+    padding: 22.4px;
+    border: 2px dashed #ffedd5;
     border-radius: 16px;
     background: #fffaf5;
+  }
+
+  &__content {
+    margin-top: 24px;
+    --bs-gutter-x: 24px;
+    --bs-gutter-y: 24px;
   }
 
   &__section-head {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 1rem;
-    margin-bottom: 1rem;
+    gap: 16px;
+    margin-bottom: 16px;
   }
 
   &__heading {
     margin: 0;
     color: #7c2d12;
-    font-size: 1.2rem;
+    font-size: 19.2px;
   }
 
   &__description {
@@ -127,11 +135,11 @@ watch(lessonId, async (id) => {
 
   &__count {
     flex-shrink: 0;
-    padding: 0.45rem 0.8rem;
+    padding: 7.2px 12.8px;
     border-radius: 999px;
     background: #ffedd5;
     color: #c2410c;
-    font-size: 0.78rem;
+    font-size: 12.48px;
     font-weight: 700;
   }
 }

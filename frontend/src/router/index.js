@@ -21,6 +21,24 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: '/passport',
+      name: 'passport',
+      component: () => import('../views/PassportView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path : '/globals',
+      name: 'globals',
+      component: () => import('../views/GlobalsView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/global-diary',
+      name: 'global-diary',
+      component: () => import('../views/GlobalDiaryView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
       path: '/units',
       name: 'units',
       component: () => import('../views/UnitsView.vue'),
@@ -47,11 +65,14 @@ const router = createRouter({
   ],
 })
 
+let sessionFetched = false
+
 router.beforeEach(async (to) => {
   const auth = useAuthStore()
 
-  if (auth.user === null && to.meta.requiresAuth) {
+  if (!sessionFetched) {
     await auth.fetchSession()
+    sessionFetched = true
   }
 
   if (to.meta.requiresAuth && !auth.user) {

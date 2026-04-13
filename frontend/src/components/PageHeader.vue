@@ -8,24 +8,23 @@ defineProps({
 
 <template lang="pug">
 .lp-page-header
-  .lp-page-header__main
-    h1.lp-page-header__title {{ title }}
-    p.lp-page-header__subtitle(v-if="subtitle") {{ subtitle }}
-    .lp-page-header__meta(v-if="$slots.meta")
-      slot(name="meta")
-  .lp-page-header__side(v-if="$slots.default")
-    img.animated_badge(v-if="showDecoration" src="/assets/img/students-width-baloons.svg" alt="Header decoration" width="160")
-    slot
+  .row.lp-page-header__row
+    .col-12.col-xl-7
+      .lp-page-header__main
+        h1.lp-page-header__title {{ title }}
+        p.lp-page-header__subtitle(v-if="subtitle") {{ subtitle }}
+        .lp-page-header__meta(v-if="$slots.meta")
+          slot(name="meta")
+    .col-12.col-xl-5(v-if="$slots.default")
+      .lp-page-header__side
+        img.animated_badge(v-if="showDecoration" src="/assets/img/students-width-baloons.svg" alt="Header decoration" width="160")
+        slot
 </template>
 
 <style lang="scss" scoped>
 .lp-page-header {
   position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 24px;
   overflow: hidden;
   padding: 48px 48px 72px;
   border: 1px solid #f1f5f9;
@@ -53,6 +52,12 @@ defineProps({
       lp-header-float-side 9600ms ease-in-out 900ms infinite;
   }
 
+  &__row {
+    align-items: center;
+    --bs-gutter-x: 24px;
+    --bs-gutter-y: 16px;
+  }
+
   &__main {
     min-width: 0;
   }
@@ -65,19 +70,19 @@ defineProps({
   }
 
   &__subtitle {
-    margin: 0.35rem 0 0;
+    margin: 5.6px 0 0;
     color: #fff;
-    font-size: 0.92rem;
+    font-size: 14.72px;
   }
 
   &__meta {
-    margin-top: 1rem;
+    margin-top: 16px;
   }
 
   &__side {
-    flex-shrink: 0;
     display: flex;
     align-items: center;
+    justify-content: flex-end;
     gap: 16px;
     .animated_badge { animation:
       lp-header-slide-up 700ms cubic-bezier(.22, .9, .35, 1) 150ms forwards,
@@ -148,11 +153,9 @@ defineProps({
 
 @media (max-width: 900px) {
   .lp-page-header {
-    align-items: stretch;
-    flex-direction: column;
-
     &__side {
       width: 100%;
+      justify-content: flex-start;
     }
   }
 }
