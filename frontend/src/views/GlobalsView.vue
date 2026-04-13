@@ -1,14 +1,14 @@
-<script setup> 
-import { useAuthStore } from '@/stores/auth'
+<script setup>
+import { useUserStore } from '@/stores/user'
 import StudentDashboard from './StudentDashboard.vue'
 import TeacherDashboard from './TeacherDashboard.vue'
-const auth = useAuthStore()
+const user = useUserStore() 
 </script>
 
 <template lang="pug">
 .lp-dashboard
-	StudentDashboard(v-if="auth.user?.role === 'student'")
-	TeacherDashboard(v-else-if="auth.user?.role === 'teacher'")
+	StudentDashboard(v-if="user.profile?.role === 'student'")
+	TeacherDashboard(v-else-if="user.profile?.role === 'teacher'")
 	.lp-dashboard__loading(v-else) Loading...
 </template>
 

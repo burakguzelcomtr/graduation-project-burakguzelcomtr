@@ -8,12 +8,14 @@ defineEmits(['loginClick'])
 <template lang="pug">
 header.lp-home-nav
     .container
-        .row
-            .col-6
-              span.lp-home-nav__brand-icon 🌍
-              span.lp-home-nav__brand-name LearnPass
-            .col-6.text-end
-              button.lp-home-nav__login(@click="$emit('loginClick')") {{ loggedIn ? 'Go to Dashboard' : 'Login' }} →
+        .row.lp-home-nav__row
+            .col-7.col-md-8
+              .lp-home-nav__brand
+                span.lp-home-nav__brand-icon 🌍
+                span.lp-home-nav__brand-name LearnPass
+            .col-5.col-md-4
+              .lp-home-nav__actions
+                button.lp-home-nav__login.btn(type="button" @click="$emit('loginClick')") {{ loggedIn ? 'Go to Dashboard' : 'Login' }} →
 </template>
 
 <style lang="scss" scoped>
@@ -25,29 +27,40 @@ header.lp-home-nav
   left: 0;
   right: 0;
   z-index: 10;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1.2rem 3rem;
+  padding: 19.2px 48px;
+
+  &__row {
+    align-items: center;
+  }
+
+  &__brand {
+    display: flex;
+    align-items: center;
+    gap: 10.4px;
+  }
+
+  &__actions {
+    text-align: right;
+  }
 
   &__brand-icon {
-    font-size: 1.8rem;
+    font-size: 28.8px;
   }
 
   &__brand-name {
     color: #fff;
-    font-size: 1.5rem;
+    font-size: 24px;
     font-weight: 600;
     letter-spacing: 1px;
   }
 
   &__login {
-    padding: 0.45rem 1.2rem;
+    padding: 7.2px 19.2px;
     border: 2px solid #fff;
     border-radius: 6px;
     background: transparent;
     color: #fff;
-    font-size: 1rem;
+    font-size: 16px;
     cursor: pointer;
     transition: background 0.2s, color 0.2s;
 

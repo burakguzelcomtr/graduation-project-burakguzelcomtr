@@ -13,19 +13,15 @@ const loading = ref(false)
 
 const classGroupId = computed(() => user.profile?.classGroup?._id ?? user.profile?.classGroup ?? null)
 
-onMounted(async () => {
-  if (!classGroupId.value) {
-    return
-  }
+onMounted(async () => { 
 
   if (!lessonsStore.premunLessons[classGroupId.value] || !lessonsStore.mainLessons[classGroupId.value]) {
     loading.value = true
   }
-
+  
   try {
     await Promise.all([
-      lessonsStore.getPremunLessons(classGroupId.value),
-      lessonsStore.getMainLessons(classGroupId.value),
+      lessonsStore.getPremunLessons(classGroupId.value)
     ])
   } finally {
     loading.value = false
@@ -38,22 +34,15 @@ const lessonCards = computed(() => {
   }
 
   return lessonsStore.premunLessons[classGroupId.value] ?? []
-})
-const mainLessonCards = computed(() => {
-  if (!classGroupId.value) {
-    return []
-  }
-
-  return lessonsStore.mainLessons[classGroupId.value] ?? []
-})
-const totalUnits = computed(() => mainLessonCards.value.reduce((count, lesson) => count + (lesson.units?.length ?? 0), 0))
+}) 
+const totalUnits = computed(() => lessonCards.value.reduce((count, lesson) => count + (lesson.units?.length ?? 0), 0))
 const completedUnits = computed(() => 0)
 const courseProgress = computed(() => 0)
-const currentLesson = computed(() => mainLessonCards.value[0]?.units?.[0]?.title ?? '—')
+const currentLesson = computed(() => lessonCards.value[0]?.units?.[0]?.title ?? '—')
 </script>
 
 <template lang="pug">
-.lp-premun-hub
+section.lp-premun-hub.container-fluid
   .lp-premun-hub__loading(v-if="loading")
     span Loading your PREMUN lessons...
 
@@ -72,24 +61,24 @@ const currentLesson = computed(() => mainLessonCards.value[0]?.units?.[0]?.title
     .lp-premun-hub__empty(v-if="!lessonCards.length")
       p No PREMUN lessons have been assigned to your class yet.
 
-    StudentLessonList(v-else :lesson-cards="lessonCards")
+    StudentLessonList(v-else :lesson-cards="lessonCards"  lesson-route-name="lesson-detail")
 </template>
 
 <style lang="scss" scoped>
 .lp-premun-hub {
-  padding: 1.5rem;
+  padding: 24px 0;
   font-family: 'Fredoka', sans-serif;
 
   &__loading {
-    padding: 2rem;
+    padding: 32px;
     color: #a0aec0;
-    font-size: 0.95rem;
+    font-size: 15.2px;
   }
 
   &__empty {
-    padding: 1.5rem;
+    padding: 24px;
     color: #a0aec0;
-    font-size: 0.95rem;
+    font-size: 15.2px;
     text-align: center;
   }
 }

@@ -39,7 +39,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="lp-teacher-students">
+  <div class="lp-teacher-students container-fluid">
     <PageHeader title="My Students">
       <span class="lp-teacher-students__count" v-if="students.length">{{ students.length }} students</span>
     </PageHeader>
@@ -48,52 +48,56 @@ onMounted(async () => {
     <div class="lp-teacher-students__state lp-teacher-students__state--error" v-else-if="error">{{ error }}</div>
     <div class="lp-teacher-students__state" v-else-if="students.length === 0">No students found in your class.</div>
 
-    <div class="lp-teacher-students__table-wrap" v-else>
-      <table class="lp-teacher-students__table">
-        <thead class="lp-teacher-students__thead">
-          <tr>
-            <th>#</th>
-            <th>Name</th>
-            <th>Surname</th>
-            <th>Student ID</th>
-            <th>Grade</th>
-            <th>Section</th>
-            <th>Campus</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(student, i) in students" :key="student._id">
-            <td class="lp-teacher-students__cell lp-teacher-students__cell--muted">{{ i + 1 }}</td>
-            <td class="lp-teacher-students__cell lp-teacher-students__cell--strong">{{ student.name }}</td>
-            <td>{{ student.surname }}</td>
-            <td class="lp-teacher-students__cell lp-teacher-students__cell--mono">{{ student.studentId ?? '—' }}</td>
-            <td>{{ student.grade }}</td>
-            <td>{{ student.section }}</td>
-            <td>{{ student.campus }}</td>
-          </tr>
-        </tbody>
-      </table>
+    <div class="row" v-else>
+      <div class="col-12">
+        <div class="lp-teacher-students__table-wrap">
+          <table class="lp-teacher-students__table">
+            <thead class="lp-teacher-students__thead">
+              <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Surname</th>
+                <th>Student ID</th>
+                <th>Grade</th>
+                <th>Section</th>
+                <th>Campus</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(student, i) in students" :key="student._id">
+                <td class="lp-teacher-students__cell lp-teacher-students__cell--muted">{{ i + 1 }}</td>
+                <td class="lp-teacher-students__cell lp-teacher-students__cell--strong">{{ student.name }}</td>
+                <td>{{ student.surname }}</td>
+                <td class="lp-teacher-students__cell lp-teacher-students__cell--mono">{{ student.studentId ?? '—' }}</td>
+                <td>{{ student.grade }}</td>
+                <td>{{ student.section }}</td>
+                <td>{{ student.campus }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
 .lp-teacher-students {
-  padding: 1.5rem;
+  padding: 24px 0;
 
   &__count {
-    padding: 0.25rem 0.7rem;
+    padding: 4px 11.2px;
     border-radius: 20px;
     background: #ebf8ff;
     color: #2b6cb0;
-    font-size: 0.8rem;
+    font-size: 12.8px;
     font-weight: 700;
   }
 
   &__state {
-    padding: 1rem 0;
+    padding: 16px 0;
     color: #718096;
-    font-size: 0.95rem;
+    font-size: 15.2px;
 
     &--error {
       color: #e53e3e;
@@ -120,10 +124,10 @@ onMounted(async () => {
     }
 
     th {
-      padding: 0.75rem 1rem;
+      padding: 12px 16px;
       border-bottom: 1px solid #e2e8f0;
       color: #4a5568;
-      font-size: 0.78rem;
+      font-size: 12.48px;
       font-weight: 700;
       letter-spacing: 0.5px;
       text-align: left;
@@ -131,10 +135,10 @@ onMounted(async () => {
     }
 
     td {
-      padding: 0.75rem 1rem;
+      padding: 12px 16px;
       border-bottom: 1px solid #f0f4f8;
       color: #2d3748;
-      font-size: 0.9rem;
+      font-size: 14.4px;
     }
   }
 
@@ -153,7 +157,7 @@ onMounted(async () => {
 
     &--mono {
       font-family: monospace;
-      font-size: 0.85rem;
+      font-size: 13.6px;
     }
   }
 }

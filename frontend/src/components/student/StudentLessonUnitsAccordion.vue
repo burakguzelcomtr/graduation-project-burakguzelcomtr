@@ -18,24 +18,28 @@ defineProps({
       :open="unitIndex === 0"
     )
       summary.lp-lesson-units__summary
-        .lp-lesson-units__summary-main
-          span.lp-lesson-units__number {{ unit.order ?? (unitIndex + 1) }}
-          div
-            strong.lp-lesson-units__title {{ unit.title || 'Untitled Unit' }}
-            p.lp-lesson-units__meta {{ unit.items?.length ?? 0 }} lesson items
+        .lp-lesson-units__summary-main.row
+          .col-auto
+            span.lp-lesson-units__number {{ unit.order ?? (unitIndex + 1) }}
+          .col
+            div
+              strong.lp-lesson-units__title {{ unit.title || 'Untitled Unit' }}
+              p.lp-lesson-units__meta {{ unit.items?.length ?? 0 }} lesson items
 
       .lp-lesson-units__body
         p.lp-lesson-units__description {{ unit.description || '' }}
 
         .lp-lesson-units__items(v-if="unit.items?.length")
-          .lp-lesson-units__row(
+          .lp-lesson-units__row.row(
             v-for="(item, itemIndex) in unit.items"
             :key="item.item?._id ?? item._id ?? itemIndex"
           )
-            span.lp-lesson-units__row-number {{ item.order ?? (itemIndex + 1) }}
-            div
-              strong.lp-lesson-units__row-title {{ item.item?.title || item.title || ('Lesson item ' + (itemIndex + 1)) }}
-              p.lp-lesson-units__row-type {{ (item.itemType || item.item?.type || 'topic').toUpperCase() }}
+            .col-auto
+              span.lp-lesson-units__row-number {{ item.order ?? (itemIndex + 1) }}
+            .col
+              div
+                strong.lp-lesson-units__row-title {{ item.item?.title || item.title || ('Lesson item ' + (itemIndex + 1)) }}
+                p.lp-lesson-units__row-type {{ (item.itemType || item.item?.type || 'topic').toUpperCase() }}
 
         p.lp-lesson-units__hint(v-else) Lesson items will appear here when they are ready.
 </template>
@@ -44,11 +48,11 @@ defineProps({
 .lp-lesson-units {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 12px;
 
   &__empty {
     margin: 0;
-    padding: 1rem;
+    padding: 16px;
     border-radius: 14px;
     background: #fff7ed;
     color: #9a3412;
@@ -64,8 +68,8 @@ defineProps({
   &__summary {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    padding: 1rem 1.1rem;
+    gap: 12px;
+    padding: 16px 17.6px;
     cursor: pointer;
     list-style: none;
     background: #fff7ed;
@@ -76,9 +80,8 @@ defineProps({
   }
 
   &__summary-main {
-    display: flex;
     align-items: center;
-    gap: 0.75rem;
+    --bs-gutter-x: 12px;
   }
 
   &__number {
@@ -90,13 +93,13 @@ defineProps({
     border-radius: 10px;
     background: #ea580c;
     color: #fff;
-    font-size: 0.85rem;
+    font-size: 13.6px;
     font-weight: 700;
   }
 
   &__title {
     color: #7c2d12;
-    font-size: 0.95rem;
+    font-size: 15.2px;
   }
 
   &__meta,
@@ -105,27 +108,26 @@ defineProps({
   &__hint {
     margin: 0;
     color: #6b7280;
-    font-size: 0.8rem;
+    font-size: 12.8px;
   }
 
   &__body {
     display: flex;
     flex-direction: column;
-    gap: 0.9rem;
-    padding: 1rem 1.1rem 1.1rem;
+    gap: 14.4px;
+    padding: 16px 17.6px 17.6px;
   }
 
   &__items {
     display: flex;
     flex-direction: column;
-    gap: 0.65rem;
+    gap: 10.4px;
   }
 
   &__row {
-    display: flex;
     align-items: center;
-    gap: 0.75rem;
-    padding: 0.8rem 0.9rem;
+    --bs-gutter-x: 12px;
+    padding: 12.8px 14.4px;
     border: 1px solid #ffedd5;
     border-radius: 12px;
     background: #fffaf5;
@@ -140,13 +142,13 @@ defineProps({
     border-radius: 999px;
     background: #fdba74;
     color: #7c2d12;
-    font-size: 0.8rem;
+    font-size: 12.8px;
     font-weight: 700;
   }
 
   &__row-title {
     color: #431407;
-    font-size: 0.9rem;
+    font-size: 14.4px;
   }
 }
 </style>

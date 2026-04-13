@@ -3,6 +3,8 @@ import { watch } from 'vue'
 import api from '@/lib/api'
 import { useAuthStore } from './auth'
 
+let stopAuthWatch = null
+
 export const useUserStore = defineStore('user', {
   state: () => ({
     profile: null,
@@ -17,15 +19,20 @@ export const useUserStore = defineStore('user', {
     },
 
     watchAuth() {
+      if (stopAuthWatch) {
+        return stopAuthWatch
+      }
+
       const authStore = useAuthStore()
-      watch(
+      stopAuthWatch = watch(
         () => authStore.user,
         (account) => {
-          if (account) this.fetchMe()
-          else this.profile = null
+          this.profile = account ?? null
         },
-        { immediate: true },
+        { immediate: false },
       )
+
+      return stopAuthWatch
     },
   },
 })

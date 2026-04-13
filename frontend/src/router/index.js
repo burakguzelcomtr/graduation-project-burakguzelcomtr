@@ -21,6 +21,24 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: '/passport',
+      name: 'passport',
+      component: () => import('../views/PassportView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path : '/globals',
+      name: 'globals',
+      component: () => import('../views/GlobalsView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/global-diary',
+      name: 'global-diary',
+      component: () => import('../views/GlobalDiaryView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
       path: '/units',
       name: 'units',
       component: () => import('../views/UnitsView.vue'),

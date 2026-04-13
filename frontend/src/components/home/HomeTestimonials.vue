@@ -17,15 +17,19 @@ const testimonials = [
 
 <template lang="pug">
 section.lp-home-testimonials
-  h2 What People Are Saying
-  .lp-home-testimonials__grid
-    .lp-home-testimonials__card(v-for="t in testimonials" :key="t.name")
-      p.lp-home-testimonials__quote "{{ t.quote }}"
-      .lp-home-testimonials__author
-        .lp-home-testimonials__avatar {{ t.initials }}
-        div
-          strong {{ t.name }}
-          span {{ t.role }}
+  .container
+    .row
+      .col-12
+        h2 What People Are Saying
+    .lp-home-testimonials__grid.row
+      .lp-home-testimonials__col.col-12.col-lg-6(v-for="t in testimonials" :key="t.name")
+        .lp-home-testimonials__card
+          p.lp-home-testimonials__quote "{{ t.quote }}"
+          .lp-home-testimonials__author
+            .lp-home-testimonials__avatar {{ t.initials }}
+            div
+              strong {{ t.name }}
+              span {{ t.role }}
 </template>
 
 <style lang="scss" scoped>
@@ -33,29 +37,26 @@ section.lp-home-testimonials
 
 .lp-home-testimonials {
   background: #f3ede6;
-  padding: 4rem 2rem;
+  padding: 64px 32px;
   text-align: center;
 
   h2 {
-    font-size: 2rem;
+    font-size: 32px;
     font-weight: 700;
-    margin-bottom: 2.5rem;
+    margin-bottom: 40px;
     color: $text-dark;
   }
 
   &__grid {
-    display: flex;
-    gap: 1.5rem;
+    --bs-gutter-x: 24px;
+    --bs-gutter-y: 24px;
     max-width: 860px;
     margin: 0 auto;
-    flex-wrap: wrap;
-    justify-content: center;
   }
 
   &__card {
-    max-width: 400px;
-    flex: 1 1 340px;
-    padding: 2rem;
+    height: 100%;
+    padding: 32px;
     border-radius: 12px;
     background: #fff;
     text-align: left;
@@ -63,16 +64,16 @@ section.lp-home-testimonials
 
   &__quote {
     font-style: italic;
-    font-size: 0.95rem;
+    font-size: 15.2px;
     line-height: 1.65;
     color: #444;
-    margin-bottom: 1.2rem;
+    margin-bottom: 19.2px;
   }
 
   &__author {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 12px;
   }
 
   &__avatar {
@@ -85,19 +86,19 @@ section.lp-home-testimonials
     border-radius: 50%;
     background: $primary;
     color: #fff;
-    font-size: 0.9rem;
+    font-size: 14.4px;
     font-weight: 700;
   }
 
   strong {
     display: block;
     color: $text-dark;
-    font-size: 0.9rem;
+    font-size: 14.4px;
   }
 
   span {
     color: #888;
-    font-size: 0.78rem;
+    font-size: 12.48px;
   }
 }
 </style>
