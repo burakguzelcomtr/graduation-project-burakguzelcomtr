@@ -19,7 +19,6 @@ const teachersRouter = require('./routes/teachers')
 const accountsRouter = require('./routes/accounts')
 const lessonsRouter = require('./routes/lessons')
 const unitsRouter = require('./routes/units')
-const classGroupsRouter = require('./routes/class-groups')
 const lessonMaterialsRouter = require('./routes/lesson-materials')
 const usersRouter = require('./routes/users')
 
@@ -66,7 +65,6 @@ app.use('/teachers', teachersRouter)
 app.use('/accounts', accountsRouter)
 app.use('/lessons', lessonsRouter)
 app.use('/units', unitsRouter)
-app.use('/class-groups', classGroupsRouter)
 app.use('/lesson-materials', lessonMaterialsRouter)
 app.use('/users', usersRouter)
 // catch 404 and forward to error handler
@@ -75,7 +73,7 @@ app.use(function (req, res, next) {
 })
 
 // error handler
-app.use(function (err, req, res, next) {
+app.use(function errorHandler(err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message
   res.locals.error = req.app.get('env') === 'development' ? err : {}

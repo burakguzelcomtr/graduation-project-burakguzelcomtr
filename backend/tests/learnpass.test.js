@@ -3,7 +3,6 @@
 /* eslint-disable no-undef */
 const request = require('supertest')
 const mongoose = require('mongoose')
-const ClassGroup = require('../src/models/class-group')
 const Lesson = require('../src/models/lesson')
 const Question = require('../src/models/question')
 const Unit = require('../src/models/unit')
@@ -15,7 +14,6 @@ const app = require('../src/app')
 
 describe('LearnPass', () => {
   beforeEach(async () => {
-    await ClassGroup.deleteMany()
     await Lesson.deleteMany()
     await Question.deleteMany()
     await Unit.deleteMany()
@@ -178,15 +176,13 @@ describe('LearnPass', () => {
   })
 
   it('can filter lessons by class group and type through the route', async () => {
-    const classGroup = await ClassGroup.create({ grade: 4, section: 'A', campus: 'Main Campus' })
-    const otherClassGroup = await ClassGroup.create({ grade: 4, section: 'B', campus: 'South Campus' })
-    const mainLesson = await Lesson.create({ title: 'Main Lesson', type: 'main', classGroups: [classGroup._id], order: 1 })
+    const mainLesson = await Lesson.create({ title: 'Main Lesson', type: 'main', classGroups: ['4-*-*'], order: 1 })
 
-    await Lesson.create({ title: 'Premun Lesson', type: 'premun', classGroups: [classGroup._id], order: 2 })
-    await Lesson.create({ title: 'Other Class Lesson', type: 'main', classGroups: [otherClassGroup._id], order: 3 })
+    await Lesson.create({ title: 'Premun Lesson', type: 'premun', classGroups: ['4-*-*'], order: 2 })
+    await Lesson.create({ title: 'Other Class Lesson', type: 'main', classGroups: ['5-*-*'], order: 3 })
     await Unit.create({ title: 'Main Unit', lesson: mainLesson._id, order: 1 })
 
-    const actualOutput = await request(app).get(`/lessons?classGroupId=${classGroup._id}&type=main&withUnits=true`)
+    const actualOutput = await request(app).get('/lessons').query({ classGroup: '4-A-Main Campus', type: 'main', withUnits: 'true' })
 
     expect(actualOutput.status).toBe(200)
     expect(actualOutput.body).toHaveLength(1)

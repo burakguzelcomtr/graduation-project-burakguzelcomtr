@@ -11,11 +11,6 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    classGroup: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'ClassGroup',
-      autopopulate: { maxDepth: 1, select: '-students' },
-    },
   },
   { timestamps: true, discriminatorKey: 'role' }
 )

@@ -1,6 +1,6 @@
 const Lesson = require('../models/lesson')
-const ClassGroup = require('../models/class-group')
 const Unit = require('../models/unit')
+const esref = require('../utils/esref.js')
 
 class LessonManager {
   static async getLessonById(lessonId, withUnits = false) {
@@ -30,43 +30,20 @@ class LessonManager {
     }
   }
 
-  static async getLessonsWithUnits({ classGroupId, type = 'main' } = {}) {
-    const lessons = await this.getLessons({ classGroupId, type })
-    return Promise.all(lessons.map(lesson => this.getLessonWithUnits(lesson)))
-  }
+  static async getLessons({ classGroup, type, withUnits = false } = {}) {
+    const query = type ? { type } : {}
 
-  static async getLessons({ classGroupId, type, withUnits = false } = {}) {
-    const filters = []
+    let lessons = await Lesson.find(query).sort({ order: 1, createdAt: 1 })
 
-    if (type) {
-      filters.push({ type })
-    }
-
-    if (classGroupId) {
-      const classGroup = await ClassGroup.findById(classGroupId).select('grade')
-
-      if (classGroup?.grade != null) {
-        filters.push({
-          $or: [{ classGroups: classGroupId }, { grade: classGroup.grade }],
-        })
-      } else {
-        filters.push({ classGroups: classGroupId })
-      }
-    }
-
-    if (filters.length === 0) {
-      return Lesson.find().sort({ order: 1, createdAt: 1 })
-    }
-
-    if (filters.length === 1) {
-      return Lesson.find(filters[0]).sort({ order: 1, createdAt: 1 })
+    if (classGroup) {
+      lessons = lessons.filter(lesson => lesson.classGroups?.some(pattern => esref.matches(pattern, classGroup)))
     }
 
     if (withUnits) {
-      return this.getLessonsWithUnits({ classGroupId, type })
+      return Promise.all(lessons.map(lesson => this.getLessonWithUnits(lesson)))
     }
 
-    return Lesson.find({ $and: filters }).sort({ order: 1, createdAt: 1 })
+    return lessons
   }
 
   static async createLesson({ title, description, classGroups = [], type = 'main', order }) {

@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import api from '@/lib/api'
+import { useUserStore } from './user'
 
 export const useStudentsStore = defineStore('students', {
   state: () => ({
@@ -7,17 +8,27 @@ export const useStudentsStore = defineStore('students', {
   }),
 
   actions: {
-    async getStudentsByClassGroup(classGroupId) {
-      if (!classGroupId) return []
+    async getStudentsByClassGroup() {
+      const userStore = useUserStore()
+      const classGroup = userStore.classGroupKey
+      const user = userStore.profile
 
-      if (this.studentsByClassGroup[classGroupId]) {
-        return this.studentsByClassGroup[classGroupId]
+      if (!classGroup || !user?.grade || !user?.section || !user?.campus) return []
+
+      if (this.studentsByClassGroup[classGroup]) {
+        return this.studentsByClassGroup[classGroup]
       }
 
-      const res = await api.get(`/students/class-group/${classGroupId}`)
+      const res = await api.get('/students', {
+        params: {
+          grade: user.grade,
+          section: user.section,
+          campus: user.campus,
+        },
+      })
 
-      this.studentsByClassGroup[classGroupId] = res.data ?? []
-      return this.studentsByClassGroup[classGroupId]
+      this.studentsByClassGroup[classGroup] = res.data ?? []
+      return this.studentsByClassGroup[classGroup]
     },
 
     resetCache() {

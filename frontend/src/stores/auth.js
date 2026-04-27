@@ -11,7 +11,9 @@ export const useAuthStore = defineStore('Account', {
       const userStore = useUserStore()
 
       try {
-        this.user = (await api.get('/accounts/session')).data ?? null
+        const session = (await api.get('/accounts/session')).data ?? null
+
+        this.user = session?.user ?? null
         userStore.profile = this.user
       } catch {
         this.user = null
@@ -23,7 +25,9 @@ export const useAuthStore = defineStore('Account', {
       const userStore = useUserStore()
 
       try {
-        this.user = (await api.post('/accounts/session', { email, password })).data
+        const session = (await api.post('/accounts/session', { email, password })).data ?? null
+
+        this.user = session?.user ?? null
         userStore.profile = this.user
       } catch (error) {
         throw new Error(error.response?.data?.message || error.response?.data?.error || 'Login failed', { cause: error })

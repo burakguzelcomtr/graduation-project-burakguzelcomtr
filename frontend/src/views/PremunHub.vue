@@ -11,29 +11,28 @@ const lessonsStore = useLessonsStore()
 const badgesEarned = 0
 const loading = ref(false)
 
-const classGroupId = computed(() => user.profile?.classGroup?._id ?? user.profile?.classGroup ?? null)
-
 onMounted(async () => { 
+  if (!user.classGroupKey) {
+    return
+  }
 
-  if (!lessonsStore.premunLessons[classGroupId.value] || !lessonsStore.mainLessons[classGroupId.value]) {
+  if (!lessonsStore.premunLessons[user.classGroupKey]) {
     loading.value = true
   }
   
   try {
-    await Promise.all([
-      lessonsStore.getPremunLessons(classGroupId.value)
-    ])
+    await lessonsStore.getPremunLessons(user.classGroupKey)
   } finally {
     loading.value = false
   }
 })
 
 const lessonCards = computed(() => {
-  if (!classGroupId.value) {
+  if (!user.classGroupKey) {
     return []
   }
 
-  return lessonsStore.premunLessons[classGroupId.value] ?? []
+  return lessonsStore.premunLessons[user.classGroupKey] ?? []
 }) 
 const totalUnits = computed(() => lessonCards.value.reduce((count, lesson) => count + (lesson.units?.length ?? 0), 0))
 const completedUnits = computed(() => 0)

@@ -9,8 +9,22 @@ const Account = require('../models/account')
 /* GET student listing. */
 router.get('/', async (req, res) => {
   try {
-    // TODO: Implement pagination and filtering by class group
-    const students = await User.Student.find()
+    const { grade, section, campus } = req.query
+    const query = {}
+
+    if (grade != null) {
+      query.grade = grade
+    }
+
+    if (section) {
+      query.section = section
+    }
+
+    if (campus) {
+      query.campus = campus
+    }
+
+    const students = await User.Student.find(query)
     res.send(students)
   } catch (error) {
     res.status(500).send({ error: error.message })

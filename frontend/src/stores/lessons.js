@@ -9,42 +9,42 @@ export const useLessonsStore = defineStore('lessons', {
   }),
 
   actions: {
-    async getMainLessons(classGroupId) {
-      if (!classGroupId) return []
+    async getMainLessons(classGroup) {
+      if (!classGroup) return []
 
-      if (this.mainLessons[classGroupId]) {
-        return this.mainLessons[classGroupId]
+      if (this.mainLessons[classGroup]) {
+        return this.mainLessons[classGroup]
       }
 
       const res = await api.get('/lessons', {
         params: {
           withUnits: 'true',
           type: 'main',
-          classGroupId
+          classGroup,
         }
       })
 
-      this.mainLessons[classGroupId] = res.data ?? []
-      return this.mainLessons[classGroupId]
+      this.mainLessons[classGroup] = res.data ?? []
+      return this.mainLessons[classGroup]
     },
 
-    async getPremunLessons(classGroupId) {
-      if (!classGroupId) return []
+    async getPremunLessons(classGroup) {
+      if (!classGroup) return []
 
-      if (this.premunLessons[classGroupId]) {
-        return this.premunLessons[classGroupId]
+      if (this.premunLessons[classGroup]) {
+        return this.premunLessons[classGroup]
       }
 
       const res = await api.get('/lessons', {
         params: {
           withUnits: 'true',
           type: 'premun',
-          classGroupId
+          classGroup,
         }
       })
 
-      this.premunLessons[classGroupId] = res.data ?? []
-      return this.premunLessons[classGroupId]
+      this.premunLessons[classGroup] = res.data ?? []
+      return this.premunLessons[classGroup]
     },
 
     async getLessonById(lessonId) {

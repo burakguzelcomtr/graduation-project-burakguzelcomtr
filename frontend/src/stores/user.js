@@ -9,6 +9,17 @@ export const useUserStore = defineStore('user', {
   state: () => ({
     profile: null,
   }),
+  getters: {
+    classGroupKey: (state) => {
+      const user = state.profile
+
+      if (!user?.grade || !user?.section || !user?.campus) {
+        return null
+      }
+
+      return `${user.grade}-${user.section}-${user.campus}`
+    },
+  },
   actions: {
     async fetchMe() {
       try {

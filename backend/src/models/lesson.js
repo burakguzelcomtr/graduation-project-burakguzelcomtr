@@ -12,14 +12,8 @@ const lessonSchema = new mongoose.Schema(
     },
     classGroups: [
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'ClassGroup',
-        autopopulate: {
-          maxDepth: 2,
-          select: 'grade section campus',
-        },
+        type: String,
       },
-      // TODO : add index for classGroups to optimize queries filtering by class group, e.g. find lessons for a specific campus-grade-section combination. Use recht.
     ],
     type: {
       type: String,
@@ -32,6 +26,8 @@ const lessonSchema = new mongoose.Schema(
   },
   { timestamps: true }
 )
+
+lessonSchema.index({ classGroups: 1 })
 
 lessonSchema.plugin(autopopulate)
 

@@ -6,16 +6,16 @@ const LessonManager = require('../managers/lesson-manager')
 const LessonMaterialManager = require('../managers/lesson-material-manager')
 
 /* GET lesson listing.
-   ?classGroupId=X  → only lessons assigned to that class group
+   ?classGroup=3-A-X → only lessons whose class-group pattern matches the given key
    ?type=main       → only lessons matching the given type
    ?withUnits=true  → include units per lesson
 */
 router.get('/', async (req, res) => {
   try {
-    const { classGroupId, withUnits, type = 'main' } = req.query
+    const { classGroup, withUnits, type = 'main' } = req.query
     let lessons = []
 
-    lessons = await LessonManager.getLessons({ classGroupId, type, withUnits })
+    lessons = await LessonManager.getLessons({ classGroup, type, withUnits })
 
     return res.send(lessons)
   } catch (error) {

@@ -1,35 +1,34 @@
 <script setup>
 import { computed, ref, onMounted } from 'vue'
-import { useAuthStore } from '@/stores/auth'
 import { useStudentsStore } from '@/stores/students'
+import { useUserStore } from '@/stores/user'
 import PageHeader from '@/components/PageHeader.vue'
 
-const auth = useAuthStore()
+const user = useUserStore()
 const studentsStore = useStudentsStore()
 const loading = ref(false)
 const error = ref('')
-const classGroupId = computed(() => auth.user?.classGroup?._id ?? auth.user?.classGroup ?? null)
 const students = computed(() => {
-  if (!classGroupId.value) {
+  if (!user.classGroupKey) {
     return []
   }
 
-  return studentsStore.studentsByClassGroup[classGroupId.value] ?? []
+  return studentsStore.studentsByClassGroup[user.classGroupKey] ?? []
 })
 
 onMounted(async () => {
-  if (!classGroupId.value) {
+  if (!user.classGroupKey) {
     error.value = 'No class group assigned to your account.'
     return
   }
 
-  if (!studentsStore.studentsByClassGroup[classGroupId.value]) {
+  if (!studentsStore.studentsByClassGroup[user.classGroupKey]) {
     loading.value = true
   }
 
   try {
     error.value = ''
-    await studentsStore.getStudentsByClassGroup(classGroupId.value)
+    await studentsStore.getStudentsByClassGroup()
   } catch (e) {
     error.value = e.response?.data?.error || e.message || 'Failed to fetch students.'
   } finally {
