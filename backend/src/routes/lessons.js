@@ -26,9 +26,29 @@ router.get('/', async (req, res) => {
 /* POST create a new lesson. */
 router.post('/', async (req, res) => {
   try {
-    const { title, description, classGroups, type, order } = req.body
-    const createdLesson = await LessonManager.createLesson({ title, description, classGroups, type, order })
+    const { title, description, classGroups, type, order, slug } = req.body
+    const createdLesson = await LessonManager.createLesson({ title, description, classGroups, type, order, slug })
     return res.send(createdLesson)
+  } catch (error) {
+    return res.status(error.status || 500).send({ error: error.message })
+  }
+})
+
+/* PUT update a lesson. Slug is only updated when explicitly provided. */
+router.put('/:id', async (req, res) => {
+  try {
+    const { id } = req.params
+    const { title, description, classGroups, type, order, slug } = req.body
+    const updatedLesson = await LessonManager.updateLesson({
+      lessonId: id,
+      title,
+      description,
+      classGroups,
+      type,
+      order,
+      slug,
+    })
+    return res.send(updatedLesson)
   } catch (error) {
     return res.status(error.status || 500).send({ error: error.message })
   }

@@ -1,6 +1,7 @@
 const Lesson = require('../models/lesson')
 const Unit = require('../models/unit')
-const esref = require('../utils/esref.js')
+const esref = require('../utils/esref')
+const { generateUniqueSlug } = require('../utils/slugify-unique')
 
 class LessonManager {
   static async getLessonById(lessonId, withUnits = false) {
@@ -46,14 +47,31 @@ class LessonManager {
     return lessons
   }
 
-  static async createLesson({ title, description, classGroups = [], type = 'main', order }) {
+  static async createLesson({ title, description, classGroups = [], type = 'main', order, slug }) {
     if (!title) {
       const error = new Error('Missing required fields')
       error.status = 400
       throw error
     }
 
-    return Lesson.create({ title, description, classGroups, type, order })
+    const resolvedSlug = slug || (await generateUniqueSlug(title, Lesson))
+    return Lesson.create({ title, description, classGroups, type, order, slug: resolvedSlug })
+  }
+
+  static async updateLesson({ lessonId, title, description, classGroups, type, order, slug }) {
+    const lesson = await this.getLessonById(lessonId)
+
+    if (title !== undefined) lesson.title = title
+    if (description !== undefined) lesson.description = description
+    if (classGroups !== undefined) lesson.classGroups = classGroups
+    if (type !== undefined) lesson.type = type
+    if (order !== undefined) lesson.order = order
+    if (slug !== undefined) {
+      lesson.slug = await generateUniqueSlug(slug, Lesson, lessonId)
+    }
+
+    await lesson.save()
+    return lesson
   }
 
   static async getUnitById(unitId) {
@@ -64,28 +82,28 @@ class LessonManager {
     return Unit.find().sort({ order: 1, createdAt: 1 })
   }
 
-  static async createUnit({ title, items = [] }) {
+  static async createUnit({ title, lesson, items = [], slug }) {
     if (!title) {
       const error = new Error('Missing required fields')
       error.status = 400
       throw error
     }
-    const createdUnit = await Unit.create({ title, items })
+    const resolvedSlug = slug || (await generateUniqueSlug(title, Unit))
+    const createdUnit = await Unit.create({ title, lesson, items, slug: resolvedSlug })
     return createdUnit
   }
 
-  static async updateUnit({ unitId, title, items }) {
+  static async updateUnit({ unitId, title, items, slug }) {
     const unit = await this.getUnitById(unitId)
     if (!unit) {
       const error = new Error('Unit not found')
       error.status = 404
       throw error
     }
-    if (title) {
-      unit.title = title
-    }
-    if (items) {
-      unit.items = items
+    if (title !== undefined) unit.title = title
+    if (items !== undefined) unit.items = items
+    if (slug !== undefined) {
+      unit.slug = await generateUniqueSlug(slug, Unit, unitId)
     }
     await unit.save()
     return unit

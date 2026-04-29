@@ -3,22 +3,28 @@
 
 <template lang="pug">
 footer.lp-home-footer
-  .container
-    .lp-home-footer__inner.row
-      .lp-home-footer__brand.col-12.col-lg-5
+    .lp-home-footer__inner
+      .lp-home-footer__brand
         span.lp-home-footer__brand-name LearnPass
         p Empowering the next generation of global citizens through language and diplomacy education.
-      .lp-home-footer__contact.col-12.col-md-6.col-lg-3
-        h4 Contact
-        p info@learnpass.edu
-        p +90 212 000 00 00
-      .lp-home-footer__links.col-12.col-md-6.col-lg-4
+      .lp-home-footer__col
         h4 Platform
         ul
           li: a(href="#") About Us
           li: a(href="#") Curriculum
           li: a(href="#") For Schools
           li: a(href="#") Privacy Policy
+      .lp-home-footer__col
+        h4 Help
+        ul
+          li: a(href="#") FAQ
+          li: a(href="#") Contact
+          li: a(href="#") Terms & Conditions
+          li: a(href="#") Cookie Policy
+      .lp-home-footer__col
+        h4 Contact
+        p info@learnpass.edu
+        p +90 212 000 00 00
     .lp-home-footer__bottom
       p © {{ new Date().getFullYear() }} LearnPass. All rights reserved.
 </template>
@@ -29,73 +35,82 @@ footer.lp-home-footer
 .lp-home-footer {
   background: $bg-dark;
   color: #ccc;
-  padding: 48px 32px 24px;
+  padding: 56px 32px 24px;
 
   &__inner {
-    --bs-gutter-x: 48px;
-    --bs-gutter-y: 32px;
-    max-width: 960px;
-    margin: 0 auto 32px;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 40px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    margin-bottom: 24px;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr 1fr;
+    }
+    @media (max-width: 480px) {
+      grid-template-columns: 1fr;
+    }
   }
 
   &__brand-name {
     display: block;
-    margin-bottom: 9.6px;
+    margin-bottom: 12px;
     color: #fff;
-    font-size: 22.4px;
-    font-weight: 700;
+    font-size: 26px;
+    font-weight: 800;
   }
 
   &__brand p {
-    font-size: 13.6px;
+    font-size: 15px;
     line-height: 1.6;
-    opacity: 0.75;
+    opacity: 0.65;
   }
 
-  &__contact,
-  &__links {
+  &__col {
     h4 {
       color: #fff;
-      font-size: 13.6px;
+      font-size: 13px;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
-      margin-bottom: 12px;
+      letter-spacing: 0.12em;
+      margin-bottom: 16px;
+      font-weight: 700;
     }
 
     p {
-      font-size: 13.6px;
-      margin-bottom: 4.8px;
-      opacity: 0.75;
-    }
-  }
-
-  &__links ul {
-    list-style: none;
-    padding: 0;
-
-    li {
-      margin-bottom: 5.6px;
+      font-size: 15px;
+      opacity: 0.65;
+      margin-bottom: 4px;
     }
 
-    a {
-      color: #ccc;
-      text-decoration: none;
-      font-size: 13.6px;
-      opacity: 0.75;
-      transition: opacity 0.2s;
+    ul {
+      list-style: none;
+      padding: 0;
 
-      &:hover { opacity: 1; }
+      li { margin-bottom: 10px; }
+
+      a {
+        color: #ccc;
+        text-decoration: none;
+        font-size: 15px;
+        opacity: 0.65;
+        transition: opacity 0.2s;
+
+        &:hover { opacity: 1; }
+      }
     }
   }
 
   &__bottom {
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    padding-top: 16px;
     text-align: center;
+    max-width: 1200px;
+    margin: 0 auto;
 
     p {
-      font-size: 12.48px;
-      opacity: 0.5;
+      font-size: 12px;
+      opacity: 0.4;
     }
   }
 }

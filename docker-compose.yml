@@ -28,14 +28,7 @@ services:
   mongodb:
     image: mongo
     ports:
-      - 27017:27017
+      - '27017:27017'
     volumes:
       - ./data:/data/db
-    command: mongod --quiet --replSet rs0 --bind_ip_all
-    healthcheck:
-      test: |
-        mongosh --quiet --eval "
-          try { rs.status().ok } catch(e) { rs.initiate({ _id: 'rs0', members: [{ _id: 0, host: 'mongodb:27017' }] }) }
-        "
-      interval: 10s
-      start_period: 10s
+    attach: false

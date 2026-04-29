@@ -32,5 +32,6 @@ function handleLoginClick() {
 .lp-home {
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
 }
 </style>
