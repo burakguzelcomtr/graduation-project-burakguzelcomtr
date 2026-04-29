@@ -1,10 +1,24 @@
 <script setup>
-defineProps({
+import { useRouter } from 'vue-router'
+
+const props = defineProps({
   units: {
     type: Array,
     default: () => [],
   },
+  lessonSlug: {
+    type: String,
+    default: '',
+  },
 })
+
+const router = useRouter()
+
+function navigateToUnit(unit) {
+  const uSlug = unit.slug || unit._id
+  if (!props.lessonSlug || !uSlug) return
+  router.push({ name: 'unit-detail', params: { lessonSlug: props.lessonSlug, unitSlug: uSlug } })
+}
 </script>
 
 <template lang="pug">
@@ -17,7 +31,7 @@ defineProps({
       :key="unit._id ?? unitIndex"
       :open="unitIndex === 0"
     )
-      summary.lp-lesson-units__summary
+      summary.lp-lesson-units__summary(:class="{ 'lp-lesson-units__summary--linkable': lessonSlug && (unit.slug || unit._id) }" @click.prevent="lessonSlug ? navigateToUnit(unit) : undefined")
         .lp-lesson-units__summary-main.row
           .col-auto
             span.lp-lesson-units__number {{ unit.order ?? (unitIndex + 1) }}
@@ -76,6 +90,10 @@ defineProps({
 
     &::-webkit-details-marker {
       display: none;
+    }
+
+    &--linkable:hover {
+      background: #fed7aa;
     }
   }
 

@@ -20,6 +20,7 @@ const accountsRouter = require('./routes/accounts')
 const lessonsRouter = require('./routes/lessons')
 const unitsRouter = require('./routes/units')
 const lessonMaterialsRouter = require('./routes/lesson-materials')
+const questionsRouter = require('./routes/questions')
 const usersRouter = require('./routes/users')
 
 // use static authenticate method of model in LocalStrategy
@@ -66,6 +67,7 @@ app.use('/accounts', accountsRouter)
 app.use('/lessons', lessonsRouter)
 app.use('/units', unitsRouter)
 app.use('/lesson-materials', lessonMaterialsRouter)
+app.use('/questions', questionsRouter)
 app.use('/users', usersRouter)
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

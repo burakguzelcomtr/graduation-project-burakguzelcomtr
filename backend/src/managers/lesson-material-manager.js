@@ -21,18 +21,17 @@ class LessonMaterialManager {
       throw error
     }
 
-    if (!['topic', 'quiz'].includes(type)) {
-      const error = new Error('Invalid lesson material type')
-      error.status = 400
-      throw error
+    if (type === 'topic') {
+      return LessonMaterial.Topic.create({ title, content })
     }
 
-    return LessonMaterial.create({
-      title,
-      type,
-      content,
-      passingScorePercent,
-    })
+    if (type === 'quiz') {
+      return LessonMaterial.Quiz.create({ title, passingScorePercent })
+    }
+
+    const error = new Error('Invalid lesson material type')
+    error.status = 400
+    throw error
   }
 
   static async getLessonMaterials({ unitId } = {}) {
@@ -40,21 +39,11 @@ class LessonMaterialManager {
     return LessonMaterial.find(query).sort({ order: 1, createdAt: 1 })
   }
 
-  static async updateLessonMaterial({ lessonMaterialId, title, type, content, passingScorePercent, order }) {
+  static async updateLessonMaterial({ lessonMaterialId, title, content, passingScorePercent, order }) {
     const lessonMaterial = await this.getLessonMaterialById(lessonMaterialId)
-
-    if (type && !['topic', 'quiz'].includes(type)) {
-      const error = new Error('Invalid lesson material type')
-      error.status = 400
-      throw error
-    }
 
     if (title !== undefined) {
       lessonMaterial.title = title
-    }
-
-    if (type !== undefined) {
-      lessonMaterial.type = type
     }
 
     if (content !== undefined) {
@@ -69,14 +58,11 @@ class LessonMaterialManager {
       lessonMaterial.order = order
     }
 
-    lessonMaterial.updatedAt = new Date()
-
     if (lessonMaterial.unit) {
       const unit = await Unit.findById(lessonMaterial.unit)
       if (unit) {
         const item = unit.items.find(existingItem => String(existingItem.item) === String(lessonMaterial.id))
         if (item) {
-          item.itemType = lessonMaterial.type
           if (order !== undefined) {
             item.order = order
           }
@@ -112,7 +98,6 @@ class LessonMaterialManager {
 
     lessonMaterial.unit = unit.id
     lessonMaterial.order = itemOrder
-    lessonMaterial.updatedAt = new Date()
     unit.items.push({
       itemType: lessonMaterial.type,
       item: lessonMaterial.id,

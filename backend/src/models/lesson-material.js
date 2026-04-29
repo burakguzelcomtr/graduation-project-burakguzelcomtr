@@ -7,39 +7,44 @@ const lessonMaterialSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    type: {
-      type: String,
-      enum: ['topic', 'quiz'],
-      required: true,
-    },
-    content: {
-      type: String,
-    },
     unit: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Unit',
       autopopulate: { maxDepth: 1 },
     },
-    questions: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Question',
-        autopopulate: { maxDepth: 1 },
-        required() {
-          return this.type === 'quiz'
-        },
-      },
-    ],
     order: {
       type: Number,
     },
-    passingScorePercent: {
-      type: Number,
-    },
   },
-  { timestamps: true }
+  { timestamps: true, discriminatorKey: 'type' }
 )
 
 lessonMaterialSchema.plugin(autopopulate)
 
-module.exports = mongoose.model('LessonMaterial', lessonMaterialSchema)
+const topicSchema = new mongoose.Schema({
+  content: {
+    type: String,
+  },
+})
+
+const quizSchema = new mongoose.Schema({
+  questions: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Question',
+      autopopulate: { maxDepth: 1 },
+    },
+  ],
+  passingScorePercent: {
+    type: Number,
+  },
+})
+
+const LessonMaterial = mongoose.model('LessonMaterial', lessonMaterialSchema)
+const Topic = LessonMaterial.discriminator('topic', topicSchema)
+const Quiz = LessonMaterial.discriminator('quiz', quizSchema)
+
+LessonMaterial.Topic = Topic
+LessonMaterial.Quiz = Quiz
+
+module.exports = LessonMaterial

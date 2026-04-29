@@ -45,9 +45,21 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
-      path: '/lesson/:lessonId',
+      path: '/lesson/:lessonSlug',
       name: 'lesson-detail',
       component: () => import('../views/LessonDetailView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/lesson/:lessonSlug/:unitSlug',
+      name: 'unit-detail',
+      component: () => import('../views/UnitDetailView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/lesson/:lessonSlug/:unitSlug/:materialId',
+      name: 'material-detail',
+      component: () => import('../views/MaterialView.vue'),
       meta: { requiresAuth: true },
     },
     {

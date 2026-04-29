@@ -28,6 +28,10 @@ const unitSchema = new mongoose.Schema(
           ref: 'LessonMaterial',
           autopopulate: { maxDepth: 1 },
         },
+        itemType: {
+          type: String,
+          enum: ['topic', 'quiz'],
+        },
         order: {
           type: Number,
         },

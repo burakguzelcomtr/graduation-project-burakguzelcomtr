@@ -47,6 +47,24 @@ export const useLessonsStore = defineStore('lessons', {
       return this.premunLessons[classGroup]
     },
 
+    async getLessonBySlug(slug) {
+      if (!slug) return null
+
+      const res = await api.get(`/lessons/slug/${slug}`, {
+        params: { withUnits: 'true' },
+      })
+
+      this.lesson = res.data ?? null
+      return this.lesson
+    },
+
+    async getUnitBySlug(lessonSlug, unitSlug) {
+      if (!lessonSlug || !unitSlug) return null
+
+      const res = await api.get(`/lessons/slug/${lessonSlug}/units/${unitSlug}`)
+      return res.data ?? null
+    },
+
     async getLessonById(lessonId) {
       if (!lessonId) return null
 
@@ -58,6 +76,12 @@ export const useLessonsStore = defineStore('lessons', {
 
       this.lesson = res.data ?? null
       return this.lesson
+    },
+
+    async getMaterialById(materialId) {
+      if (!materialId) return null
+      const res = await api.get(`/lesson-materials/${materialId}`)
+      return res.data ?? null
     },
 
     resetCache() {

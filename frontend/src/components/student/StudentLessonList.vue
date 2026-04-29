@@ -23,6 +23,10 @@ function getLessonId(lesson, lessonIndex) {
   return lesson._id ?? `lesson-${lessonIndex}`
 }
 
+function getLessonSlug(lesson, lessonIndex) {
+  return lesson.slug ?? getLessonId(lesson, lessonIndex)
+}
+
 function getUnitId(unit, lesson, unitIndex) {
   return unit._id ?? `${lesson._id ?? 'lesson'}-${unitIndex}`
 }
@@ -50,6 +54,13 @@ function getUnitStatusModifier(unit) {
 function getUnitActionModifier(unit) {
   return getUnitStatus(unit) === 'completed' ? 'review' : 'start'
 }
+
+function unitRoute(unit, lesson) {
+  const lSlug = lesson.slug || lesson._id
+  const uSlug = unit.slug || unit._id
+  if (!lSlug || !uSlug) return null
+  return { name: 'unit-detail', params: { lessonSlug: lSlug, unitSlug: uSlug } }
+}
 </script>
 
 <template lang="pug">
@@ -62,7 +73,7 @@ function getUnitActionModifier(unit) {
       .lp-lesson-list__header-main.col-12.col-md
         router-link.lp-lesson-list__title.lp-lesson-list__title--link(
           v-if="lessonRouteName"
-          :to="{ name: lessonRouteName, params: { lessonId: getLessonId(lesson, lessonIndex) } }"
+          :to="{ name: lessonRouteName, params: { lessonSlug: getLessonSlug(lesson, lessonIndex) } }"
         ) {{ lessonTitle(lesson) }}
         h3.lp-lesson-list__title(v-else) {{ lessonTitle(lesson) }}
       .lp-lesson-list__header-side.col-12.col-md-auto
@@ -78,11 +89,24 @@ function getUnitActionModifier(unit) {
           .lp-lesson-list__num-col.col-auto
             .lp-lesson-list__num {{ getUnitNum(unit, unitIndex) }}
           .lp-lesson-list__info.col-12.col-md
-            .lp-lesson-list__name {{ getUnitName(unit) }}
+            router-link.lp-lesson-list__name.lp-lesson-list__name--link(
+              v-if="unitRoute(unit, lesson)"
+              :to="unitRoute(unit, lesson)"
+            ) {{ getUnitName(unit) }}
+            .lp-lesson-list__name(v-else) {{ getUnitName(unit) }}
             .lp-lesson-list__meta
               span.lp-lesson-list__status(:class="`lp-lesson-list__status--${getUnitStatusModifier(unit)}`") {{ getUnitStatus(unit) === 'completed' ? '✔ Completed' : '⬛ Not Started' }}
           .lp-lesson-list__action-col.col-12.col-md-auto
-            button.lp-lesson-list__action.btn(:class="`lp-lesson-list__action--${getUnitActionModifier(unit)}`" type="button") {{ getUnitStatus(unit) === 'completed' ? 'Review' : 'Start' }}
+            router-link.lp-lesson-list__action.btn(
+              v-if="unitRoute(unit, lesson)"
+              :to="unitRoute(unit, lesson)"
+              :class="`lp-lesson-list__action--${getUnitActionModifier(unit)}`"
+            ) {{ getUnitStatus(unit) === 'completed' ? 'Review' : 'Start' }}
+            button.lp-lesson-list__action.btn(
+              v-else
+              :class="`lp-lesson-list__action--${getUnitActionModifier(unit)}`"
+              type="button"
+            ) {{ getUnitStatus(unit) === 'completed' ? 'Review' : 'Start' }}
 </template>
 
 <style lang="scss" scoped>
@@ -188,6 +212,15 @@ function getUnitActionModifier(unit) {
     color: #2d3748;
     font-size: 14.4px;
     font-weight: 700;
+
+    &--link {
+      text-decoration: none;
+      color: #de7534;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
   }
 
   &__sub {

@@ -54,6 +54,29 @@ router.put('/:id', async (req, res) => {
   }
 })
 
+/* GET lesson by slug. ?withUnits=true includes units. */
+router.get('/slug/:slug', async (req, res) => {
+  try {
+    const { slug } = req.params
+    const withUnits = req.query.withUnits === 'true'
+    const lesson = await LessonManager.getLessonBySlug(slug, withUnits)
+    return res.send(lesson)
+  } catch (error) {
+    return res.status(error.status || 500).send({ error: error.message })
+  }
+})
+
+/* GET unit by lesson slug and unit slug. */
+router.get('/slug/:lessonSlug/units/:unitSlug', async (req, res) => {
+  try {
+    const { lessonSlug, unitSlug } = req.params
+    const unit = await LessonManager.getUnitBySlug(lessonSlug, unitSlug)
+    return res.send(unit)
+  } catch (error) {
+    return res.status(error.status || 500).send({ error: error.message })
+  }
+})
+
 /* GET lesson by id. ?withUnits=true includes units. */
 router.get('/:id', async (req, res) => {
   try {
@@ -80,7 +103,6 @@ router.post('/:lessonId/units', async (req, res) => {
 
 router.post('/:lessonId/units/:unitId/lesson-materials', async (req, res) => {
   try {
-    // TODO : express params
     const { lessonId, unitId } = req.params
     const { lessonMaterialId, order } = req.body
     const unit = await LessonMaterialManager.assignLessonMaterialToUnit({

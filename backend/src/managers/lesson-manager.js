@@ -74,6 +74,32 @@ class LessonManager {
     return lesson
   }
 
+  static async getLessonBySlug(slug, withUnits = false) {
+    const lesson = (await Lesson.findOne({ slug })) ?? (await Lesson.findById(slug).catch(() => null))
+    if (!lesson) {
+      const error = new Error('Lesson not found')
+      error.status = 404
+      throw error
+    }
+    if (withUnits) {
+      return this.getLessonWithUnits(lesson)
+    }
+    return lesson
+  }
+
+  static async getUnitBySlug(lessonSlug, unitSlug) {
+    const lesson = await this.getLessonBySlug(lessonSlug)
+    const unit =
+      (await Unit.findOne({ slug: unitSlug, lesson: lesson.id })) ??
+      (await Unit.findOne({ _id: unitSlug, lesson: lesson.id }).catch(() => null))
+    if (!unit) {
+      const error = new Error('Unit not found')
+      error.status = 404
+      throw error
+    }
+    return unit
+  }
+
   static async getUnitById(unitId) {
     return Unit.findById(unitId)
   }

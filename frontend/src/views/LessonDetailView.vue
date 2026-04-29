@@ -11,15 +11,15 @@ const lessonsStore = useLessonsStore()
 const loading = ref(false)
 const errorMessage = ref('')
 
-const lessonId = computed(() => route.params.lessonId ?? '')
+const lessonSlug = computed(() => route.params.lessonSlug ?? '')
 const lesson = computed(() => lessonsStore.lesson)
 const totalUnits = computed(() => lesson.value?.units?.length ?? 0)
 const currentUnitTitle = computed(() => lesson.value?.units?.[0]?.title ?? '—')
 const completedUnits = 0
 const courseProgress = 0
 
-watch(lessonId, async (id) => {
-  if (!id) {
+watch(lessonSlug, async (slug) => {
+  if (!slug) {
     lessonsStore.lesson = null
     return
   }
@@ -29,7 +29,7 @@ watch(lessonId, async (id) => {
   errorMessage.value = ''
 
   try {
-    await lessonsStore.getLessonById(id)
+    await lessonsStore.getLessonBySlug(slug)
   } catch (error) {
     errorMessage.value = error.response?.data?.error ?? 'Lesson could not be loaded.'
   } finally {
@@ -73,7 +73,7 @@ section.lp-lesson-detail.container-fluid
             h2.lp-lesson-detail__heading Units
             span.lp-lesson-detail__count {{ totalUnits }} units
 
-          StudentLessonUnitsAccordion(:units="lesson.units || []")
+          StudentLessonUnitsAccordion(:units="lesson.units || []" :lesson-slug="lessonSlug")
 </template>
 
 <style lang="scss" scoped>
