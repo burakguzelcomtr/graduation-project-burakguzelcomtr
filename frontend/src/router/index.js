@@ -74,6 +74,18 @@ const router = createRouter({
       component: () => import('../views/TeacherStudents.vue'),
       meta: { requiresAuth: true },
     },
+    {
+      path: '/ai-assistant',
+      name: 'ai-history',
+      component: () => import('../views/AiHistoryView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/ai-assistant/:sessionId',
+      name: 'ai-session-detail',
+      component: () => import('../views/AiSessionDetailView.vue'),
+      meta: { requiresAuth: true },
+    },
   ],
 })
 

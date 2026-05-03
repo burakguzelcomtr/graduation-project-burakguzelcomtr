@@ -2,6 +2,7 @@
 import { RouterView, useRoute } from 'vue-router'
 import { computed, onMounted } from 'vue'
 import Sidebar from './components/Sidebar.vue'
+import ChatBox from './components/ChatBox.vue'
 import { useAuthStore } from '@/stores/auth'
 import { useUserStore } from '@/stores/user'
 
@@ -17,6 +18,7 @@ const showSidebar = computed(() => route.path !== '/' && route.path !== '/login'
   main.lp-app__main
     Suspense
       RouterView
+  ChatBox(v-if="auth.user")
 </template>
 
 <style lang="scss">
