@@ -1,16 +1,22 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import PageHeader from '@/components/PageHeader.vue'
+import MaterialContentRenderer from '@/components/lesson/MaterialContentRenderer.vue'
+import MaterialNavigation from '@/components/lesson/MaterialNavigation.vue'
 import { useLessonsStore } from '@/stores/lessons'
 
 const route = useRoute()
+const router = useRouter()
 const lessonsStore = useLessonsStore()
 const loading = ref(false)
 const errorMessage = ref('')
 const material = ref(null)
+const unitItems = ref([])
 
 const materialId = computed(() => route.params.materialId ?? '')
+const lessonSlug = computed(() => route.params.lessonSlug ?? '')
+const unitSlug = computed(() => route.params.unitSlug ?? '')
 
 watch(
   materialId,
@@ -25,7 +31,12 @@ watch(
     errorMessage.value = ''
 
     try {
-      material.value = await lessonsStore.getMaterialById(id)
+      const [mat, unit] = await Promise.all([
+        lessonsStore.getMaterialById(id),
+        lessonsStore.getUnitBySlug(lessonSlug.value, unitSlug.value),
+      ])
+      material.value = mat
+      unitItems.value = unit?.items ?? []
     } catch (error) {
       errorMessage.value = error.response?.data?.error ?? 'Content could not be loaded.'
     } finally {
@@ -34,6 +45,44 @@ watch(
   },
   { immediate: true },
 )
+
+const currentIndex = computed(() =>
+  unitItems.value.findIndex((item) => {
+    const id = item.item?._id ?? item._id
+    return String(id) === String(materialId.value)
+  }),
+)
+
+const prevItem = computed(() => (currentIndex.value > 0 ? unitItems.value[currentIndex.value - 1] : null))
+const nextItem = computed(() =>
+  currentIndex.value !== -1 && currentIndex.value < unitItems.value.length - 1
+    ? unitItems.value[currentIndex.value + 1]
+    : null,
+)
+const isLast = computed(
+  () => currentIndex.value !== -1 && currentIndex.value === unitItems.value.length - 1,
+)
+
+function itemTitle(item) {
+  return item?.item?.title ?? item?.title ?? ''
+}
+
+function itemType(item) {
+  return item?.item?.type ?? item?.type ?? 'topic'
+}
+
+function itemId(item) {
+  return item?.item?._id ?? item?._id
+}
+
+function navigate(item) {
+  const id = itemId(item)
+  if (!id) return
+  router.push({
+    name: 'material-detail',
+    params: { lessonSlug: lessonSlug.value, unitSlug: unitSlug.value, materialId: id },
+  })
+}
 </script>
 
 <template lang="pug">
@@ -57,7 +106,7 @@ section.lp-material.container-fluid
       //- TOPIC
       template(v-if="material.type === 'topic'")
         .lp-material__topic
-          .lp-material__content(v-if="material.content" v-html="material.content")
+          MaterialContentRenderer(v-if="material.content" :content="material.content")
           p.lp-material__empty-content(v-else) No content has been added yet.
 
       //- QUIZ
@@ -67,13 +116,22 @@ section.lp-material.container-fluid
             span.lp-material__quiz-icon 📝
             p.lp-material__quiz-label Quiz coming soon
             p.lp-material__quiz-sub Quiz details are not available yet.
+
+    //- NAV
+    MaterialNavigation(
+      :prev-item="prevItem"
+      :next-item="nextItem"
+      :is-last="isLast"
+      :lesson-slug="lessonSlug"
+      :unit-slug="unitSlug"
+    )
 </template>
 
 <style lang="scss" scoped>
 .lp-material {
   padding: 24px 0;
   font-family: 'Fredoka', sans-serif;
-
+  margin-bottom: 80px;
   &__loading,
   &__error,
   &__empty {
@@ -102,34 +160,15 @@ section.lp-material.container-fluid
 
   &__body {
     margin-top: 24px;
+    padding: 48px;
+    background-color: #fff; 
+    border: 1px solid #f1f5f9;
+    border-radius: 14px;
   }
 
   &__topic {
-    max-width: 800px;
-  }
-
-  &__content {
-    line-height: 1.8;
-    color: #374151;
-    font-size: 15.2px;
-
-    :deep(h1),
-    :deep(h2),
-    :deep(h3) {
-      margin: 1.2em 0 0.4em;
-      color: #1a202c;
-      font-weight: 700;
-    }
-
-    :deep(p) {
-      margin: 0 0 1em;
-    }
-
-    :deep(ul),
-    :deep(ol) {
-      padding-left: 1.5em;
-      margin-bottom: 1em;
-    }
+    max-width: 100%;
+    margin: 0 auto;
   }
 
   &__empty-content {
