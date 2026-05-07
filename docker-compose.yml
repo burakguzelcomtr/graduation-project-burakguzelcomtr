@@ -9,6 +9,7 @@ services:
     ports:
       - 3000:3000
     volumes:
+      - ./backend/bin:/app/bin
       - ./backend/src:/app/src
     env_file:
       - backend/.env
@@ -22,6 +23,7 @@ services:
     ports:
       - 5173:5173
     volumes:
+      - ./frontend/vite.config.js:/app/vite.config.js
       - ./frontend/src:/app/src
       - ./frontend/public:/app/public 
 

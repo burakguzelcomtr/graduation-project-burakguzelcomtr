@@ -3,10 +3,12 @@ import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import PageHeader from '@/components/PageHeader.vue'
 import { useLessonsStore } from '@/stores/lessons'
+import { useSocketStore } from '@/stores/socket'
 
 const route = useRoute()
 const router = useRouter()
 const lessonsStore = useLessonsStore()
+const socketStore = useSocketStore()
 const loading = ref(false)
 const errorMessage = ref('')
 const unit = ref(null)
@@ -28,6 +30,7 @@ watch(
 
     try {
       unit.value = await lessonsStore.getUnitBySlug(lSlug, uSlug)
+      socketStore.startUnit(unit.value?._id ?? unit.value?.id)
     } catch (error) {
       errorMessage.value = error.response?.data?.error ?? 'Unit could not be loaded.'
     } finally {

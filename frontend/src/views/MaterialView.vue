@@ -5,10 +5,12 @@ import PageHeader from '@/components/PageHeader.vue'
 import MaterialContentRenderer from '@/components/lesson/MaterialContentRenderer.vue'
 import MaterialNavigation from '@/components/lesson/MaterialNavigation.vue'
 import { useLessonsStore } from '@/stores/lessons'
+import { useSocketStore } from '@/stores/socket'
 
 const route = useRoute()
 const router = useRouter()
 const lessonsStore = useLessonsStore()
+const socketStore = useSocketStore()
 const loading = ref(false)
 const errorMessage = ref('')
 const material = ref(null)
@@ -37,6 +39,7 @@ watch(
       ])
       material.value = mat
       unitItems.value = unit?.items ?? []
+      socketStore.startMaterial(material.value?._id ?? material.value?.id)
     } catch (error) {
       errorMessage.value = error.response?.data?.error ?? 'Content could not be loaded.'
     } finally {

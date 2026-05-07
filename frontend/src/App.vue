@@ -1,15 +1,31 @@
 <script setup>
 import { RouterView, useRoute } from 'vue-router'
-import { computed, onMounted } from 'vue'
+import { computed, watch } from 'vue'
+import { ToastifyContainer } from 'vue3-toastify'
 import Sidebar from './components/Sidebar.vue'
 import ChatBox from './components/ChatBox.vue'
 import { useAuthStore } from '@/stores/auth'
-import { useUserStore } from '@/stores/user'
+import { useSocketStore } from '@/stores/socket'
 
 const route = useRoute()
-const auth = useAuthStore() 
+const auth = useAuthStore()
+const socketStore = useSocketStore()
 const showSidebar = computed(() => route.path !== '/' && route.path !== '/login' && route.path !== '/404')
- 
+
+socketStore.init()
+
+watch(
+  () => auth.user,
+  (user) => {
+    if (user) {
+      socketStore.connect()
+      return
+    }
+
+    socketStore.disconnect()
+  },
+  { immediate: true },
+)
 </script>
 
 <template lang="pug">
@@ -19,6 +35,7 @@ const showSidebar = computed(() => route.path !== '/' && route.path !== '/login'
     Suspense
       RouterView
   ChatBox(v-if="auth.user")
+  ToastifyContainer(:limit="4" position="top-right" theme="light")
 </template>
 
 <style lang="scss">
@@ -40,5 +57,14 @@ body {
     transition: margin-left 0.25s ease;
     padding: 15px;
   }
+}
+
+.Toastify__toast-container {
+  z-index: 2000;
+}
+
+.Toastify__toast {
+  border-radius: 18px;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.16);
 }
 </style>
