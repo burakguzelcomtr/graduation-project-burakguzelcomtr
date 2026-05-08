@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import PageHeader from '@/components/PageHeader.vue'
 import { useLessonsStore } from '@/stores/lessons'
 import { useSocketStore } from '@/stores/socket'
+import { displayOrder, numberBulletSrc } from '@/utils/numberBullet'
 
 const route = useRoute()
 const router = useRouter()
@@ -88,7 +89,13 @@ section.lp-unit-detail.container-fluid
               :class="`lp-unit-detail__item--${materialType(item)}`"
             )
               .col-auto
-                span.lp-unit-detail__num {{ item.order ?? (index + 1) }}
+                img.lp-unit-detail__bullet(
+                  v-if="numberBulletSrc(item.order, index)"
+                  :src="numberBulletSrc(item.order, index)"
+                  alt=""
+                  aria-hidden="true"
+                )
+                span.lp-unit-detail__num(v-else) {{ displayOrder(item.order, index) }}
               .col
                 strong.lp-unit-detail__item-title {{ item.item?.title || item.title || ('Lesson item ' + (index + 1)) }}
                 p.lp-unit-detail__item-type(:class="`lp-unit-detail__item-type--${materialType(item)}`") {{ materialType(item).toUpperCase() }}
@@ -176,6 +183,13 @@ section.lp-unit-detail.container-fluid
     color: #fff;
     font-size: 13.6px;
     font-weight: 700;
+  }
+
+  &__bullet {
+    display: block;
+    width: 36px;
+    height: 52px;
+    object-fit: contain;
   }
 
   &__item-title {

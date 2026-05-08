@@ -84,6 +84,15 @@ export const useLessonsStore = defineStore('lessons', {
       return res.data ?? null
     },
 
+    async validateQuestion(questionId, answer) {
+      if (!questionId) {
+        throw new Error('Question id is required')
+      }
+
+      const res = await api.post(`/questions/${questionId}/validate`, { answer })
+      return res.data ?? { isCorrect: false }
+    },
+
     resetCache() {
       this.$reset()
     }

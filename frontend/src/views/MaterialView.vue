@@ -1,11 +1,12 @@
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import PageHeader from '@/components/PageHeader.vue'
 import MaterialContentRenderer from '@/components/lesson/MaterialContentRenderer.vue'
 import MaterialNavigation from '@/components/lesson/MaterialNavigation.vue'
 import { useLessonsStore } from '@/stores/lessons'
 import { useSocketStore } from '@/stores/socket'
+import { numberBulletSrc } from '@/utils/numberBullet'
 
 const route = useRoute()
 const router = useRouter()
@@ -15,6 +16,12 @@ const loading = ref(false)
 const errorMessage = ref('')
 const material = ref(null)
 const unitItems = ref([])
+const quizQuestions = ref([])
+const quizResponses = ref({})
+const quizQuestionStates = ref({})
+const quizFinished = ref(false)
+const currentQuizPage = ref(0)
+const submittingQuestionKey = ref('')
 
 const materialId = computed(() => route.params.materialId ?? '')
 const lessonSlug = computed(() => route.params.lessonSlug ?? '')
@@ -25,10 +32,22 @@ watch(
   async (id) => {
     if (!id) {
       material.value = null
+      quizQuestions.value = []
+      quizResponses.value = {}
+      quizQuestionStates.value = {}
+      quizFinished.value = false
+      currentQuizPage.value = 0
+      submittingQuestionKey.value = ''
       return
     }
 
     material.value = null
+    quizQuestions.value = []
+    quizResponses.value = {}
+    quizQuestionStates.value = {}
+    quizFinished.value = false
+    currentQuizPage.value = 0
+    submittingQuestionKey.value = ''
     loading.value = true
     errorMessage.value = ''
 
@@ -39,6 +58,11 @@ watch(
       ])
       material.value = mat
       unitItems.value = unit?.items ?? []
+
+      if (mat?.type === 'quiz') {
+        quizQuestions.value = Array.isArray(mat?.questions) ? mat.questions : []
+      }
+
       socketStore.startMaterial(material.value?._id ?? material.value?.id)
     } catch (error) {
       errorMessage.value = error.response?.data?.error ?? 'Content could not be loaded.'
@@ -65,6 +89,30 @@ const nextItem = computed(() =>
 const isLast = computed(
   () => currentIndex.value !== -1 && currentIndex.value === unitItems.value.length - 1,
 )
+const completedQuestions = computed(() =>
+  quizQuestions.value.reduce((count, question, index) => count + (isQuestionCompleted(question, index) ? 1 : 0), 0),
+)
+const quizReadyToFinish = computed(() => quizQuestions.value.length > 0 && completedQuestions.value === quizQuestions.value.length)
+const quizSubmitted = computed(() => quizFinished.value && quizReadyToFinish.value)
+const canGoForwardInMaterialNav = computed(() => material.value?.type !== 'quiz' || quizSubmitted.value)
+const shouldDisableNextInMaterialNav = computed(() => material.value?.type === 'quiz' && !quizSubmitted.value)
+const shouldDisableFinishInMaterialNav = computed(() => material.value?.type === 'quiz' && !quizSubmitted.value)
+const currentQuestion = computed(() => quizQuestions.value[currentQuizPage.value] ?? null)
+const currentQuestionIndex = computed(() => {
+  if (!quizQuestions.value.length) {
+    return 0
+  }
+
+  return Math.min(currentQuizPage.value, quizQuestions.value.length - 1)
+})
+const hasPreviousQuizQuestion = computed(() => currentQuestionIndex.value > 0)
+const hasNextQuizQuestion = computed(() => currentQuestionIndex.value < quizQuestions.value.length - 1)
+const currentQuestionCompleted = computed(() =>
+  currentQuestion.value ? isQuestionCompleted(currentQuestion.value, currentQuestionIndex.value) : false,
+)
+const isSubmittingCurrentQuestion = computed(() =>
+  currentQuestion.value ? submittingQuestionKey.value === questionKey(currentQuestion.value, currentQuestionIndex.value) : false,
+)
 
 function itemTitle(item) {
   return item?.item?.title ?? item?.title ?? ''
@@ -85,6 +133,167 @@ function navigate(item) {
     name: 'material-detail',
     params: { lessonSlug: lessonSlug.value, unitSlug: unitSlug.value, materialId: id },
   })
+}
+
+function questionKey(question, index) {
+  return question?._id ?? question?.id ?? `question-${index}`
+}
+
+function quizResponse(question, index) {
+  return quizResponses.value[questionKey(question, index)] ?? ''
+}
+
+function questionState(question, index) {
+  return quizQuestionStates.value[questionKey(question, index)] ?? null
+}
+
+function setQuizResponse(question, index, value) {
+  if (quizSubmitted.value || isQuestionCompleted(question, index)) {
+    return
+  }
+
+  quizResponses.value = {
+    ...quizResponses.value,
+    [questionKey(question, index)]: value,
+  }
+
+  if (questionState(question, index)) {
+    quizQuestionStates.value = {
+      ...quizQuestionStates.value,
+      [questionKey(question, index)]: null,
+    }
+  }
+}
+
+function hasQuizResponse(question, index) {
+  return String(quizResponse(question, index)).trim().length > 0
+}
+
+function questionOptions(question) {
+  if (question?.type === 'true-false') {
+    return question?.answers?.length ? question.answers : ['True', 'False']
+  }
+
+  return question?.answers ?? []
+}
+
+function questionTypeLabel(question) {
+  if (question?.type === 'multiple-choice') return 'Choose one answer'
+  if (question?.type === 'true-false') return 'True or false'
+  if (question?.type === 'short-answer') return 'Write your answer'
+  return 'Question'
+}
+
+function isQuestionCompleted(question, index) {
+  return questionState(question, index)?.completed === true
+}
+
+function questionFeedbackMessage(question, index) {
+  return questionState(question, index)?.message ?? ''
+}
+
+async function submitCurrentQuestion() {
+  if (!currentQuestion.value) {
+    return
+  }
+
+  const question = currentQuestion.value
+  const index = currentQuestionIndex.value
+  const key = questionKey(question, index)
+
+   if (submittingQuestionKey.value) {
+    return
+  }
+
+  submittingQuestionKey.value = key
+  await nextTick()
+
+  try {
+    if (!hasQuizResponse(question, index)) {
+      quizQuestionStates.value = {
+        ...quizQuestionStates.value,
+        [key]: {
+          completed: false,
+          correct: false,
+          message: 'Please answer this question before submitting.',
+        },
+      }
+      return
+    }
+
+    const questionId = question?._id ?? question?.id
+    if (!questionId) {
+      quizQuestionStates.value = {
+        ...quizQuestionStates.value,
+        [key]: {
+          completed: false,
+          correct: false,
+          message: 'Question validation is unavailable right now.',
+        },
+      }
+      return
+    }
+
+    const validation = await lessonsStore.validateQuestion(questionId, quizResponse(question, index))
+    const correct = validation?.isCorrect === true
+
+    if (!correct) {
+      quizQuestionStates.value = {
+        ...quizQuestionStates.value,
+        [key]: {
+          completed: false,
+          correct: false,
+          message: 'That is not correct. Please try again.',
+        },
+      }
+      return
+    }
+
+    quizQuestionStates.value = {
+      ...quizQuestionStates.value,
+      [key]: {
+        completed: true,
+        correct: true,
+        message: hasNextQuizQuestion.value
+          ? 'Correct answer. Moving to the next question.'
+          : 'Correct answer. You can continue the lesson now.',
+      },
+    }
+
+    if (hasNextQuizQuestion.value) {
+      currentQuizPage.value += 1
+      return
+    }
+
+    quizFinished.value = true
+  } catch (error) {
+    quizQuestionStates.value = {
+      ...quizQuestionStates.value,
+      [key]: {
+        completed: false,
+        correct: false,
+        message: error.response?.data?.error ?? error.message ?? 'Question validation failed. Please try again.',
+      },
+    }
+  } finally {
+    submittingQuestionKey.value = ''
+  }
+}
+
+function goToPreviousQuizQuestion() {
+  if (!hasPreviousQuizQuestion.value) {
+    return
+  }
+
+  currentQuizPage.value -= 1
+}
+
+function goToNextQuizQuestion() {
+  if (!hasNextQuizQuestion.value || !currentQuestionCompleted.value) {
+    return
+  }
+
+  currentQuizPage.value += 1
 }
 </script>
 
@@ -115,16 +324,87 @@ section.lp-material.container-fluid
       //- QUIZ
       template(v-else-if="material.type === 'quiz'")
         .lp-material__quiz
-          .lp-material__quiz-placeholder
-            span.lp-material__quiz-icon 📝
-            p.lp-material__quiz-label Quiz coming soon
-            p.lp-material__quiz-sub Quiz details are not available yet.
+          .lp-material__quiz-head
+            .lp-material__quiz-copy
+              h2.lp-material__quiz-title {{ material.title ?? 'Quiz' }}
+              p.lp-material__quiz-subtitle {{ completedQuestions }} / {{ quizQuestions.length }} questions completed
+
+          p.lp-material__quiz-note(v-if="quizSubmitted") Quiz completed successfully. You can continue the lesson now.
+          p.lp-material__quiz-empty(v-if="!quizQuestions.length") No questions have been added to this quiz yet.
+
+          .lp-material__quiz-list(v-else)
+            .lp-material__quiz-pagination
+              span.lp-material__quiz-page Question {{ currentQuestionIndex + 1 }} of {{ quizQuestions.length }}
+
+            article.lp-material__quiz-question(
+              v-if="currentQuestion"
+              :key="questionKey(currentQuestion, currentQuestionIndex)"
+            )
+              .lp-material__quiz-question-head
+                img.lp-material__quiz-number(
+                  v-if="numberBulletSrc(currentQuestion.order, currentQuestionIndex)"
+                  :src="numberBulletSrc(currentQuestion.order, currentQuestionIndex)"
+                  alt=""
+                  aria-hidden="true"
+                )
+                span.lp-material__quiz-number-fallback(v-else) {{ currentQuestionIndex + 1 }}
+                .lp-material__quiz-heading-block
+                  h3.lp-material__quiz-question-title {{ currentQuestion.question }}
+                  p.lp-material__quiz-question-type {{ questionTypeLabel(currentQuestion) }}
+
+              .lp-material__quiz-options(v-if="currentQuestion.type !== 'short-answer'")
+                button.lp-material__quiz-option(
+                  v-for="(answer, answerIndex) in questionOptions(currentQuestion)"
+                  :key="`${questionKey(currentQuestion, currentQuestionIndex)}-${answerIndex}`"
+                  type="button"
+                  :class="{ 'lp-material__quiz-option--selected': quizResponse(currentQuestion, currentQuestionIndex) === answer }"
+                  :disabled="quizSubmitted || currentQuestionCompleted || isSubmittingCurrentQuestion"
+                  @click="setQuizResponse(currentQuestion, currentQuestionIndex, answer)"
+                )
+                  span.lp-material__quiz-option-indicator {{ quizResponse(currentQuestion, currentQuestionIndex) === answer ? '✓' : '' }}
+                  span.lp-material__quiz-option-text {{ answer }}
+
+              textarea.lp-material__quiz-textarea(
+                v-else
+                :value="quizResponse(currentQuestion, currentQuestionIndex)"
+                placeholder="Type your response here"
+                rows="4"
+                :disabled="quizSubmitted || currentQuestionCompleted || isSubmittingCurrentQuestion"
+                @input="setQuizResponse(currentQuestion, currentQuestionIndex, $event.target.value)"
+              )
+
+              p.lp-material__quiz-helper(v-if="currentQuestion.type === 'short-answer'") Submit this answer to check whether it is correct.
+              .lp-material__quiz-feedback(v-if="questionFeedbackMessage(currentQuestion, currentQuestionIndex)")
+                p.lp-material__quiz-feedback-state(:class="{ 'lp-material__quiz-feedback-state--correct': currentQuestionCompleted, 'lp-material__quiz-feedback-state--wrong': !currentQuestionCompleted }")
+                  | {{ questionFeedbackMessage(currentQuestion, currentQuestionIndex) }}
+
+              .lp-material__quiz-footer
+                button.lp-material__quiz-submit.btn(
+                  type="button"
+                  :disabled="quizSubmitted || currentQuestionCompleted || isSubmittingCurrentQuestion"
+                  @click="submitCurrentQuestion"
+                ) {{ isSubmittingCurrentQuestion ? 'Checking...' : (currentQuestionCompleted ? 'Submitted' : 'Submit Answer') }}
+
+                .lp-material__quiz-footer-actions
+                  button.lp-material__quiz-page-btn(
+                    type="button"
+                    :disabled="!hasPreviousQuizQuestion || isSubmittingCurrentQuestion"
+                    @click="goToPreviousQuizQuestion"
+                  ) Previous
+                  button.lp-material__quiz-page-btn(
+                    v-if="hasNextQuizQuestion"
+                    type="button"
+                    :disabled="!currentQuestionCompleted || isSubmittingCurrentQuestion"
+                    @click="goToNextQuizQuestion"
+                  ) Next
 
     //- NAV
     MaterialNavigation(
       :prev-item="prevItem"
       :next-item="nextItem"
       :is-last="isLast"
+      :disable-next="shouldDisableNextInMaterialNav"
+      :disable-finish="shouldDisableFinishInMaterialNav"
       :lesson-slug="lessonSlug"
       :unit-slug="unitSlug"
     )
@@ -179,35 +459,314 @@ section.lp-material.container-fluid
     font-size: 14.4px;
   }
 
-  &__quiz-placeholder {
+  &__quiz {
     display: flex;
     flex-direction: column;
+    gap: 18px;
+  }
+
+  &__quiz-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  &__quiz-title {
+    margin: 0;
+    color: #ea6d27;
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+  }
+
+  &__quiz-subtitle,
+  &__quiz-note,
+  &__quiz-empty,
+  &__quiz-helper {
+    margin: 0;
+    color: #6b7280;
+    font-size: 13.6px;
+  }
+
+  &__quiz-empty {
+    display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    padding: 48px 24px;
+    padding: 32px 24px;
     border-radius: 16px;
-    background: #fffbeb;
-    border: 2px dashed #fcd34d;
-    max-width: 480px;
+    background: #fff9eb;
+    border: 1px dashed #f3a260;
     text-align: center;
   }
 
-  &__quiz-icon {
-    font-size: 40px;
+  &__quiz-list {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
   }
 
-  &__quiz-label {
+  &__quiz-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+
+  &__quiz-page {
+    color: #ea6d27;
+    font-size: 14.4px;
+    font-weight: 800;
+  }
+
+  &__quiz-footer-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  &__quiz-page-btn {
+    padding: 10px 16px;
+    border: 1px dashed #f3a260;
+    border-radius: 12px;
+    background: #fff;
+    color: #ea6d27;
+    font: inherit;
+    font-size: 13.6px;
+    font-weight: 800;
+    cursor: pointer;
+
+    &:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    &--finish {
+      background: linear-gradient(135deg, #7c4dff 0%, #5b3df5 100%);
+      color: #fff;
+      border-color: transparent;
+    }
+  }
+
+  &__quiz-question {
+    padding: 18px;
+    border: 1px dashed #f3a260;
+    border-radius: 18px;
+    background: #fffaf0;
+  }
+
+  &__quiz-question-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+
+  &__quiz-number {
+    display: block;
+    width: 36px;
+    height: 52px;
+    object-fit: contain;
+    flex-shrink: 0;
+  }
+
+  &__quiz-number-fallback {
+    display: inline-flex;
+    width: 36px;
+    height: 36px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: #ea6d27;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 800;
+    flex-shrink: 0;
+  }
+
+  &__quiz-heading-block {
+    min-width: 0;
+  }
+
+  &__quiz-question-title {
     margin: 0;
-    color: #92400e;
-    font-size: 18px;
+    color: #ea6d27;
+    font-size: 17.6px;
+    font-weight: 800;
+  }
+
+  &__quiz-question-type {
+    margin: 4px 0 0;
+    color: #7c4dff;
+    font-size: 12.8px;
     font-weight: 700;
   }
 
-  &__quiz-sub {
+  &__quiz-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  &__quiz-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 14px 18px;
+    border: 1px dashed #f3a260;
+    border-radius: 14px;
+    background: #fff;
+    color: #334155;
+    font-size: 15.2px;
+    font-weight: 700;
+    text-align: left;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 18px rgba(124, 77, 255, 0.12);
+    }
+
+    &:disabled {
+      cursor: default;
+    }
+
+    &--selected {
+      background: linear-gradient(135deg, #7c4dff 0%, #5b3df5 100%);
+      color: #fff;
+    }
+  }
+
+  &__quiz-option-indicator {
+    display: inline-flex;
+    width: 28px;
+    height: 28px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    border: 1px solid currentColor;
+    flex-shrink: 0;
+    font-size: 14px;
+    font-weight: 800;
+  }
+
+  &__quiz-option-text {
+    min-width: 0;
+  }
+
+  &__quiz-textarea {
+    width: 100%;
+    min-height: 120px;
+    padding: 18px 20px;
+    border: 1px dashed #f3a260;
+    border-radius: 14px;
+    background: #fff;
+    color: #334155;
+    font: inherit;
+    resize: vertical;
+
+    &:focus {
+      outline: none;
+      border-color: #ea6d27;
+      box-shadow: 0 0 0 4px rgba(234, 109, 39, 0.12);
+    }
+
+    &:disabled {
+      background: #f8fafc;
+      cursor: default;
+    }
+  }
+
+  &__quiz-feedback {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px dashed #f3a260;
+  }
+
+  &__quiz-feedback-state,
+  &__quiz-feedback-answer {
     margin: 0;
-    color: #b45309;
     font-size: 13.6px;
+  }
+
+  &__quiz-feedback-state {
+    font-weight: 800;
+
+    &--correct {
+      color: #15803d;
+    }
+
+    &--wrong {
+      color: #b91c1c;
+    }
+  }
+
+  &__quiz-feedback-answer {
+    margin-top: 6px;
+    color: #475569;
+  }
+
+  &__quiz-footer {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 18px;
+    flex-wrap: wrap;
+  }
+
+  &__quiz-submit {
+    min-width: 180px;
+    padding: 12px 18px;
+    border: none;
+    border-radius: 12px;
+    background: #ea6d27;
+    color: #fff;
+    font-size: 14.4px;
+    font-weight: 800;
+    cursor: pointer;
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+}
+
+@media (max-width: 700px) {
+  .lp-material {
+    &__body {
+      padding: 24px;
+    }
+
+    &__quiz-head {
+      align-items: stretch;
+    }
+
+    &__quiz-pagination {
+      align-items: stretch;
+    }
+
+    &__quiz-footer {
+      align-items: stretch;
+    }
+
+    &__quiz-footer-actions {
+      width: 100%;
+    }
+
+    &__quiz-page-btn {
+      flex: 1 1 0;
+    }
+
+    &__quiz-submit {
+      width: 100%;
+    }
   }
 }
 </style>

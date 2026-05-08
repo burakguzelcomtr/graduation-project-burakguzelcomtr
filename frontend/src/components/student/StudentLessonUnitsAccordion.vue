@@ -1,5 +1,6 @@
 <script setup>
 import { useRouter } from 'vue-router'
+import { displayOrder, numberBulletSrc } from '@/utils/numberBullet'
 
 const props = defineProps({
   units: {
@@ -34,7 +35,13 @@ function navigateToUnit(unit) {
       summary.lp-lesson-units__summary(:class="{ 'lp-lesson-units__summary--linkable': lessonSlug && (unit.slug || unit._id) }" @click.prevent="lessonSlug ? navigateToUnit(unit) : undefined")
         .lp-lesson-units__summary-main.row
           .col-auto
-            span.lp-lesson-units__number {{ unit.order ?? (unitIndex + 1) }}
+            img.lp-lesson-units__number-bullet(
+              v-if="numberBulletSrc(unit.order, unitIndex)"
+              :src="numberBulletSrc(unit.order, unitIndex)"
+              alt=""
+              aria-hidden="true"
+            )
+            span.lp-lesson-units__number(v-else) {{ displayOrder(unit.order, unitIndex) }}
           .col
             div
               strong.lp-lesson-units__title {{ unit.title || 'Untitled Unit' }}
@@ -49,7 +56,13 @@ function navigateToUnit(unit) {
             :key="item.item?._id ?? item._id ?? itemIndex"
           )
             .col-auto
-              span.lp-lesson-units__row-number {{ item.order ?? (itemIndex + 1) }}
+              img.lp-lesson-units__row-bullet(
+                v-if="numberBulletSrc(item.order, itemIndex)"
+                :src="numberBulletSrc(item.order, itemIndex)"
+                alt=""
+                aria-hidden="true"
+              )
+              span.lp-lesson-units__row-number(v-else) {{ displayOrder(item.order, itemIndex) }}
             .col
               div
                 strong.lp-lesson-units__row-title {{ item.item?.title || item.title || ('Lesson item ' + (itemIndex + 1)) }}
@@ -115,6 +128,13 @@ function navigateToUnit(unit) {
     font-weight: 700;
   }
 
+  &__number-bullet {
+    display: block;
+    width: 36px;
+    height: 52px;
+    object-fit: contain;
+  }
+
   &__title {
     color: #7c2d12;
     font-size: 15.2px;
@@ -162,6 +182,13 @@ function navigateToUnit(unit) {
     color: #7c2d12;
     font-size: 12.8px;
     font-weight: 700;
+  }
+
+  &__row-bullet {
+    display: block;
+    width: 36px;
+    height: 52px;
+    object-fit: contain;
   }
 
   &__row-title {

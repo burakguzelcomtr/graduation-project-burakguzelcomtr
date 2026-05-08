@@ -1,4 +1,6 @@
 <script setup>
+import { displayOrder, numberBulletSrc } from '@/utils/numberBullet'
+
 defineProps({
   lessonCards: {
     type: Array,
@@ -36,7 +38,7 @@ function getUnitName(unit) {
 }
 
 function getUnitNum(unit, unitIndex) {
-  return unit.num ?? unit.order ?? (unitIndex + 1)
+  return displayOrder(unit.num ?? unit.order, unitIndex)
 }
 
 function getUnitStatus(unit) {
@@ -87,7 +89,13 @@ function unitRoute(unit, lesson) {
       )
         .row
           .lp-lesson-list__num-col.col-auto
-            .lp-lesson-list__num {{ getUnitNum(unit, unitIndex) }}
+            img.lp-lesson-list__bullet(
+              v-if="numberBulletSrc(unit.num ?? unit.order, unitIndex)"
+              :src="numberBulletSrc(unit.num ?? unit.order, unitIndex)"
+              alt=""
+              aria-hidden="true"
+            )
+            .lp-lesson-list__num(v-else) {{ getUnitNum(unit, unitIndex) }}
           .lp-lesson-list__info.col-12.col-md
             router-link.lp-lesson-list__name.lp-lesson-list__name--link(
               v-if="unitRoute(unit, lesson)"
@@ -202,6 +210,13 @@ function unitRoute(unit, lesson) {
     color: #fff;
     font-size: 12.48px;
     font-weight: 800;
+  }
+
+  &__bullet {
+    display: block;
+    width: 36px;
+    height: 52px;
+    object-fit: contain;
   }
 
   &__info {

@@ -18,12 +18,16 @@ const questionSchema = new mongoose.Schema(
         required: true,
       },
     ],
-    correctAnswers: [
-      {
-        type: String,
-        required: true,
-      },
-    ],
+    correctAnswers: {
+      type: [
+        {
+          type: String,
+          required: true,
+        },
+      ],
+      default: [],
+      select: false,
+    },
     type: {
       type: String,
       required: true,

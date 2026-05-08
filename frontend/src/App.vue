@@ -11,6 +11,7 @@ const route = useRoute()
 const auth = useAuthStore()
 const socketStore = useSocketStore()
 const showSidebar = computed(() => route.path !== '/' && route.path !== '/login' && route.path !== '/404')
+const showChatBox = computed(() => Boolean(auth.user) && route.path !== '/')
 
 socketStore.init()
 
@@ -34,7 +35,7 @@ watch(
   main.lp-app__main
     Suspense
       RouterView
-  ChatBox(v-if="auth.user")
+  ChatBox(v-if="showChatBox")
   ToastifyContainer(:limit="4" position="top-right" theme="light")
 </template>
 

@@ -1,15 +1,55 @@
 <script setup>
+import confetti from 'canvas-confetti'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 const props = defineProps({
   prevItem: { type: Object, default: null },
   nextItem: { type: Object, default: null },
   isLast: { type: Boolean, default: false },
+  disableNext: { type: Boolean, default: false },
+  disableFinish: { type: Boolean, default: false },
   lessonSlug: { type: String, required: true },
   unitSlug: { type: String, required: true },
 })
 
 const router = useRouter()
+const finishing = ref(false)
+
+function wait(ms) {
+  return new Promise((resolve) => {
+    window.setTimeout(resolve, ms)
+  })
+}
+
+async function playFinishCelebration() {
+  const defaults = {
+    spread: 70,
+    startVelocity: 40,
+    ticks: 180,
+    zIndex: 3000,
+  }
+
+  await Promise.all([
+    confetti({
+      ...defaults,
+      particleCount: 120,
+      origin: { y: 0.55 },
+    }),
+    wait(180).then(() => confetti({
+      ...defaults,
+      particleCount: 70,
+      angle: 60,
+      origin: { x: 0, y: 0.7 },
+    })),
+    wait(180).then(() => confetti({
+      ...defaults,
+      particleCount: 70,
+      angle: 120,
+      origin: { x: 1, y: 0.7 },
+    })),
+  ])
+}
 
 function itemId(item) {
   return item?.item?._id ?? item?._id
@@ -24,6 +64,8 @@ function itemType(item) {
 }
 
 function navigateToItem(item) {
+  if (finishing.value) return
+
   const id = itemId(item)
   if (!id) return
   router.push({
@@ -32,11 +74,22 @@ function navigateToItem(item) {
   })
 }
 
-function finishUnit() {
-  router.push({
-    name: 'unit-detail',
-    params: { lessonSlug: props.lessonSlug, unitSlug: props.unitSlug },
-  })
+async function finishUnit() {
+  if (finishing.value || props.disableFinish) {
+    return
+  }
+
+  finishing.value = true
+
+  try {
+    await playFinishCelebration()
+    await router.push({
+      name: 'unit-detail',
+      params: { lessonSlug: props.lessonSlug, unitSlug: props.unitSlug },
+    })
+  } finally {
+    finishing.value = false
+  }
 }
 </script>
 
@@ -45,6 +98,7 @@ nav.lp-material-nav(v-if="prevItem || nextItem || isLast")
   button.lp-material-nav__btn.lp-material-nav__btn--prev(
     v-if="prevItem"
     type="button"
+    :disabled="finishing"
     @click="navigateToItem(prevItem)"
   )
     span.lp-material-nav__dir Previous
@@ -54,6 +108,7 @@ nav.lp-material-nav(v-if="prevItem || nextItem || isLast")
   button.lp-material-nav__btn.lp-material-nav__btn--next(
     v-if="nextItem"
     type="button"
+    :disabled="disableNext || finishing"
     @click="navigateToItem(nextItem)"
   )
     span.lp-material-nav__dir Next
@@ -61,9 +116,10 @@ nav.lp-material-nav(v-if="prevItem || nextItem || isLast")
   button.lp-material-nav__btn.lp-material-nav__btn--finish(
     v-else-if="isLast"
     type="button"
+    :disabled="disableFinish || finishing"
     @click="finishUnit"
   )
-    span.lp-material-nav__dir Finish Unit
+    span.lp-material-nav__dir {{ finishing ? 'Finishing...' : 'Finish Unit' }}
 </template>
 
 <style lang="scss" scoped>
@@ -98,6 +154,13 @@ nav.lp-material-nav(v-if="prevItem || nextItem || isLast")
       transform: translateY(-2px) scale(1.01);
     }
 
+    &:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
+      filter: grayscale(0.15);
+    }
+
     &--next,
     &--finish {
       margin-left: auto;
@@ -127,6 +190,11 @@ nav.lp-material-nav(v-if="prevItem || nextItem || isLast")
       text-shadow:
         1px 1px #ddd,
         -1px -1px #da7e70;
+    }
+
+    .lp-material-nav__btn:disabled & {
+      text-shadow: none;
+      opacity: 0.8;
     }
   }
 

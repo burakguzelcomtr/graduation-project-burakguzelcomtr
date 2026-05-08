@@ -31,6 +31,19 @@ router.get('/', async (req, res) => {
   }
 })
 
+/* POST validate a submitted answer for a question. */
+router.post('/:id/validate', async (req, res) => {
+  try {
+    const result = await QuestionManager.validateQuestionAnswer({
+      questionId: req.params.id,
+      answer: req.body?.answer,
+    })
+    res.send(result)
+  } catch (error) {
+    res.status(error.status || 500).send({ error: error.message })
+  }
+})
+
 /* GET a single question by id. */
 router.get('/:id', async (req, res) => {
   try {
