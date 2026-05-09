@@ -1,82 +1,82 @@
 const express = require('express')
-const mongoose = require('mongoose')
 
 const router = express.Router()
 
-const User = require('../models/user')
-const Account = require('../models/account')
+const UserManager = require('../managers/user-manager')
 
 /* GET student listing. */
 router.get('/', async (req, res) => {
   try {
     const { grade, section, campus } = req.query
     const query = {}
-
-    if (grade != null) {
-      query.grade = grade
-    }
-
-    if (section) {
-      query.section = section
-    }
-
-    if (campus) {
-      query.campus = campus
-    }
-
-    const students = await User.Student.find(query)
+    if (grade != null) query.grade = grade
+    if (section) query.section = section
+    if (campus) query.campus = campus
+    const students = await UserManager.getStudents(query)
     res.send(students)
   } catch (error) {
-    res.status(500).send({ error: error.message })
+    res.status(error.status ?? 500).send({ error: error.message })
   }
 })
 
 /* GET students by class group. */
 router.get('/class-group/:classGroupId', async (req, res) => {
   try {
-    const { classGroupId } = req.params
-    const students = await User.Student.find({ classGroup: classGroupId })
+    const students = await UserManager.getStudentsByClassGroup(req.params.classGroupId)
     res.send(students)
   } catch (error) {
-    res.status(500).send({ error: error.message })
+    res.status(error.status ?? 500).send({ error: error.message })
   }
 })
 
 /* GET student by id. */
 router.get('/:id', async (req, res) => {
   try {
-    const { id } = req.params
-    const student = await User.Student.findById(id)
-    if (!student) {
-      res.status(404).send({ error: 'Student not found' })
-      return
-    }
+    const student = await UserManager.getStudentById(req.params.id)
     res.send(student)
   } catch (error) {
-    res.status(500).send({ error: error.message })
+    res.status(error.status ?? 500).send({ error: error.message })
+  }
+})
+
+/* PATCH update student profile (hero, country, studentId, grade, section, campus). */
+router.patch('/:id/profile', async (req, res) => {
+  try {
+    const { name, surname, hero, country, studentId, grade, section, campus } = req.body
+    const update = {}
+    if (name !== undefined) update.name = name
+    if (surname !== undefined) update.surname = surname
+    if (hero !== undefined) update.hero = hero || null
+    if (country !== undefined) update.country = country || null
+    if (studentId !== undefined) update.studentId = studentId
+    if (grade !== undefined) update.grade = grade
+    if (section !== undefined) update.section = section
+    if (campus !== undefined) update.campus = campus
+    const student = await UserManager.updateStudentProfile(req.params.id, update)
+    res.send(student)
+  } catch (error) {
+    res.status(error.status ?? 400).send({ error: error.message })
   }
 })
 
 /* POST create a new student. */
 router.post('/', async (req, res) => {
-  const session = await mongoose.startSession()
-  session.startTransaction()
   try {
     const { name, surname, studentId, grade, section, campus, classGroup, email, password } = req.body
-    const [newStudent] = await User.Student.create([{ name, surname, studentId, grade, campus, section, classGroup }], {
-      session,
+    const newStudent = await UserManager.createStudent({
+      name,
+      surname,
+      studentId,
+      grade,
+      section,
+      campus,
+      classGroup,
+      email,
+      password,
     })
-    // eslint-disable-next-line no-underscore-dangle
-    const account = new Account({ email, user: newStudent._id })
-    await account.setPassword(password)
-    await account.save({ session })
-    await session.commitTransaction()
     res.send(newStudent)
   } catch (error) {
-    await session.abortTransaction()
-    res.status(400).send({ error: error.message })
-  } finally {
-    session.endSession()
+    res.status(error.status ?? 400).send({ error: error.message })
   }
 })
 

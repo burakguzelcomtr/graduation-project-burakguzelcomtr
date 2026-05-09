@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="katman_1" data-name="katman 1" xmlns="http://www.w3.org/2000/svg" width="73.1" height="87.72" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 73.1 87.72">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #fff;
+      }
+
+      .cls-2, .cls-3, .cls-4 {
+        fill: none;
+      }
+
+      .cls-3 {
+        stroke: #203664;
+        stroke-width: 19.89px;
+      }
+
+      .cls-4 {
+        stroke: #231f20;
+        stroke-width: .52px;
+      }
+
+      .cls-5 {
+        fill: #010101;
+      }
+
+      .cls-6 {
+        clip-path: url(#clippath);
+      }
+    </style>
+    <clipPath id="clippath">
+      <rect class="cls-2" x=".26" y=".26" width="72.58" height="87.2"/>
+    </clipPath>
+  </defs>
+  <rect class="cls-1" x=".26" y=".26" width="72.58" height="87.2"/>
+  <path class="cls-5" d="M36.47,59.93v27.54-27.54ZM.26,59.93h36.21H.26ZM36.47,59.93h36.37-36.37ZM36.47.26v59.67V.26Z"/>
+  <g class="cls-6">
+    <path class="cls-3" d="M0,59.93h72.94M36.47,103.03V-16.33"/>
+  </g>
+  <rect class="cls-4" x=".26" y=".26" width="72.58" height="87.2"/>
+</svg>

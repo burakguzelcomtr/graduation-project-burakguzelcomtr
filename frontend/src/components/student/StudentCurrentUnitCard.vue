@@ -13,9 +13,11 @@ defineProps({
 
 <template lang="pug">
 .lp-current-unit-card.border-gradient
+  img.lp-current-unit-card__left_image(src="/assets/img/pencil_boy.webp" alt="" aria-hidden="true")
   p.lp-current-unit-card__eyebrow Your Current Unit
   h2.lp-current-unit-card__title {{ currentLesson.toUpperCase() }}
   p.lp-current-unit-card__desc {{ currentLessonDesc }}
+  img.lp-current-unit-card__right_image(src="/assets/img/pencil_girl.webp" alt="" aria-hidden="true")
 </template>
 
 <style lang="scss" scoped>
@@ -26,6 +28,7 @@ defineProps({
   border-radius: 14px;
   background-color: #fff;
   text-align: center; 
+  position: relative;
   &__eyebrow {
     margin: 0 0 6.4px;
     color: #a0aec0;
@@ -50,5 +53,32 @@ defineProps({
     font-size: 14.72px;
     line-height: 1.6;
   }
+  &__left_image,
+  &__right_image {
+    position: absolute;
+      animation: 2s linear 0s infinite alternate none running auto-move-side;
+    transition: 0.3s linear;
+    width: 90px;
+    height: auto;
+  }
+  &__left_image {
+    left: 20px;
+    top: 20%; 
+  }
+  &__right_image {
+    right: 20px;
+    bottom: 20px;   
+  }
+
+  @keyframes auto-move-side {
+    0% {
+      transform: translateY(-50%) translateX(0);
+    }
+    100% {
+      transform: translateY(-50%) translateX(10px);
+    }
+  }
+
+  
 }
 </style>

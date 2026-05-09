@@ -1,5 +1,7 @@
 const mongoose = require('mongoose')
 const autopopulate = require('mongoose-autopopulate')
+require('./hero')
+require('./country')
 
 const userSchema = new mongoose.Schema(
   {
@@ -33,6 +35,18 @@ const studentSchema = new mongoose.Schema({
   campus: {
     type: String,
     required: true,
+  },
+  hero: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Hero',
+    autopopulate: true,
+    default: null,
+  },
+  country: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Country',
+    autopopulate: true,
+    default: null,
   },
 })
 

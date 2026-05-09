@@ -11,10 +11,15 @@ const MongoStore = require('connect-mongo').default
 const socketIo = require('socket.io')
 require('./database-connection')
 
+mongoose.connection.once('open', () => {
+  seedProfileOptions().catch((err) => console.error('Seed error:', err))
+})
+
 const passport = require('passport')
 const Account = require('./models/account')
 const LessonManager = require('./managers/lesson-manager')
 const LessonMaterialManager = require('./managers/lesson-material-manager')
+const seedProfileOptions = require('./utils/seed-profile-options')
 
 const indexRouter = require('./routes/index')
 const studentsRouter = require('./routes/students')
@@ -26,6 +31,8 @@ const lessonMaterialsRouter = require('./routes/lesson-materials')
 const questionsRouter = require('./routes/questions')
 const usersRouter = require('./routes/users')
 const chatRouter = require('./routes/chat')
+const herosRouter = require('./routes/heros')
+const countriesRouter = require('./routes/countries')
 
 // use static authenticate method of model in LocalStrategy
 passport.use(Account.createStrategy())
@@ -73,6 +80,8 @@ app.use('/lesson-materials', lessonMaterialsRouter)
 app.use('/questions', questionsRouter)
 app.use('/users', usersRouter)
 app.use('/chat', chatRouter)
+app.use('/heros', herosRouter)
+app.use('/countries', countriesRouter)
 // catch 404 and forward to error handler
 app.use(function notFoundHandler(req, res, next) {
   next(createError(404))

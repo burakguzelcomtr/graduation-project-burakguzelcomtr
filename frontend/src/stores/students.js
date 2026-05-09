@@ -33,6 +33,13 @@ export const useStudentsStore = defineStore('students', {
 
     resetCache() {
       this.$reset()
-    }
+    },
+
+    async updateStudentProfile(studentId, update) {
+      const res = await api.patch(`/students/${studentId}/profile`, update)
+      this.resetCache()
+      await this.getStudentsByClassGroup()
+      return res.data
+    },
   }
 })
