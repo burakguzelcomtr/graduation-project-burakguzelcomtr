@@ -40,6 +40,10 @@ function buildSystemContent(pageContext, studentContext) {
     if (studentContext.grade) content += `\nGrade: ${studentContext.grade}`
     if (studentContext.section) content += `, Section: ${studentContext.section}`
     if (studentContext.campus) content += `, Campus: ${studentContext.campus}`
+    if (studentContext.role) content += `\nRole: ${studentContext.role}`
+    // student hero and countery
+    if (studentContext.hero) content += `\nFavorite Hero: ${studentContext.hero.name}`
+    if (studentContext.country) content += `\nCountry: ${studentContext.country.name}`
   }
 
   if (pageContext?.title) {

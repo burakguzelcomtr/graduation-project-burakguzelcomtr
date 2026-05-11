@@ -36,10 +36,14 @@ class ChatSessionManager {
   }
 
   static async fetchStudentContext(userId) {
-    const user = await User.findById(userId).select('name surname grade section campus role').lean()
+    // include hero and country so assistant can mention student's assigned hero/country
+    const user = await User.findById(userId)
+      .select('name surname grade section campus role hero country')
+      .populate('hero country')
+      .lean()
     if (!user) return null
-    const { name, surname, grade, section, campus, role } = user
-    return { name, surname, grade, section, campus, role }
+    const { name, surname, grade, section, campus, role, hero, country } = user
+    return { name, surname, grade, section, campus, role, hero, country }
   }
 
   static async prepareUserMessage(userId, { message, page, pageContext, sessionId: incomingSessionId }) {
