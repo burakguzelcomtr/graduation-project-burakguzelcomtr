@@ -1,6 +1,5 @@
-<script setup>
-import { computed, nextTick, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+<script>
+import { nextTick } from 'vue'
 import PageHeader from '@/components/PageHeader.vue'
 import MaterialContentRenderer from '@/components/lesson/MaterialContentRenderer.vue'
 import MaterialNavigation from '@/components/lesson/MaterialNavigation.vue'
@@ -8,292 +7,354 @@ import { useLessonsStore } from '@/stores/lessons'
 import { useSocketStore } from '@/stores/socket'
 import { numberBulletSrc } from '@/utils/numberBullet'
 
-const route = useRoute()
-const router = useRouter()
-const lessonsStore = useLessonsStore()
-const socketStore = useSocketStore()
-const loading = ref(false)
-const errorMessage = ref('')
-const material = ref(null)
-const unitItems = ref([])
-const quizQuestions = ref([])
-const quizResponses = ref({})
-const quizQuestionStates = ref({})
-const quizFinished = ref(false)
-const currentQuizPage = ref(0)
-const submittingQuestionKey = ref('')
+export default {
+  name: 'MaterialView',
 
-const materialId = computed(() => route.params.materialId ?? '')
-const lessonSlug = computed(() => route.params.lessonSlug ?? '')
-const unitSlug = computed(() => route.params.unitSlug ?? '')
+  components: {
+    PageHeader,
+    MaterialContentRenderer,
+    MaterialNavigation,
+  },
 
-watch(
-  materialId,
-  async (id) => {
-    if (!id) {
-      material.value = null
-      quizQuestions.value = []
-      quizResponses.value = {}
-      quizQuestionStates.value = {}
-      quizFinished.value = false
-      currentQuizPage.value = 0
-      submittingQuestionKey.value = ''
-      return
-    }
-
-    material.value = null
-    quizQuestions.value = []
-    quizResponses.value = {}
-    quizQuestionStates.value = {}
-    quizFinished.value = false
-    currentQuizPage.value = 0
-    submittingQuestionKey.value = ''
-    loading.value = true
-    errorMessage.value = ''
-
-    try {
-      const [mat, unit] = await Promise.all([
-        lessonsStore.getMaterialById(id),
-        lessonsStore.getUnitBySlug(lessonSlug.value, unitSlug.value),
-      ])
-      material.value = mat
-      unitItems.value = unit?.items ?? []
-
-      if (mat?.type === 'quiz') {
-        quizQuestions.value = Array.isArray(mat?.questions) ? mat.questions : []
-      }
-
-      socketStore.startMaterial(material.value?._id ?? material.value?.id)
-    } catch (error) {
-      errorMessage.value = error.response?.data?.error ?? 'Content could not be loaded.'
-    } finally {
-      loading.value = false
+  data() {
+    return {
+      lessonsStore: useLessonsStore(),
+      socketStore: useSocketStore(),
+      loading: false,
+      errorMessage: '',
+      material: null,
+      unitItems: [],
+      quizQuestions: [],
+      quizResponses: {},
+      quizQuestionStates: {},
+      quizFinished: false,
+      currentQuizPage: 0,
+      submittingQuestionKey: '',
     }
   },
-  { immediate: true },
-)
 
-const currentIndex = computed(() =>
-  unitItems.value.findIndex((item) => {
-    const id = item.item?._id ?? item._id
-    return String(id) === String(materialId.value)
-  }),
-)
+  computed: {
+    materialId() {
+      return this.$route.params.materialId ?? ''
+    },
 
-const prevItem = computed(() => (currentIndex.value > 0 ? unitItems.value[currentIndex.value - 1] : null))
-const nextItem = computed(() =>
-  currentIndex.value !== -1 && currentIndex.value < unitItems.value.length - 1
-    ? unitItems.value[currentIndex.value + 1]
-    : null,
-)
-const isLast = computed(
-  () => currentIndex.value !== -1 && currentIndex.value === unitItems.value.length - 1,
-)
-const completedQuestions = computed(() =>
-  quizQuestions.value.reduce((count, question, index) => count + (isQuestionCompleted(question, index) ? 1 : 0), 0),
-)
-const quizReadyToFinish = computed(() => quizQuestions.value.length > 0 && completedQuestions.value === quizQuestions.value.length)
-const quizSubmitted = computed(() => quizFinished.value && quizReadyToFinish.value)
-const canGoForwardInMaterialNav = computed(() => material.value?.type !== 'quiz' || quizSubmitted.value)
-const shouldDisableNextInMaterialNav = computed(() => material.value?.type === 'quiz' && !quizSubmitted.value)
-const shouldDisableFinishInMaterialNav = computed(() => material.value?.type === 'quiz' && !quizSubmitted.value)
-const currentQuestion = computed(() => quizQuestions.value[currentQuizPage.value] ?? null)
-const currentQuestionIndex = computed(() => {
-  if (!quizQuestions.value.length) {
-    return 0
-  }
+    lessonSlug() {
+      return this.$route.params.lessonSlug ?? ''
+    },
 
-  return Math.min(currentQuizPage.value, quizQuestions.value.length - 1)
-})
-const hasPreviousQuizQuestion = computed(() => currentQuestionIndex.value > 0)
-const hasNextQuizQuestion = computed(() => currentQuestionIndex.value < quizQuestions.value.length - 1)
-const currentQuestionCompleted = computed(() =>
-  currentQuestion.value ? isQuestionCompleted(currentQuestion.value, currentQuestionIndex.value) : false,
-)
-const isSubmittingCurrentQuestion = computed(() =>
-  currentQuestion.value ? submittingQuestionKey.value === questionKey(currentQuestion.value, currentQuestionIndex.value) : false,
-)
+    unitSlug() {
+      return this.$route.params.unitSlug ?? ''
+    },
 
-function itemTitle(item) {
-  return item?.item?.title ?? item?.title ?? ''
-}
+    currentIndex() {
+      return this.unitItems.findIndex((item) => {
+        const id = item.item?._id ?? item._id
+        return String(id) === String(this.materialId)
+      })
+    },
 
-function itemType(item) {
-  return item?.item?.type ?? item?.type ?? 'topic'
-}
+    prevItem() {
+      return this.currentIndex > 0 ? this.unitItems[this.currentIndex - 1] : null
+    },
 
-function itemId(item) {
-  return item?.item?._id ?? item?._id
-}
+    nextItem() {
+      return this.currentIndex !== -1 && this.currentIndex < this.unitItems.length - 1
+        ? this.unitItems[this.currentIndex + 1]
+        : null
+    },
 
-function navigate(item) {
-  const id = itemId(item)
-  if (!id) return
-  router.push({
-    name: 'material-detail',
-    params: { lessonSlug: lessonSlug.value, unitSlug: unitSlug.value, materialId: id },
-  })
-}
+    isLast() {
+      return this.currentIndex !== -1 && this.currentIndex === this.unitItems.length - 1
+    },
 
-function questionKey(question, index) {
-  return question?._id ?? question?.id ?? `question-${index}`
-}
+    completedQuestions() {
+      return this.quizQuestions.reduce((count, question, index) => count + (this.isQuestionCompleted(question, index) ? 1 : 0), 0)
+    },
 
-function quizResponse(question, index) {
-  return quizResponses.value[questionKey(question, index)] ?? ''
-}
+    quizReadyToFinish() {
+      return this.quizQuestions.length > 0 && this.completedQuestions === this.quizQuestions.length
+    },
 
-function questionState(question, index) {
-  return quizQuestionStates.value[questionKey(question, index)] ?? null
-}
+    quizSubmitted() {
+      return this.quizFinished && this.quizReadyToFinish
+    },
 
-function setQuizResponse(question, index, value) {
-  if (quizSubmitted.value || isQuestionCompleted(question, index)) {
-    return
-  }
+    canGoForwardInMaterialNav() {
+      return this.material?.type !== 'quiz' || this.quizSubmitted
+    },
 
-  quizResponses.value = {
-    ...quizResponses.value,
-    [questionKey(question, index)]: value,
-  }
+    shouldDisableNextInMaterialNav() {
+      return this.material?.type === 'quiz' && !this.quizSubmitted
+    },
 
-  if (questionState(question, index)) {
-    quizQuestionStates.value = {
-      ...quizQuestionStates.value,
-      [questionKey(question, index)]: null,
-    }
-  }
-}
+    shouldDisableFinishInMaterialNav() {
+      return this.material?.type === 'quiz' && !this.quizSubmitted
+    },
 
-function hasQuizResponse(question, index) {
-  return String(quizResponse(question, index)).trim().length > 0
-}
+    currentQuestion() {
+      return this.quizQuestions[this.currentQuizPage] ?? null
+    },
 
-function questionOptions(question) {
-  if (question?.type === 'true-false') {
-    return question?.answers?.length ? question.answers : ['True', 'False']
-  }
-
-  return question?.answers ?? []
-}
-
-function questionTypeLabel(question) {
-  if (question?.type === 'multiple-choice') return 'Choose one answer'
-  if (question?.type === 'true-false') return 'True or false'
-  if (question?.type === 'short-answer') return 'Write your answer'
-  return 'Question'
-}
-
-function isQuestionCompleted(question, index) {
-  return questionState(question, index)?.completed === true
-}
-
-function questionFeedbackMessage(question, index) {
-  return questionState(question, index)?.message ?? ''
-}
-
-async function submitCurrentQuestion() {
-  if (!currentQuestion.value) {
-    return
-  }
-
-  const question = currentQuestion.value
-  const index = currentQuestionIndex.value
-  const key = questionKey(question, index)
-
-   if (submittingQuestionKey.value) {
-    return
-  }
-
-  submittingQuestionKey.value = key
-  await nextTick()
-
-  try {
-    if (!hasQuizResponse(question, index)) {
-      quizQuestionStates.value = {
-        ...quizQuestionStates.value,
-        [key]: {
-          completed: false,
-          correct: false,
-          message: 'Please answer this question before submitting.',
-        },
+    currentQuestionIndex() {
+      if (!this.quizQuestions.length) {
+        return 0
       }
-      return
-    }
 
-    const questionId = question?._id ?? question?.id
-    if (!questionId) {
-      quizQuestionStates.value = {
-        ...quizQuestionStates.value,
-        [key]: {
-          completed: false,
-          correct: false,
-          message: 'Question validation is unavailable right now.',
-        },
-      }
-      return
-    }
+      return Math.min(this.currentQuizPage, this.quizQuestions.length - 1)
+    },
 
-    const validation = await lessonsStore.validateQuestion(questionId, quizResponse(question, index))
-    const correct = validation?.isCorrect === true
+    hasPreviousQuizQuestion() {
+      return this.currentQuestionIndex > 0
+    },
 
-    if (!correct) {
-      quizQuestionStates.value = {
-        ...quizQuestionStates.value,
-        [key]: {
-          completed: false,
-          correct: false,
-          message: 'That is not correct. Please try again.',
-        },
-      }
-      return
-    }
+    hasNextQuizQuestion() {
+      return this.currentQuestionIndex < this.quizQuestions.length - 1
+    },
 
-    quizQuestionStates.value = {
-      ...quizQuestionStates.value,
-      [key]: {
-        completed: true,
-        correct: true,
-        message: hasNextQuizQuestion.value
-          ? 'Correct answer. Moving to the next question.'
-          : 'Correct answer. You can continue the lesson now.',
+    currentQuestionCompleted() {
+      return this.currentQuestion ? this.isQuestionCompleted(this.currentQuestion, this.currentQuestionIndex) : false
+    },
+
+    isSubmittingCurrentQuestion() {
+      return this.currentQuestion ? this.submittingQuestionKey === this.questionKey(this.currentQuestion, this.currentQuestionIndex) : false
+    },
+  },
+
+  watch: {
+    materialId: {
+      immediate: true,
+      async handler(id) {
+        await this.loadMaterial(id)
       },
-    }
+    },
+  },
 
-    if (hasNextQuizQuestion.value) {
-      currentQuizPage.value += 1
-      return
-    }
+  methods: {
+    numberBulletSrc,
 
-    quizFinished.value = true
-  } catch (error) {
-    quizQuestionStates.value = {
-      ...quizQuestionStates.value,
-      [key]: {
-        completed: false,
-        correct: false,
-        message: error.response?.data?.error ?? error.message ?? 'Question validation failed. Please try again.',
-      },
-    }
-  } finally {
-    submittingQuestionKey.value = ''
-  }
-}
+    resetQuizState() {
+      this.quizQuestions = []
+      this.quizResponses = {}
+      this.quizQuestionStates = {}
+      this.quizFinished = false
+      this.currentQuizPage = 0
+      this.submittingQuestionKey = ''
+    },
 
-function goToPreviousQuizQuestion() {
-  if (!hasPreviousQuizQuestion.value) {
-    return
-  }
+    async loadMaterial(id) {
+      if (!id) {
+        this.material = null
+        this.resetQuizState()
+        return
+      }
 
-  currentQuizPage.value -= 1
-}
+      this.material = null
+      this.resetQuizState()
+      this.loading = true
+      this.errorMessage = ''
 
-function goToNextQuizQuestion() {
-  if (!hasNextQuizQuestion.value || !currentQuestionCompleted.value) {
-    return
-  }
+      try {
+        const [mat, unit] = await Promise.all([
+          this.lessonsStore.getMaterialById(id),
+          this.lessonsStore.getUnitBySlug(this.lessonSlug, this.unitSlug),
+        ])
+        this.material = mat
+        this.unitItems = unit?.items ?? []
 
-  currentQuizPage.value += 1
+        if (mat?.type === 'quiz') {
+          this.quizQuestions = Array.isArray(mat?.questions) ? mat.questions : []
+        }
+
+        this.socketStore.startMaterial(this.material?._id ?? this.material?.id)
+      } catch (error) {
+        this.errorMessage = error.response?.data?.error ?? 'Content could not be loaded.'
+      } finally {
+        this.loading = false
+      }
+    },
+
+    itemTitle(item) {
+      return item?.item?.title ?? item?.title ?? ''
+    },
+
+    itemType(item) {
+      return item?.item?.type ?? item?.type ?? 'topic'
+    },
+
+    itemId(item) {
+      return item?.item?._id ?? item?._id
+    },
+
+    navigate(item) {
+      const id = this.itemId(item)
+      if (!id) return
+      this.$router.push({
+        name: 'material-detail',
+        params: { lessonSlug: this.lessonSlug, unitSlug: this.unitSlug, materialId: id },
+      })
+    },
+
+    questionKey(question, index) {
+      return question?._id ?? question?.id ?? `question-${index}`
+    },
+
+    quizResponse(question, index) {
+      return this.quizResponses[this.questionKey(question, index)] ?? ''
+    },
+
+    questionState(question, index) {
+      return this.quizQuestionStates[this.questionKey(question, index)] ?? null
+    },
+
+    setQuizResponse(question, index, value) {
+      if (this.quizSubmitted || this.isQuestionCompleted(question, index)) {
+        return
+      }
+
+      this.quizResponses = {
+        ...this.quizResponses,
+        [this.questionKey(question, index)]: value,
+      }
+
+      if (this.questionState(question, index)) {
+        this.quizQuestionStates = {
+          ...this.quizQuestionStates,
+          [this.questionKey(question, index)]: null,
+        }
+      }
+    },
+
+    hasQuizResponse(question, index) {
+      return String(this.quizResponse(question, index)).trim().length > 0
+    },
+
+    questionOptions(question) {
+      if (question?.type === 'true-false') {
+        return question?.answers?.length ? question.answers : ['True', 'False']
+      }
+
+      return question?.answers ?? []
+    },
+
+    questionTypeLabel(question) {
+      if (question?.type === 'multiple-choice') return 'Choose one answer'
+      if (question?.type === 'true-false') return 'True or false'
+      if (question?.type === 'short-answer') return 'Write your answer'
+      return 'Question'
+    },
+
+    isQuestionCompleted(question, index) {
+      return this.questionState(question, index)?.completed === true
+    },
+
+    questionFeedbackMessage(question, index) {
+      return this.questionState(question, index)?.message ?? ''
+    },
+
+    async submitCurrentQuestion() {
+      if (!this.currentQuestion) {
+        return
+      }
+
+      const question = this.currentQuestion
+      const index = this.currentQuestionIndex
+      const key = this.questionKey(question, index)
+
+      if (this.submittingQuestionKey) {
+        return
+      }
+
+      this.submittingQuestionKey = key
+      await nextTick()
+
+      try {
+        if (!this.hasQuizResponse(question, index)) {
+          this.quizQuestionStates = {
+            ...this.quizQuestionStates,
+            [key]: {
+              completed: false,
+              correct: false,
+              message: 'Please answer this question before submitting.',
+            },
+          }
+          return
+        }
+
+        const questionId = question?._id ?? question?.id
+        if (!questionId) {
+          this.quizQuestionStates = {
+            ...this.quizQuestionStates,
+            [key]: {
+              completed: false,
+              correct: false,
+              message: 'Question validation is unavailable right now.',
+            },
+          }
+          return
+        }
+
+        const validation = await this.lessonsStore.validateQuestion(questionId, this.quizResponse(question, index))
+        const correct = validation?.isCorrect === true
+
+        if (!correct) {
+          this.quizQuestionStates = {
+            ...this.quizQuestionStates,
+            [key]: {
+              completed: false,
+              correct: false,
+              message: 'That is not correct. Please try again.',
+            },
+          }
+          return
+        }
+
+        this.quizQuestionStates = {
+          ...this.quizQuestionStates,
+          [key]: {
+            completed: true,
+            correct: true,
+            message: this.hasNextQuizQuestion
+              ? 'Correct answer. Moving to the next question.'
+              : 'Correct answer. You can continue the lesson now.',
+          },
+        }
+
+        if (this.hasNextQuizQuestion) {
+          this.currentQuizPage += 1
+          return
+        }
+
+        this.quizFinished = true
+      } catch (error) {
+        this.quizQuestionStates = {
+          ...this.quizQuestionStates,
+          [key]: {
+            completed: false,
+            correct: false,
+            message: error.response?.data?.error ?? error.message ?? 'Question validation failed. Please try again.',
+          },
+        }
+      } finally {
+        this.submittingQuestionKey = ''
+      }
+    },
+
+    goToPreviousQuizQuestion() {
+      if (!this.hasPreviousQuizQuestion) {
+        return
+      }
+
+      this.currentQuizPage -= 1
+    },
+
+    goToNextQuizQuestion() {
+      if (!this.hasNextQuizQuestion || !this.currentQuestionCompleted) {
+        return
+      }
+
+      this.currentQuizPage += 1
+    },
+  },
 }
 </script>
 

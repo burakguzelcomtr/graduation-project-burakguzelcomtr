@@ -1,10 +1,18 @@
-<script setup>
-const steps = [
-  { num: '01', icon: '📖', title: 'Learn', desc: 'Dive into curriculum-aligned lessons that blend language skills with global awareness topics.', color: '#fce8d5' },
-  { num: '02', icon: '✏️', title: 'Practice', desc: 'Reinforce knowledge through quizzes, simulations, and interactive exercises.', color: '#d5eafc' },
-  { num: '03', icon: '🤝', title: 'Collaborate', desc: 'Participate in group challenges that mirror real UN and diplomatic scenarios.', color: '#d5fce8' },
-  { num: '04', icon: '🚀', title: 'Grow', desc: 'Track your progress and earn certificates as you advance through the LearnPass journey.', color: '#f5fcd5' },
-]
+<script>
+export default {
+  name: 'HomeJourney',
+
+  data() {
+    return {
+      steps: [
+        { num: '01', icon: '📖', title: 'Learn', desc: 'Dive into curriculum-aligned lessons that blend language skills with global awareness topics.', color: '#fce8d5' },
+        { num: '02', icon: '✏️', title: 'Practice', desc: 'Reinforce knowledge through quizzes, simulations, and interactive exercises.', color: '#d5eafc' },
+        { num: '03', icon: '🤝', title: 'Collaborate', desc: 'Participate in group challenges that mirror real UN and diplomatic scenarios.', color: '#d5fce8' },
+        { num: '04', icon: '🚀', title: 'Grow', desc: 'Track your progress and earn certificates as you advance through the LearnPass journey.', color: '#f5fcd5' },
+      ],
+    }
+  },
+}
 </script>
 
 <template lang="pug">

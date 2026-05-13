@@ -1,95 +1,102 @@
-<script setup>
+<script>
 import confetti from 'canvas-confetti'
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
 
-const props = defineProps({
-  prevItem: { type: Object, default: null },
-  nextItem: { type: Object, default: null },
-  isLast: { type: Boolean, default: false },
-  disableNext: { type: Boolean, default: false },
-  disableFinish: { type: Boolean, default: false },
-  lessonSlug: { type: String, required: true },
-  unitSlug: { type: String, required: true },
-})
+export default {
+  name: 'MaterialNavigation',
 
-const router = useRouter()
-const finishing = ref(false)
+  props: {
+    prevItem: { type: Object, default: null },
+    nextItem: { type: Object, default: null },
+    isLast: { type: Boolean, default: false },
+    disableNext: { type: Boolean, default: false },
+    disableFinish: { type: Boolean, default: false },
+    lessonSlug: { type: String, required: true },
+    unitSlug: { type: String, required: true },
+  },
 
-function wait(ms) {
-  return new Promise((resolve) => {
-    window.setTimeout(resolve, ms)
-  })
-}
+  data() {
+    return {
+      finishing: false,
+    }
+  },
 
-async function playFinishCelebration() {
-  const defaults = {
-    spread: 70,
-    startVelocity: 40,
-    ticks: 180,
-    zIndex: 3000,
-  }
+  methods: {
+    wait(ms) {
+      return new Promise((resolve) => {
+        window.setTimeout(resolve, ms)
+      })
+    },
 
-  await Promise.all([
-    confetti({
-      ...defaults,
-      particleCount: 120,
-      origin: { y: 0.55 },
-    }),
-    wait(180).then(() => confetti({
-      ...defaults,
-      particleCount: 70,
-      angle: 60,
-      origin: { x: 0, y: 0.7 },
-    })),
-    wait(180).then(() => confetti({
-      ...defaults,
-      particleCount: 70,
-      angle: 120,
-      origin: { x: 1, y: 0.7 },
-    })),
-  ])
-}
+    async playFinishCelebration() {
+      const defaults = {
+        spread: 70,
+        startVelocity: 40,
+        ticks: 180,
+        zIndex: 3000,
+      }
 
-function itemId(item) {
-  return item?.item?._id ?? item?._id
-}
+      await Promise.all([
+        confetti({
+          ...defaults,
+          particleCount: 120,
+          origin: { y: 0.55 },
+        }),
+        this.wait(180).then(() => confetti({
+          ...defaults,
+          particleCount: 70,
+          angle: 60,
+          origin: { x: 0, y: 0.7 },
+        })),
+        this.wait(180).then(() => confetti({
+          ...defaults,
+          particleCount: 70,
+          angle: 120,
+          origin: { x: 1, y: 0.7 },
+        })),
+      ])
+    },
 
-function itemTitle(item) {
-  return item?.item?.title ?? item?.title ?? ''
-}
+    itemId(item) {
+      return item?.item?._id ?? item?._id
+    },
 
-function itemType(item) {
-  return item?.item?.type ?? item?.type ?? 'topic'
-}
+    itemTitle(item) {
+      return item?.item?.title ?? item?.title ?? ''
+    },
 
-function navigateToItem(item) {
-  if (finishing.value) return
+    itemType(item) {
+      return item?.item?.type ?? item?.type ?? 'topic'
+    },
 
-  const id = itemId(item)
-  if (!id) return
-  router.push({
-    name: 'material-detail',
-    params: { lessonSlug: props.lessonSlug, unitSlug: props.unitSlug, materialId: id },
-  })
-}
+    navigateToItem(item) {
+      if (this.finishing) return
 
-async function finishUnit() {
-  if (finishing.value || props.disableFinish) {
-    return
-  }
+      const id = this.itemId(item)
+      if (!id) return
+      this.$router.push({
+        name: 'material-detail',
+        params: { lessonSlug: this.lessonSlug, unitSlug: this.unitSlug, materialId: id },
+      })
+    },
 
-  finishing.value = true
+    async finishUnit() {
+      if (this.finishing || this.disableFinish) {
+        return
+      }
 
-  try {
-    await playFinishCelebration()
-    await router.push({
-      name: 'unit-detail',
-      params: { lessonSlug: props.lessonSlug, unitSlug: props.unitSlug },
-    })
-  } finally {
-    finishing.value = false
-  }
+      this.finishing = true
+
+      try {
+        await this.playFinishCelebration()
+        await this.$router.push({
+          name: 'unit-detail',
+          params: { lessonSlug: this.lessonSlug, unitSlug: this.unitSlug },
+        })
+      } finally {
+        this.finishing = false
+      }
+    },
+  },
 }
 </script>
 

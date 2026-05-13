@@ -1,50 +1,85 @@
-<script setup>
-import { computed, onMounted, ref } from 'vue'
+<script>
 import { useLessonsStore } from '@/stores/lessons'
 import { useUserStore } from '@/stores/user'
 import PageHeader from '@/components/PageHeader.vue'
 import StudentProgressSummary from '@/components/student/StudentProgressSummary.vue'
 
-const user = useUserStore()
-const lessonsStore = useLessonsStore()
-const badgesEarned = 0
-const loading = ref(false)
-const hero = computed(() => user.profile?.hero ?? null)
-const country = computed(() => user.profile?.country ?? null)
+export default {
+  name: 'GlobalsView',
 
-onMounted(async () => {
-  if (!user.classGroupKey) {
-    return
-  }
+  components: {
+    PageHeader,
+    StudentProgressSummary,
+  },
 
-  if (!lessonsStore.mainLessons[user.classGroupKey]) {
-    loading.value = true
-  }
+  data() {
+    return {
+      user: useUserStore(),
+      lessonsStore: useLessonsStore(),
+      badgesEarned: 0,
+      loading: false,
+    }
+  },
 
-  try {
-    await lessonsStore.getMainLessons(user.classGroupKey)
-  } finally {
-    loading.value = false
-  }
-})
+  computed: {
+    hero() {
+      return this.user.profile?.hero ?? null
+    },
 
-const lessonCards = computed(() => {
-  if (!user.classGroupKey) {
-    return []
-  }
+    country() {
+      return this.user.profile?.country ?? null
+    },
 
-  return lessonsStore.mainLessons[user.classGroupKey] ?? []
-})
-const totalUnits = computed(() => lessonCards.value.reduce((count, lesson) => count + (lesson.units?.length ?? 0), 0))
-const completedUnits = computed(() => 0)
-const courseProgress = computed(() => 0)
-const currentLesson = computed(() => lessonCards.value[0]?.units?.[0]?.title ?? '—')
+    lessonCards() {
+      if (!this.user.classGroupKey) {
+        return []
+      }
 
-function heroImg(slug) {
-  return `/assets/img/heros/${slug}.svg`
-}
-function countryImg(slug) {
-  return `/assets/img/countries/${slug}.svg`
+      return this.lessonsStore.mainLessons[this.user.classGroupKey] ?? []
+    },
+
+    totalUnits() {
+      return this.lessonCards.reduce((count, lesson) => count + (lesson.units?.length ?? 0), 0)
+    },
+
+    completedUnits() {
+      return 0
+    },
+
+    courseProgress() {
+      return 0
+    },
+
+    currentLesson() {
+      return this.lessonCards[0]?.units?.[0]?.title ?? '—'
+    },
+  },
+
+  async mounted() {
+    if (!this.user.classGroupKey) {
+      return
+    }
+
+    if (!this.lessonsStore.mainLessons[this.user.classGroupKey]) {
+      this.loading = true
+    }
+
+    try {
+      await this.lessonsStore.getMainLessons(this.user.classGroupKey)
+    } finally {
+      this.loading = false
+    }
+  },
+
+  methods: {
+    heroImg(slug) {
+      return `/assets/img/heros/${slug}.svg`
+    },
+
+    countryImg(slug) {
+      return `/assets/img/countries/${slug}.svg`
+    },
+  },
 }
 </script>
 

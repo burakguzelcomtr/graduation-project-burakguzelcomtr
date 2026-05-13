@@ -1,76 +1,85 @@
-<script setup>
-import { computed } from 'vue'
+<script>
 import FlashCardsBlock from './FlashCardsBlock.vue'
 
-const props = defineProps({
-  content: {
-    type: String,
-    default: '',
+export default {
+  name: 'MaterialContentRenderer',
+
+  components: {
+    FlashCardsBlock,
   },
-})
 
-/**
- * Parses the content string into segments:
- *   { type: 'html', content: '...' }
- *   { type: 'pdf', url: '...' }
- *   { type: 'flash_cards', items: ['url1', 'url2', ...] }
- */
-const segments = computed(() => {
-  if (!props.content) return []
+  props: {
+    content: {
+      type: String,
+      default: '',
+    },
+  },
 
-  const result = []
+  computed: {
+    /**
+     * Parses the content string into segments:
+     *   { type: 'html', content: '...' }
+     *   { type: 'pdf', url: '...' }
+     *   { type: 'flash_cards', items: ['url1', 'url2', ...] }
+     */
+    segments() {
+      if (!this.content) return []
 
-  // Combined pattern: matches [pdf url="..."] or [flash_cards]...[/flash_cards]
-  const shortcodePattern =
-    /\[pdf\s+url="([^"]+)"\s*\]|\[flash_cards\]([\s\S]*?)\[\/flash_cards\]/gi
+      const result = []
 
-  let lastIndex = 0
-  let match
+      // Combined pattern: matches [pdf url="..."] or [flash_cards]...[/flash_cards]
+      const shortcodePattern =
+        /\[pdf\s+url="([^"]+)"\s*\]|\[flash_cards\]([\s\S]*?)\[\/flash_cards\]/gi
 
-  while ((match = shortcodePattern.exec(props.content)) !== null) {
-    // Push any HTML text before this match
-    if (match.index > lastIndex) {
-      const htmlChunk = props.content.slice(lastIndex, match.index)
-      if (htmlChunk.trim()) {
-        result.push({ type: 'html', content: htmlChunk })
+      let lastIndex = 0
+      let match
+
+      while ((match = shortcodePattern.exec(this.content)) !== null) {
+        // Push any HTML text before this match
+        if (match.index > lastIndex) {
+          const htmlChunk = this.content.slice(lastIndex, match.index)
+          if (htmlChunk.trim()) {
+            result.push({ type: 'html', content: htmlChunk })
+          }
+        }
+
+        if (match[1] !== undefined) {
+          // [pdf url="..."]
+          result.push({ type: 'pdf', url: match[1] })
+        } else if (match[2] !== undefined) {
+          // [flash_cards]...[/flash_cards]
+          const inner = match[2]
+          const itemPattern = /\[item\s+url="([^"]+)"\s*\/?]/gi
+          const items = []
+          let itemMatch
+          while ((itemMatch = itemPattern.exec(inner)) !== null) {
+            items.push(itemMatch[1])
+          }
+          if (items.length) {
+            result.push({ type: 'flash_cards', items })
+          }
+        }
+
+        lastIndex = match.index + match[0].length
       }
-    }
 
-    if (match[1] !== undefined) {
-      // [pdf url="..."]
-      result.push({ type: 'pdf', url: match[1] })
-    } else if (match[2] !== undefined) {
-      // [flash_cards]...[/flash_cards]
-      const inner = match[2]
-      const itemPattern = /\[item\s+url="([^"]+)"\s*\/?]/gi
-      const items = []
-      let itemMatch
-      while ((itemMatch = itemPattern.exec(inner)) !== null) {
-        items.push(itemMatch[1])
+      // Push any remaining HTML after the last shortcode
+      if (lastIndex < this.content.length) {
+        const remaining = this.content.slice(lastIndex)
+        if (remaining.trim()) {
+          result.push({ type: 'html', content: remaining })
+        }
       }
-      if (items.length) {
-        result.push({ type: 'flash_cards', items })
+
+      // If no shortcodes found, treat the whole content as HTML
+      if (result.length === 0 && this.content.trim()) {
+        result.push({ type: 'html', content: this.content })
       }
-    }
 
-    lastIndex = match.index + match[0].length
-  }
-
-  // Push any remaining HTML after the last shortcode
-  if (lastIndex < props.content.length) {
-    const remaining = props.content.slice(lastIndex)
-    if (remaining.trim()) {
-      result.push({ type: 'html', content: remaining })
-    }
-  }
-
-  // If no shortcodes found, treat the whole content as HTML
-  if (result.length === 0 && props.content.trim()) {
-    result.push({ type: 'html', content: props.content })
-  }
-
-  return result
-})
+      return result
+    },
+  },
+}
 </script>
 
 <template lang="pug">

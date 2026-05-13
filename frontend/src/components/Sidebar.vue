@@ -1,18 +1,28 @@
-<script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+<script>
 import { useAuthStore } from '@/stores/auth'
 import { commonNavItems, studentNavItems, teacherNavItems } from '@/data/navItems.js'
 import { useUserStore } from '@/stores/user'
 
-const router = useRouter()
-const auth = useAuthStore()
-const user = useUserStore()
-const collapsed = ref(false)
+export default {
+  name: 'AppSidebar',
 
-async function handleLogout() {
-  await auth.logout()
-  router.push('/')
+  data() {
+    return {
+      auth: useAuthStore(),
+      user: useUserStore(),
+      collapsed: false,
+      commonNavItems,
+      studentNavItems,
+      teacherNavItems,
+    }
+  },
+
+  methods: {
+    async handleLogout() {
+      await this.auth.logout()
+      this.$router.push('/')
+    },
+  },
 }
 </script>
 

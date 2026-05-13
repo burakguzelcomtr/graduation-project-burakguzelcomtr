@@ -1,21 +1,25 @@
-<script setup>
-import { computed } from 'vue'
+<script>
+export default {
+	name: 'GradeLabel',
 
-const props = defineProps({
-	grade: {
-		type: [Number, String],
-		default: null,
+	props: {
+		grade: {
+			type: [Number, String],
+			default: null,
+		},
 	},
-})
 
-const label = computed(() => {
-	const g = props.grade == null ? null : Number(props.grade)
+	computed: {
+		label() {
+			const g = this.grade == null ? null : Number(this.grade)
 
-	if (!g) return 'Your Grade'
+			if (!g) return 'Your Grade'
 
-	const suffix = g === 1 ? 'st' : g === 2 ? 'nd' : g === 3 ? 'rd' : 'th'
-	return `${g}${suffix} Grade`
-})
+			const suffix = g === 1 ? 'st' : g === 2 ? 'nd' : g === 3 ? 'rd' : 'th'
+			return `${g}${suffix} Grade`
+		},
+	},
+}
 </script>
 
 <template>

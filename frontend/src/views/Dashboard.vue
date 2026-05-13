@@ -1,8 +1,22 @@
-<script setup> 
+<script>
 import { useAuthStore } from '@/stores/auth'
 import StudentDashboard from './StudentDashboard.vue'
 import TeacherDashboard from './TeacherDashboard.vue'
-const auth = useAuthStore()
+
+export default {
+	name: 'DashboardView',
+
+	components: {
+		StudentDashboard,
+		TeacherDashboard,
+	},
+
+	data() {
+		return {
+			auth: useAuthStore(),
+		}
+	},
+}
 </script>
 
 <template lang="pug">

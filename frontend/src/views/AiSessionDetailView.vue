@@ -1,57 +1,72 @@
-<script setup>
-import { ref, onMounted, nextTick, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+<script>
+import { nextTick } from 'vue'
 import { useChatStore } from '@/stores/chat'
 import PageHeader from '@/components/PageHeader.vue'
 
-const route = useRoute()
-const router = useRouter()
-const chat = useChatStore()
+export default {
+  name: 'AiSessionDetailView',
 
-const newMessage = ref('')
-const messagesEnd = ref(null)
+  components: {
+    PageHeader,
+  },
 
-onMounted(async () => {
-  await chat.fetchSession(route.params.sessionId)
-  scrollToBottom()
-})
+  data() {
+    return {
+      chat: useChatStore(),
+      newMessage: '',
+    }
+  },
 
-watch(() => chat.activeMessages.length, () => {
-  scrollToBottom()
-})
+  watch: {
+    'chat.activeMessages.length'() {
+      this.scrollToBottom()
+    },
+  },
 
-function formatDate(dateStr) {
-  const date = new Date(dateStr)
-  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) +
-    ' · ' +
-    date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
-}
+  async mounted() {
+    await this.chat.fetchSession(this.$route.params.sessionId)
+    this.scrollToBottom()
+  },
 
-async function scrollToBottom() {
-  await nextTick()
-  messagesEnd.value?.scrollIntoView({ behavior: 'smooth' })
-}
+  methods: {
+    formatDate(dateStr) {
+      const date = new Date(dateStr)
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) +
+        ' · ' +
+        date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+    },
 
-function handleKeydown(e) {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault()
-    sendMessage()
-  }
-}
+    async scrollToBottom() {
+      await nextTick()
+      this.$refs.messagesEnd?.scrollIntoView({ behavior: 'smooth' })
+    },
 
-async function sendMessage() {
-  const text = newMessage.value.trim()
-  if (!text) return
-  newMessage.value = ''
-  await chat.sendSessionMessage(text)
-  scrollToBottom()
+    handleKeydown(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault()
+        this.sendMessage()
+      }
+    },
+
+    async sendMessage() {
+      const text = this.newMessage.trim()
+      if (!text) return
+      this.newMessage = ''
+      await this.chat.sendSessionMessage(text)
+      this.scrollToBottom()
+    },
+
+    goBackToHistory() {
+      this.$router.push({ name: 'ai-history' })
+    },
+  },
 }
 </script>
 
 <template lang="pug">
 section.lp-ai-session
   .lp-ai-session__back
-    button.lp-ai-session__back-btn(@click="router.push({ name: 'ai-history' })")
+    button.lp-ai-session__back-btn(@click="goBackToHistory")
       | ← Back to History
 
   .lp-ai-session__loading(v-if="chat.activeLoading")

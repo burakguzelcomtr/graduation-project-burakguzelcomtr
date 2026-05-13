@@ -1,9 +1,7 @@
-<script setup>
-import { computed, onMounted, watch } from 'vue'
+<script>
 import Flipbook from 'flipbook-vue'
 import { useUserStore } from '@/stores/user'
 import PageHeader from '@/components/PageHeader.vue'
-import { useRouter } from 'vue-router'
 
 const PASSPORT_PAGE_COUNT = 14
 const passportPages = Array.from({ length: PASSPORT_PAGE_COUNT }, (_, i) => {
@@ -11,20 +9,45 @@ const passportPages = Array.from({ length: PASSPORT_PAGE_COUNT }, (_, i) => {
 	return `/assets/img/grade3-passport/${n}.webp`
 })
 
-const user = useUserStore()
-const router = useRouter()
+export default {
+	name: 'PassportView',
 
-onMounted(() => {
-	if (user.profile && user.profile.role !== 'student') {
-		router.replace({ path: '/dashboard' })
-	}
-})
+	components: {
+		Flipbook,
+		PageHeader,
+	},
 
-watch(() => user.profile, (p) => {
-	if (p && p.role !== 'student') router.replace({ path: '/dashboard' })
-})
+	data() {
+		return {
+			user: useUserStore(),
+			passportPages,
+		}
+	},
 
-const profile = computed(() => user.profile ?? {})
+	computed: {
+		profile() {
+			return this.user.profile ?? {}
+		},
+	},
+
+	watch: {
+		'user.profile'(profile) {
+			this.redirectNonStudent(profile)
+		},
+	},
+
+	mounted() {
+		this.redirectNonStudent(this.user.profile)
+	},
+
+	methods: {
+		redirectNonStudent(profile) {
+			if (profile && profile.role !== 'student') {
+				this.$router.replace({ path: '/dashboard' })
+			}
+		},
+	},
+}
 </script>
 
 <template lang="pug">

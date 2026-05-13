@@ -1,23 +1,37 @@
-<script setup>
-import { ref } from 'vue'
+<script>
 import { Swiper, SwiperSlide } from 'swiper/vue'
 import { Navigation, Pagination } from 'swiper/modules'
 import 'swiper/css'
 import 'swiper/css/navigation'
 import 'swiper/css/pagination'
 
-defineProps({
-  items: {
-    type: Array,
-    default: () => [],
+export default {
+  name: 'FlashCardsBlock',
+
+  components: {
+    Swiper,
+    SwiperSlide,
   },
-})
 
-const modules = [Navigation, Pagination]
-const activeIndex = ref(0)
+  props: {
+    items: {
+      type: Array,
+      default: () => [],
+    },
+  },
 
-function onSlideChange(swiper) {
-  activeIndex.value = swiper.activeIndex
+  data() {
+    return {
+      modules: [Navigation, Pagination],
+      activeIndex: 0,
+    }
+  },
+
+  methods: {
+    onSlideChange(swiper) {
+      this.activeIndex = swiper.activeIndex
+    },
+  },
 }
 </script>
 

@@ -1,24 +1,30 @@
-<script setup>
-import { useRouter } from 'vue-router'
+<script>
 import { displayOrder, numberBulletSrc } from '@/utils/numberBullet'
 
-const props = defineProps({
-  units: {
-    type: Array,
-    default: () => [],
-  },
-  lessonSlug: {
-    type: String,
-    default: '',
-  },
-})
+export default {
+  name: 'StudentLessonUnitsAccordion',
 
-const router = useRouter()
+  props: {
+    units: {
+      type: Array,
+      default: () => [],
+    },
+    lessonSlug: {
+      type: String,
+      default: '',
+    },
+  },
 
-function navigateToUnit(unit) {
-  const uSlug = unit.slug || unit._id
-  if (!props.lessonSlug || !uSlug) return
-  router.push({ name: 'unit-detail', params: { lessonSlug: props.lessonSlug, unitSlug: uSlug } })
+  methods: {
+    displayOrder,
+    numberBulletSrc,
+
+    navigateToUnit(unit) {
+      const uSlug = unit.slug || unit._id
+      if (!this.lessonSlug || !uSlug) return
+      this.$router.push({ name: 'unit-detail', params: { lessonSlug: this.lessonSlug, unitSlug: uSlug } })
+    },
+  },
 }
 </script>
 

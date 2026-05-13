@@ -1,4 +1,7 @@
-<script setup>
+<script>
+export default {
+  name: 'HomeWhy',
+}
 </script>
 
 <template lang="pug">

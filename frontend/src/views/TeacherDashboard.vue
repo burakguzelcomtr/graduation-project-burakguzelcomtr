@@ -1,5 +1,13 @@
-<script setup>
+<script>
 import PageHeader from '@/components/PageHeader.vue'
+
+export default {
+  name: 'TeacherDashboard',
+
+  components: {
+    PageHeader,
+  },
+}
 </script>
 
 <template lang="pug">

@@ -1,9 +1,13 @@
-<script setup>
-defineProps({
-  title: { type: String, required: true },
-  subtitle: { type: String, default: '' },
-  showDecoration: { type: Boolean, default: true },
-})
+<script>
+export default {
+  name: 'PageHeader',
+
+  props: {
+    title: { type: String, required: true },
+    subtitle: { type: String, default: '' },
+    showDecoration: { type: Boolean, default: true },
+  },
+}
 </script>
 
 <template lang="pug">

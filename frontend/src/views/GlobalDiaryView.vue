@@ -1,8 +1,22 @@
-<script setup>
+<script>
 import { useUserStore } from '@/stores/user'
 import StudentDashboard from './StudentDashboard.vue'
 import TeacherDashboard from './TeacherDashboard.vue'
-const user = useUserStore() 
+
+export default {
+	name: 'GlobalDiaryView',
+
+	components: {
+		StudentDashboard,
+		TeacherDashboard,
+	},
+
+	data() {
+		return {
+			user: useUserStore(),
+		}
+	},
+}
 </script>
 
 <template lang="pug">

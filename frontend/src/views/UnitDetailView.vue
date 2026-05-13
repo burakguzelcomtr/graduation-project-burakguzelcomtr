@@ -1,57 +1,86 @@
-<script setup>
-import { computed, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+<script>
 import PageHeader from '@/components/PageHeader.vue'
 import { useLessonsStore } from '@/stores/lessons'
 import { useSocketStore } from '@/stores/socket'
 import { displayOrder, numberBulletSrc } from '@/utils/numberBullet'
 
-const route = useRoute()
-const router = useRouter()
-const lessonsStore = useLessonsStore()
-const socketStore = useSocketStore()
-const loading = ref(false)
-const errorMessage = ref('')
-const unit = ref(null)
+export default {
+  name: 'UnitDetailView',
 
-const lessonSlug = computed(() => route.params.lessonSlug ?? '')
-const unitSlug = computed(() => route.params.unitSlug ?? '')
+  components: {
+    PageHeader,
+  },
 
-watch(
-  [lessonSlug, unitSlug],
-  async ([lSlug, uSlug]) => {
-    if (!lSlug || !uSlug) {
-      unit.value = null
-      return
-    }
-
-    unit.value = null
-    loading.value = true
-    errorMessage.value = ''
-
-    try {
-      unit.value = await lessonsStore.getUnitBySlug(lSlug, uSlug)
-      socketStore.startUnit(unit.value?._id ?? unit.value?.id)
-    } catch (error) {
-      errorMessage.value = error.response?.data?.error ?? 'Unit could not be loaded.'
-    } finally {
-      loading.value = false
+  data() {
+    return {
+      lessonsStore: useLessonsStore(),
+      socketStore: useSocketStore(),
+      loading: false,
+      errorMessage: '',
+      unit: null,
     }
   },
-  { immediate: true },
-)
 
-function materialRoute(item) {
-  const id = item.item?._id ?? item._id
-  if (!id) return null
-  return {
-    name: 'material-detail',
-    params: { lessonSlug: lessonSlug.value, unitSlug: unitSlug.value, materialId: id },
-  }
-}
+  watch: {
+    routeKey: {
+      immediate: true,
+      async handler() {
+        await this.loadUnit()
+      },
+    },
+  },
 
-function materialType(item) {
-  return item.item?.type ?? item.type ?? 'topic'
+  computed: {
+    lessonSlug() {
+      return this.$route.params.lessonSlug ?? ''
+    },
+
+    unitSlug() {
+      return this.$route.params.unitSlug ?? ''
+    },
+
+    routeKey() {
+      return `${this.lessonSlug}:${this.unitSlug}`
+    },
+  },
+
+  methods: {
+    displayOrder,
+    numberBulletSrc,
+
+    async loadUnit() {
+      if (!this.lessonSlug || !this.unitSlug) {
+        this.unit = null
+        return
+      }
+
+      this.unit = null
+      this.loading = true
+      this.errorMessage = ''
+
+      try {
+        this.unit = await this.lessonsStore.getUnitBySlug(this.lessonSlug, this.unitSlug)
+        this.socketStore.startUnit(this.unit?._id ?? this.unit?.id)
+      } catch (error) {
+        this.errorMessage = error.response?.data?.error ?? 'Unit could not be loaded.'
+      } finally {
+        this.loading = false
+      }
+    },
+
+    materialRoute(item) {
+      const id = item.item?._id ?? item._id
+      if (!id) return null
+      return {
+        name: 'material-detail',
+        params: { lessonSlug: this.lessonSlug, unitSlug: this.unitSlug, materialId: id },
+      }
+    },
+
+    materialType(item) {
+      return item.item?.type ?? item.type ?? 'topic'
+    },
+  },
 }
 </script>
 

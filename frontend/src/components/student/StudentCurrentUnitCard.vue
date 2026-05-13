@@ -1,14 +1,18 @@
-<script setup>
-defineProps({
-  currentLesson: {
-    type: String,
-    default: '—',
+<script>
+export default {
+  name: 'StudentCurrentUnitCard',
+
+  props: {
+    currentLesson: {
+      type: String,
+      default: '—',
+    },
+    currentLessonDesc: {
+      type: String,
+      default: '',
+    },
   },
-  currentLessonDesc: {
-    type: String,
-    default: '',
-  },
-})
+}
 </script>
 
 <template lang="pug">

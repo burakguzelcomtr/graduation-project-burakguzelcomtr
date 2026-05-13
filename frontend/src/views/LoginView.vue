@@ -1,27 +1,33 @@
-<script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+<script>
 import { useAuthStore } from '@/stores/auth'
 
-const router = useRouter()
-const auth = useAuthStore()
+export default {
+  name: 'LoginView',
 
-const email = ref('')
-const password = ref('')
-const error = ref('')
-const loading = ref(false)
+  data() {
+    return {
+      auth: useAuthStore(),
+      email: '',
+      password: '',
+      error: '',
+      loading: false,
+    }
+  },
 
-async function handleLogin() {
-  error.value = ''
-  loading.value = true
-  try {
-    await auth.login(email.value, password.value)
-    router.push('/dashboard')
-  } catch (e) {
-    error.value = e.message
-  } finally {
-    loading.value = false
-  }
+  methods: {
+    async handleLogin() {
+      this.error = ''
+      this.loading = true
+      try {
+        await this.auth.login(this.email, this.password)
+        this.$router.push('/dashboard')
+      } catch (e) {
+        this.error = e.message
+      } finally {
+        this.loading = false
+      }
+    },
+  },
 }
 </script>
 

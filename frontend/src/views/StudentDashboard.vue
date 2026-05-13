@@ -1,5 +1,4 @@
-<script setup>
-import { computed, onMounted, ref } from 'vue'
+<script>
 import { useUserStore } from '@/stores/user'
 import { useLessonsStore } from '@/stores/lessons'
 
@@ -9,39 +8,68 @@ import StudentLessonList from '@/components/student/StudentLessonList.vue'
 import StudentProgressSummary from '@/components/student/StudentProgressSummary.vue'
 import StudentSummaryCard from '@/components/student/StudentSummaryCard.vue'
 
-const user = useUserStore()
-const lessonsStore = useLessonsStore()
-const badgesEarned = 0
-const loading = ref(false)
+export default {
+	name: 'StudentDashboard',
 
-onMounted(async () => {
-	if (!user.classGroupKey) {
-		return
-	}
+	components: {
+		PageHeader,
+		StudentCurrentUnitCard,
+		StudentLessonList,
+		StudentProgressSummary,
+		StudentSummaryCard,
+	},
 
-	if (!lessonsStore.mainLessons[user.classGroupKey]) {
-		loading.value = true
-	}
+	data() {
+		return {
+			user: useUserStore(),
+			lessonsStore: useLessonsStore(),
+			badgesEarned: 0,
+			loading: false,
+		}
+	},
 
-	try {
-		await lessonsStore.getMainLessons(user.classGroupKey)
-	} finally {
-		loading.value = false
-	}
-})
+	computed: {
+		lessonCards() {
+			if (!this.user.classGroupKey) {
+				return []
+			}
 
-const lessonCards = computed(() => {
-	if (!user.classGroupKey) {
-		return []
-	}
+			return this.lessonsStore.mainLessons[this.user.classGroupKey] ?? []
+		},
 
-	return lessonsStore.mainLessons[user.classGroupKey] ?? []
-})
-const currentUnitData = computed(() => lessonCards.value[0]?.units?.[0] ?? null)
+		currentUnitData() {
+			return this.lessonCards[0]?.units?.[0] ?? null
+		},
 
-const totalUnits = computed(() => lessonCards.value.reduce((count, lesson) => count + (lesson.units?.length ?? 0), 0))
-const completedUnits = computed(() => 0)
-const courseProgress = computed(() => 0)
+		totalUnits() {
+			return this.lessonCards.reduce((count, lesson) => count + (lesson.units?.length ?? 0), 0)
+		},
+
+		completedUnits() {
+			return 0
+		},
+
+		courseProgress() {
+			return 0
+		},
+	},
+
+	async mounted() {
+		if (!this.user.classGroupKey) {
+			return
+		}
+
+		if (!this.lessonsStore.mainLessons[this.user.classGroupKey]) {
+			this.loading = true
+		}
+
+		try {
+			await this.lessonsStore.getMainLessons(this.user.classGroupKey)
+		} finally {
+			this.loading = false
+		}
+	},
+}
 </script>
 
 <template lang="pug">

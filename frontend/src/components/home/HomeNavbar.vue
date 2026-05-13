@@ -1,8 +1,13 @@
-<script setup>
-defineProps({
-  loggedIn: { type: Boolean, default: false },
-})
-defineEmits(['loginClick'])
+<script>
+export default {
+  name: 'HomeNavbar',
+
+  emits: ['loginClick'],
+
+  props: {
+    loggedIn: { type: Boolean, default: false },
+  },
+}
 </script>
 
 <template lang="pug">

@@ -1,67 +1,75 @@
-<script setup>
+<script>
 import { displayOrder, numberBulletSrc } from '@/utils/numberBullet'
 
-defineProps({
-  lessonCards: {
-    type: Array,
-    default: () => [],
+export default {
+  name: 'StudentLessonList',
+
+  props: {
+    lessonCards: {
+      type: Array,
+      default: () => [],
+    },
+    lessonRouteName: {
+      type: String,
+      default: '',
+    },
   },
-  lessonRouteName: {
-    type: String,
-    default: '',
+
+  methods: {
+    numberBulletSrc,
+
+    // Helpers support both the mapped shape and raw API lesson/unit objects.
+    lessonTitle(lesson) {
+      return lesson.title ?? lesson.name ?? 'Untitled Lesson'
+    },
+
+    lessonUnitCount(lesson) {
+      return (lesson.units ?? []).length
+    },
+
+    getLessonId(lesson, lessonIndex) {
+      return lesson._id ?? `lesson-${lessonIndex}`
+    },
+
+    getLessonSlug(lesson, lessonIndex) {
+      return lesson.slug ?? this.getLessonId(lesson, lessonIndex)
+    },
+
+    getUnitId(unit, lesson, unitIndex) {
+      return unit._id ?? `${lesson._id ?? 'lesson'}-${unitIndex}`
+    },
+
+    getUnitName(unit) {
+      return unit.title ?? unit.name ?? 'Untitled Unit'
+    },
+
+    getUnitNum(unit, unitIndex) {
+      return displayOrder(unit.num ?? unit.order, unitIndex)
+    },
+
+    getUnitStatus(unit) {
+      if (!unit) return 'not_started'
+      if (typeof unit.status === 'string') return unit.status
+      if (unit.completed === true) return 'completed'
+      if (unit.progress && unit.progress.completed) return 'completed'
+      return 'not_started'
+    },
+
+    getUnitStatusModifier(unit) {
+      return this.getUnitStatus(unit).replaceAll('_', '-')
+    },
+
+    getUnitActionModifier(unit) {
+      return this.getUnitStatus(unit) === 'completed' ? 'review' : 'start'
+    },
+
+    unitRoute(unit, lesson) {
+      const lSlug = lesson.slug || lesson._id
+      const uSlug = unit.slug || unit._id
+      if (!lSlug || !uSlug) return null
+      return { name: 'unit-detail', params: { lessonSlug: lSlug, unitSlug: uSlug } }
+    },
   },
-})
-
-// Helpers to support both the previously-mapped shape and the raw API lesson/unit objects
-function lessonTitle(lesson) {
-  return lesson.title ?? lesson.name ?? 'Untitled Lesson'
-}
-
-function lessonUnitCount(lesson) {
-  return (lesson.units ?? []).length
-}
-
-function getLessonId(lesson, lessonIndex) {
-  return lesson._id ?? `lesson-${lessonIndex}`
-}
-
-function getLessonSlug(lesson, lessonIndex) {
-  return lesson.slug ?? getLessonId(lesson, lessonIndex)
-}
-
-function getUnitId(unit, lesson, unitIndex) {
-  return unit._id ?? `${lesson._id ?? 'lesson'}-${unitIndex}`
-}
-
-function getUnitName(unit) {
-  return unit.title ?? unit.name ?? 'Untitled Unit'
-}
-
-function getUnitNum(unit, unitIndex) {
-  return displayOrder(unit.num ?? unit.order, unitIndex)
-}
-
-function getUnitStatus(unit) {
-  if (!unit) return 'not_started'
-  if (typeof unit.status === 'string') return unit.status
-  if (unit.completed === true) return 'completed'
-  if (unit.progress && unit.progress.completed) return 'completed'
-  return 'not_started'
-}
-
-function getUnitStatusModifier(unit) {
-  return getUnitStatus(unit).replaceAll('_', '-')
-}
-
-function getUnitActionModifier(unit) {
-  return getUnitStatus(unit) === 'completed' ? 'review' : 'start'
-}
-
-function unitRoute(unit, lesson) {
-  const lSlug = lesson.slug || lesson._id
-  const uSlug = unit.slug || unit._id
-  if (!lSlug || !uSlug) return null
-  return { name: 'unit-detail', params: { lessonSlug: lSlug, unitSlug: uSlug } }
 }
 </script>
 

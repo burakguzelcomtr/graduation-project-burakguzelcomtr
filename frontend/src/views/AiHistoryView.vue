@@ -1,28 +1,39 @@
-<script setup>
-import { onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+<script>
 import { useChatStore } from '@/stores/chat'
 import PageHeader from '@/components/PageHeader.vue'
 
-const router = useRouter()
-const chat = useChatStore()
+export default {
+  name: 'AiHistoryView',
 
-onMounted(() => {
-  chat.fetchSessions()
-})
+  components: {
+    PageHeader,
+  },
 
-function formatDate(dateStr) {
-  const date = new Date(dateStr)
-  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-}
+  data() {
+    return {
+      chat: useChatStore(),
+    }
+  },
 
-function formatTime(dateStr) {
-  const date = new Date(dateStr)
-  return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
-}
+  mounted() {
+    this.chat.fetchSessions()
+  },
 
-function openSession(id) {
-  router.push({ name: 'ai-session-detail', params: { sessionId: id } })
+  methods: {
+    formatDate(dateStr) {
+      const date = new Date(dateStr)
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    },
+
+    formatTime(dateStr) {
+      const date = new Date(dateStr)
+      return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+    },
+
+    openSession(id) {
+      this.$router.push({ name: 'ai-session-detail', params: { sessionId: id } })
+    },
+  },
 }
 </script>
 

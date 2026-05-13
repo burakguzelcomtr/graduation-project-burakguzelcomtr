@@ -1,32 +1,58 @@
-<script setup>
-import { RouterView, useRoute } from 'vue-router'
-import { computed, watch } from 'vue'
+<script>
+import { RouterView } from 'vue-router'
 import { ToastifyContainer } from 'vue3-toastify'
 import Sidebar from './components/Sidebar.vue'
 import ChatBox from './components/ChatBox.vue'
 import { useAuthStore } from '@/stores/auth'
 import { useSocketStore } from '@/stores/socket'
 
-const route = useRoute()
-const auth = useAuthStore()
-const socketStore = useSocketStore()
-const showSidebar = computed(() => route.path !== '/' && route.path !== '/login' && route.path !== '/404')
-const showChatBox = computed(() => Boolean(auth.user) && route.path !== '/')
-
-socketStore.init()
-
-watch(
-  () => auth.user,
-  (user) => {
-    if (user) {
-      socketStore.connect()
-      return
-    }
-
-    socketStore.disconnect()
+export default {
+  components: {
+    RouterView,
+    ToastifyContainer,
+    Sidebar,
+    ChatBox,
   },
-  { immediate: true },
-)
+
+  data() {
+    return {
+      auth: useAuthStore(),
+      socketStore: useSocketStore(),
+    }
+  },
+
+  computed: {
+    showSidebar() {
+      return this.$route.path !== '/' && this.$route.path !== '/login' && this.$route.path !== '/404'
+    },
+
+    showChatBox() {
+      return Boolean(this.auth.user) && this.$route.path !== '/'
+    },
+  },
+
+  watch: {
+    'auth.user'(user) {
+      this.syncSocketConnection(user)
+    },
+  },
+
+  created() {
+    this.socketStore.init()
+    this.syncSocketConnection(this.auth.user)
+  },
+
+  methods: {
+    syncSocketConnection(user) {
+      if (user) {
+        this.socketStore.connect()
+        return
+      }
+
+      this.socketStore.disconnect()
+    },
+  },
+}
 </script>
 
 <template lang="pug">

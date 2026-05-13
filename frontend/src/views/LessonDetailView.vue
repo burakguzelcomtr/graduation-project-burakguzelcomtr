@@ -1,41 +1,76 @@
-<script setup>
-import { computed, ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
+<script>
 import PageHeader from '@/components/PageHeader.vue'
 import StudentProgressSummary from '@/components/student/StudentProgressSummary.vue'
 import StudentLessonUnitsAccordion from '@/components/student/StudentLessonUnitsAccordion.vue'
 import { useLessonsStore } from '@/stores/lessons'
 
-const route = useRoute()
-const lessonsStore = useLessonsStore()
-const loading = ref(false)
-const errorMessage = ref('')
+export default {
+  name: 'LessonDetailView',
 
-const lessonSlug = computed(() => route.params.lessonSlug ?? '')
-const lesson = computed(() => lessonsStore.lesson)
-const totalUnits = computed(() => lesson.value?.units?.length ?? 0)
-const currentUnitTitle = computed(() => lesson.value?.units?.[0]?.title ?? '—')
-const completedUnits = 0
-const courseProgress = 0
+  components: {
+    PageHeader,
+    StudentProgressSummary,
+    StudentLessonUnitsAccordion,
+  },
 
-watch(lessonSlug, async (slug) => {
-  if (!slug) {
-    lessonsStore.lesson = null
-    return
-  }
+  data() {
+    return {
+      lessonsStore: useLessonsStore(),
+      loading: false,
+      errorMessage: '',
+      completedUnits: 0,
+      courseProgress: 0,
+    }
+  },
 
-  lessonsStore.lesson = null
-  loading.value = true
-  errorMessage.value = ''
+  computed: {
+    lessonSlug() {
+      return this.$route.params.lessonSlug ?? ''
+    },
 
-  try {
-    await lessonsStore.getLessonBySlug(slug)
-  } catch (error) {
-    errorMessage.value = error.response?.data?.error ?? 'Lesson could not be loaded.'
-  } finally {
-    loading.value = false
-  }
-}, { immediate: true })
+    lesson() {
+      return this.lessonsStore.lesson
+    },
+
+    totalUnits() {
+      return this.lesson?.units?.length ?? 0
+    },
+
+    currentUnitTitle() {
+      return this.lesson?.units?.[0]?.title ?? '—'
+    },
+  },
+
+  watch: {
+    lessonSlug: {
+      immediate: true,
+      async handler(slug) {
+        await this.loadLesson(slug)
+      },
+    },
+  },
+
+  methods: {
+    async loadLesson(slug) {
+      if (!slug) {
+        this.lessonsStore.lesson = null
+        return
+      }
+
+      this.lessonsStore.lesson = null
+      this.loading = true
+      this.errorMessage = ''
+
+      try {
+        await this.lessonsStore.getLessonBySlug(slug)
+      } catch (error) {
+        this.errorMessage = error.response?.data?.error ?? 'Lesson could not be loaded.'
+      } finally {
+        this.loading = false
+      }
+    },
+  },
+}
 </script>
 
 <template lang="pug">

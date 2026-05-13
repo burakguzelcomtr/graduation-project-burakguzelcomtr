@@ -1,43 +1,70 @@
-<script setup>
-import { computed, onMounted, ref } from 'vue' 
+<script>
 import { useUserStore } from '@/stores/user'
 import { useLessonsStore } from '@/stores/lessons'
 import PageHeader from '@/components/PageHeader.vue'
 import StudentLessonList from '@/components/student/StudentLessonList.vue'
 import StudentProgressSummary from '@/components/student/StudentProgressSummary.vue'
  
-const user = useUserStore()
-const lessonsStore = useLessonsStore()
-const badgesEarned = 0
-const loading = ref(false)
+export default {
+  name: 'PremunHub',
 
-onMounted(async () => { 
-  if (!user.classGroupKey) {
-    return
-  }
+  components: {
+    PageHeader,
+    StudentLessonList,
+    StudentProgressSummary,
+  },
 
-  if (!lessonsStore.premunLessons[user.classGroupKey]) {
-    loading.value = true
-  }
-  
-  try {
-    await lessonsStore.getPremunLessons(user.classGroupKey)
-  } finally {
-    loading.value = false
-  }
-})
+  data() {
+    return {
+      user: useUserStore(),
+      lessonsStore: useLessonsStore(),
+      badgesEarned: 0,
+      loading: false,
+    }
+  },
 
-const lessonCards = computed(() => {
-  if (!user.classGroupKey) {
-    return []
-  }
+  computed: {
+    lessonCards() {
+      if (!this.user.classGroupKey) {
+        return []
+      }
 
-  return lessonsStore.premunLessons[user.classGroupKey] ?? []
-}) 
-const totalUnits = computed(() => lessonCards.value.reduce((count, lesson) => count + (lesson.units?.length ?? 0), 0))
-const completedUnits = computed(() => 0)
-const courseProgress = computed(() => 0)
-const currentLesson = computed(() => lessonCards.value[0]?.units?.[0]?.title ?? '—')
+      return this.lessonsStore.premunLessons[this.user.classGroupKey] ?? []
+    },
+
+    totalUnits() {
+      return this.lessonCards.reduce((count, lesson) => count + (lesson.units?.length ?? 0), 0)
+    },
+
+    completedUnits() {
+      return 0
+    },
+
+    courseProgress() {
+      return 0
+    },
+
+    currentLesson() {
+      return this.lessonCards[0]?.units?.[0]?.title ?? '—'
+    },
+  },
+
+  async mounted() { 
+    if (!this.user.classGroupKey) {
+      return
+    }
+
+    if (!this.lessonsStore.premunLessons[this.user.classGroupKey]) {
+      this.loading = true
+    }
+    
+    try {
+      await this.lessonsStore.getPremunLessons(this.user.classGroupKey)
+    } finally {
+      this.loading = false
+    }
+  },
+}
 </script>
 
 <template lang="pug">

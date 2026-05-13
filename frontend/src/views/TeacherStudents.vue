@@ -1,43 +1,57 @@
-<script setup>
-import { computed, ref, onMounted } from 'vue'
+<script>
 import { useStudentsStore } from '@/stores/students'
 import { useUserStore } from '@/stores/user'
 import PageHeader from '@/components/PageHeader.vue'
 import StudentProfileEditModal from '@/components/student/StudentProfileEditModal.vue'
 
-const user = useUserStore()
-const studentsStore = useStudentsStore()
-const loading = ref(false)
-const error = ref('')
-const editingStudent = ref(null)
+export default {
+  name: 'TeacherStudents',
 
-const students = computed(() => {
-  if (!user.classGroupKey) {
-    return []
-  }
+  components: {
+    PageHeader,
+    StudentProfileEditModal,
+  },
 
-  return studentsStore.studentsByClassGroup[user.classGroupKey] ?? []
-})
+  data() {
+    return {
+      user: useUserStore(),
+      studentsStore: useStudentsStore(),
+      loading: false,
+      error: '',
+      editingStudent: null,
+    }
+  },
 
-onMounted(async () => {
-  if (!user.classGroupKey) {
-    error.value = 'No class group assigned to your account.'
-    return
-  }
+  computed: {
+    students() {
+      if (!this.user.classGroupKey) {
+        return []
+      }
 
-  if (!studentsStore.studentsByClassGroup[user.classGroupKey]) {
-    loading.value = true
-  }
+      return this.studentsStore.studentsByClassGroup[this.user.classGroupKey] ?? []
+    },
+  },
 
-  try {
-    error.value = ''
-    await studentsStore.getStudentsByClassGroup()
-  } catch (e) {
-    error.value = e.response?.data?.error || e.message || 'Failed to fetch students.'
-  } finally {
-    loading.value = false
-  }
-})
+  async mounted() {
+    if (!this.user.classGroupKey) {
+      this.error = 'No class group assigned to your account.'
+      return
+    }
+
+    if (!this.studentsStore.studentsByClassGroup[this.user.classGroupKey]) {
+      this.loading = true
+    }
+
+    try {
+      this.error = ''
+      await this.studentsStore.getStudentsByClassGroup()
+    } catch (e) {
+      this.error = e.response?.data?.error || e.message || 'Failed to fetch students.'
+    } finally {
+      this.loading = false
+    }
+  },
+}
 </script>
 
 <template>

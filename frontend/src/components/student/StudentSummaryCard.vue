@@ -1,42 +1,56 @@
-<script setup>
-import { computed } from 'vue'
+<script>
 import GradeLabel from '@/components/GradeLabel.vue'
 import IconUnits from '../icons/IconUnits.vue'
 import IconBook from '../icons/IconBook.vue'
 import IconBadge from '../icons/IconBadge.vue'
 
-const props = defineProps({
-  user: {
-    type: Object,
-    default: null,
-  },
-  badgesEarned: {
-    type: Number,
-    default: 0,
-  },
-  totalUnits: {
-    type: Number,
-    default: 0,
-  },
-  completedUnits: {
-    type: Number,
-    default: 0,
-  },
-  courseProgress: {
-    type: Number,
-    default: 0,
-  },
-  continueRoute: {
-    type: String,
-    default: '/units',
-  },
-  continueLabel: {
-    type: String,
-    default: 'Continue Learning ›',
-  },
-})
+export default {
+  name: 'StudentSummaryCard',
 
-const avatarText = computed(() => `${props.user?.name?.[0] ?? ''}${props.user?.surname?.[0] ?? ''}`)
+  components: {
+    GradeLabel,
+    IconUnits,
+    IconBook,
+    IconBadge,
+  },
+
+  props: {
+    user: {
+      type: Object,
+      default: null,
+    },
+    badgesEarned: {
+      type: Number,
+      default: 0,
+    },
+    totalUnits: {
+      type: Number,
+      default: 0,
+    },
+    completedUnits: {
+      type: Number,
+      default: 0,
+    },
+    courseProgress: {
+      type: Number,
+      default: 0,
+    },
+    continueRoute: {
+      type: String,
+      default: '/units',
+    },
+    continueLabel: {
+      type: String,
+      default: 'Continue Learning ›',
+    },
+  },
+
+  computed: {
+    avatarText() {
+      return `${this.user?.name?.[0] ?? ''}${this.user?.surname?.[0] ?? ''}`
+    },
+  },
+}
 </script>
 
 <template lang="pug">

@@ -1,26 +1,30 @@
-<script setup>
-defineProps({
-  currentLesson: {
-    type: String,
-    default: '—',
+<script>
+export default {
+  name: 'StudentProgressSummary',
+
+  props: {
+    currentLesson: {
+      type: String,
+      default: '—',
+    },
+    courseProgress: {
+      type: Number,
+      default: 0,
+    },
+    badgesEarned: {
+      type: Number,
+      default: 0,
+    },
+    completedUnits: {
+      type: Number,
+      default: 0,
+    },
+    totalUnits: {
+      type: Number,
+      default: 0,
+    },
   },
-  courseProgress: {
-    type: Number,
-    default: 0,
-  },
-  badgesEarned: {
-    type: Number,
-    default: 0,
-  },
-  completedUnits: {
-    type: Number,
-    default: 0,
-  },
-  totalUnits: {
-    type: Number,
-    default: 0,
-  },
-})
+}
 </script>
 
 <template lang="pug">

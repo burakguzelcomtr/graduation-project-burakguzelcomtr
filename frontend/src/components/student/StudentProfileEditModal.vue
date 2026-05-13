@@ -1,84 +1,95 @@
-<script setup>
-import { ref, watch, onMounted } from 'vue'
+<script>
 import api from '@/lib/api'
 import { useStudentsStore } from '@/stores/students'
 
-const props = defineProps({
-  student: {
-    type: Object,
-    default: null,
+export default {
+  name: 'StudentProfileEditModal',
+
+  emits: ['close', 'saved'],
+
+  props: {
+    student: {
+      type: Object,
+      default: null,
+    },
   },
-})
 
-const emit = defineEmits(['close', 'saved'])
-
-const studentsStore = useStudentsStore()
-
-const heros = ref([])
-const countries = ref([])
-const selectedHero = ref(null)
-const selectedCountry = ref(null)
-const form = ref({ name: '', surname: '', studentId: '', grade: '', section: '', campus: '' })
-const saving = ref(false)
-const error = ref('')
-
-async function fetchOptions() {
-  const [herosRes, countriesRes] = await Promise.all([api.get('/heros'), api.get('/countries')])
-  heros.value = herosRes.data
-  countries.value = countriesRes.data
-}
-
-watch(
-  () => props.student,
-  (student) => {
-    if (student) {
-      selectedHero.value = student.hero?._id ?? student.hero ?? null
-      selectedCountry.value = student.country?._id ?? student.country ?? null
-      form.value = {
-        name: student.name ?? '',
-        surname: student.surname ?? '',
-        studentId: student.studentId ?? '',
-        grade: student.grade ?? '',
-        section: student.section ?? '',
-        campus: student.campus ?? '',
-      }
+  data() {
+    return {
+      studentsStore: useStudentsStore(),
+      heros: [],
+      countries: [],
+      selectedHero: null,
+      selectedCountry: null,
+      form: { name: '', surname: '', studentId: '', grade: '', section: '', campus: '' },
+      saving: false,
+      error: '',
     }
   },
-  { immediate: true },
-)
 
-onMounted(fetchOptions)
+  watch: {
+    student: {
+      immediate: true,
+      handler(student) {
+        if (student) {
+          this.selectedHero = student.hero?._id ?? student.hero ?? null
+          this.selectedCountry = student.country?._id ?? student.country ?? null
+          this.form = {
+            name: student.name ?? '',
+            surname: student.surname ?? '',
+            studentId: student.studentId ?? '',
+            grade: student.grade ?? '',
+            section: student.section ?? '',
+            campus: student.campus ?? '',
+          }
+        }
+      },
+    },
+  },
 
-async function save() {
-  if (!props.student) return
-  saving.value = true
-  error.value = ''
-  try {
-    const updated = await studentsStore.updateStudentProfile(props.student._id, {
-      ...form.value,
-      hero: selectedHero.value,
-      country: selectedCountry.value,
-    })
-    emit('saved', updated)
-    emit('close')
-  } catch (e) {
-    error.value = e.response?.data?.error || e.message || 'Failed to save.'
-  } finally {
-    saving.value = false
-  }
+  mounted() {
+    this.fetchOptions()
+  },
+
+  methods: {
+    async fetchOptions() {
+      const [herosRes, countriesRes] = await Promise.all([api.get('/heros'), api.get('/countries')])
+      this.heros = herosRes.data
+      this.countries = countriesRes.data
+    },
+
+    async save() {
+      if (!this.student) return
+      this.saving = true
+      this.error = ''
+      try {
+        const updated = await this.studentsStore.updateStudentProfile(this.student._id, {
+          ...this.form,
+          hero: this.selectedHero,
+          country: this.selectedCountry,
+        })
+        this.$emit('saved', updated)
+        this.$emit('close')
+      } catch (e) {
+        this.error = e.response?.data?.error || e.message || 'Failed to save.'
+      } finally {
+        this.saving = false
+      }
+    },
+  },
 }
 </script>
 
 <template>
   <Teleport to="body">
-    <div class="lp-spe-backdrop" @click.self="emit('close')">
+    <div class="lp-spe-backdrop" @click.self="$emit('close')">
       <div class="lp-spe-modal" role="dialog" aria-modal="true">
         <div class="lp-spe-modal__header">
           <span class="lp-spe-modal__title">
             Edit Profile —
             <strong>{{ student?.name }} {{ student?.surname }}</strong>
           </span>
-          <button class="lp-spe-modal__close" @click="emit('close')" aria-label="Close">✕</button>
+          <button class="lp-spe-modal__close" @click="$emit('close')" aria-label="Close">✕</button>
         </div>
 
         <div class="lp-spe-modal__body">
@@ -134,7 +145,7 @@ async function save() {
         </div>
 
         <div class="lp-spe-modal__footer">
-          <button class="lp-spe-btn lp-spe-btn--ghost" @click="emit('close')" type="button">Cancel</button>
+          <button class="lp-spe-btn lp-spe-btn--ghost" @click="$emit('close')" type="button">Cancel</button>
           <button class="lp-spe-btn lp-spe-btn--primary" @click="save" :disabled="saving" type="button">
             {{ saving ? 'Saving…' : 'Save' }}
           </button>

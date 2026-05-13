@@ -1,27 +1,35 @@
-<script setup>
-const testimonials = [
-  {
-    quote: 'My students started talking about the UN and world issues after just a few weeks! LearnPass completely changed how they engage with English.',
-    name: 'Ms. Ayşe Kaya',
-    role: 'Primary English Teacher, Istanbul',
-    initials: 'AK',
-    stars: 5,
+<script>
+export default {
+  name: 'HomeTestimonials',
+
+  data() {
+    return {
+      testimonials: [
+        {
+          quote: 'My students started talking about the UN and world issues after just a few weeks! LearnPass completely changed how they engage with English.',
+          name: 'Ms. Ayşe Kaya',
+          role: 'Primary English Teacher, Istanbul',
+          initials: 'AK',
+          stars: 5,
+        },
+        {
+          quote: 'I never thought English could feel so relevant. Now I want to learn more because I understand why it matters for the real world.',
+          name: 'Mert, Age 11',
+          role: 'LearnPass Student, Ankara',
+          initials: 'M',
+          stars: 5,
+        },
+        {
+          quote: 'The curriculum is brilliant. It connects language learning with global citizenship in a way I have never seen before.',
+          name: 'Mr. James O\'Brien',
+          role: 'IB Curriculum Coordinator, London',
+          initials: 'JO',
+          stars: 5,
+        },
+      ],
+    }
   },
-  {
-    quote: 'I never thought English could feel so relevant. Now I want to learn more because I understand why it matters for the real world.',
-    name: 'Mert, Age 11',
-    role: 'LearnPass Student, Ankara',
-    initials: 'M',
-    stars: 5,
-  },
-  {
-    quote: 'The curriculum is brilliant. It connects language learning with global citizenship in a way I have never seen before.',
-    name: 'Mr. James O\'Brien',
-    role: 'IB Curriculum Coordinator, London',
-    initials: 'JO',
-    stars: 5,
-  },
-]
+}
 </script>
 
 <template lang="pug">

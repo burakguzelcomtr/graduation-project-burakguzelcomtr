@@ -1,5 +1,4 @@
-<script setup>
-import { useRouter } from 'vue-router'
+<script>
 import { useAuthStore } from '@/stores/auth'
 import HomeNavbar from '@/components/home/HomeNavbar.vue'
 import HomeHero from '@/components/home/HomeHero.vue'
@@ -9,11 +8,30 @@ import HomeJourney from '@/components/home/HomeJourney.vue'
 import HomeTestimonials from '@/components/home/HomeTestimonials.vue'
 import HomeFooter from '@/components/home/HomeFooter.vue'
 
-const router = useRouter()
-const auth = useAuthStore()
+export default {
+  name: 'HomeView',
 
-function handleLoginClick() {
-  router.push(auth.user ? '/dashboard' : '/login')
+  components: {
+    HomeNavbar,
+    HomeHero,
+    HomePartners,
+    HomeWhy,
+    HomeJourney,
+    HomeTestimonials,
+    HomeFooter,
+  },
+
+  data() {
+    return {
+      auth: useAuthStore(),
+    }
+  },
+
+  methods: {
+    handleLoginClick() {
+      this.$router.push(this.auth.user ? '/dashboard' : '/login')
+    },
+  },
 }
 </script>
 

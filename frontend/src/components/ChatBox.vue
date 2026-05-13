@@ -1,50 +1,56 @@
-<script setup>
-import { ref, nextTick, watch } from 'vue'
-import { useRoute } from 'vue-router'
+<script>
+import { nextTick } from 'vue'
 import { useChatStore } from '@/stores/chat'
 
-const route = useRoute()
-const chat = useChatStore()
+export default {
+  data() {
+    return {
+      chat: useChatStore(),
+      isOpen: false,
+      inputText: '',
+    }
+  },
 
-const isOpen = ref(false)
-const inputText = ref('')
-const messagesEnd = ref(null)
+  watch: {
+    isOpen(val) {
+      if (val) this.scrollToBottom()
+    },
+  },
 
-function getPageContext() {
-  return {
-    page: route.name || route.path,
-    pageContext: route.meta?.pageContext || null,
-  }
+  methods: {
+    getPageContext() {
+      return {
+        page: this.$route.name || this.$route.path,
+        pageContext: this.$route.meta?.pageContext || null,
+      }
+    },
+
+    async sendMessage() {
+      const text = this.inputText.trim()
+      if (!text || this.chat.loading) return
+      this.inputText = ''
+      const { page, pageContext } = this.getPageContext()
+      await this.chat.sendMessage(text, page, pageContext)
+      this.scrollToBottom()
+    },
+
+    startNewChat() {
+      this.chat.startNewChat()
+    },
+
+    handleKeydown(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault()
+        this.sendMessage()
+      }
+    },
+
+    async scrollToBottom() {
+      await nextTick()
+      this.$refs.messagesEnd?.scrollIntoView({ behavior: 'smooth' })
+    },
+  },
 }
-
-async function sendMessage() {
-  const text = inputText.value.trim()
-  if (!text || chat.loading) return
-  inputText.value = ''
-  const { page, pageContext } = getPageContext()
-  await chat.sendMessage(text, page, pageContext)
-  scrollToBottom()
-}
-
-function startNewChat() {
-  chat.startNewChat()
-}
-
-function handleKeydown(e) {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault()
-    sendMessage()
-  }
-}
-
-async function scrollToBottom() {
-  await nextTick()
-  messagesEnd.value?.scrollIntoView({ behavior: 'smooth' })
-}
-
-watch(isOpen, (val) => {
-  if (val) scrollToBottom()
-})
 </script>
 
 <template lang="pug">
