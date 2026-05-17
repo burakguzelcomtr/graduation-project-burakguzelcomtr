@@ -99,7 +99,7 @@ section.lp-student-dashboard.container-fluid
 
 		.lp-student-dashboard__grid.border-gradient(v-else)
 			.row
-				.lp-student-dashboard__col.col-12.col-xl-4
+				.lp-student-dashboard__col.col-12.col-xl-5
 					StudentSummaryCard(
 						:user="user.profile"
 						:badges-earned="badgesEarned"
@@ -110,7 +110,7 @@ section.lp-student-dashboard.container-fluid
 						continue-label="Continue Learning ›"
 					)
 
-				.lp-student-dashboard__col.col-12.col-xl-8
+				.lp-student-dashboard__col.col-12.col-xl-7
 					StudentLessonList(:lesson-cards="lessonCards")
 				 
 	</template>

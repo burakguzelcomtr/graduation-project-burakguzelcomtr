@@ -4,7 +4,7 @@ RUN npm install -g nodemon
 
 WORKDIR /app
 
-ADD package.json package-lock.json ./
+ADD package.json ./
 ADD bin ./bin
 ADD src ./src
 RUN npm install

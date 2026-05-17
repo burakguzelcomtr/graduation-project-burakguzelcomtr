@@ -1,6 +1,6 @@
 <script>
 import { useAuthStore } from '@/stores/auth'
-import { commonNavItems, studentNavItems, teacherNavItems } from '@/data/navItems.js'
+import { commonNavItems, studentNavItems, teacherNavItems } from '@/static_data/navItems.js'
 import { useUserStore } from '@/stores/user'
 
 export default {

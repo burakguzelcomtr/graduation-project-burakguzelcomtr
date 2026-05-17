@@ -42,9 +42,10 @@ export default {
     content: '';
     position: absolute;
     bottom: 0;
-    left: calc(50% - 250px);
-    width: 500px;
-    height: 160px;
+    left: calc(50% - 14.5vw);
+    width: calc(25vw);
+    height: 8vw;
+    max-width: 100%;
     opacity: 0;
     background-image: url('/assets/img/student-hands.svg');
     background-repeat: no-repeat;
