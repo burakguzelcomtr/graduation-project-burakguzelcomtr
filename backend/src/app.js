@@ -46,6 +46,8 @@ passport.serializeUser(Account.serializeUser())
 passport.deserializeUser(Account.deserializeUser())
 
 const app = express()
+// Trust Cloud Run / reverse proxy (required for secure cookies and correct protocol detection)
+app.set('trust proxy', 1)
 // view engine setup
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'pug')
@@ -68,7 +70,12 @@ app.use(helmet())
 app.use(sessionMiddleware)
 app.use(passport.initialize())
 app.use(passport.session())
-app.use(cors())
+app.use(
+  cors({
+    origin: process.env.CORS_ORIGIN || true,
+    credentials: true,
+  })
+)
 app.use(logger('dev'))
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
