@@ -5,6 +5,8 @@ const path = require('path')
 const cookieParser = require('cookie-parser')
 const logger = require('morgan')
 const cors = require('cors')
+const helmet = require('helmet')
+const { errors } = require('celebrate')
 const session = require('express-session')
 const mongoose = require('mongoose')
 const MongoStore = require('connect-mongo').default
@@ -12,7 +14,8 @@ const socketIo = require('socket.io')
 require('./database-connection')
 
 mongoose.connection.once('open', () => {
-  seedProfileOptions().catch((err) => console.error('Seed error:', err))
+  //ProfileOptions().catch((err) => console.error('Seed error:', err))
+  seedAcl().catch((err) => console.error('ACL seed error:', err))
 })
 
 const passport = require('passport')
@@ -20,6 +23,7 @@ const Account = require('./models/account')
 const LessonManager = require('./managers/lesson-manager')
 const LessonMaterialManager = require('./managers/lesson-material-manager')
 const seedProfileOptions = require('./utils/seed-profile-options')
+const seedAcl = require('./utils/seed-acl')
 
 const indexRouter = require('./routes/index')
 const studentsRouter = require('./routes/students')
@@ -60,6 +64,7 @@ const sessionMiddleware = session({
   store: connectionPromise,
 })
 
+app.use(helmet())
 app.use(sessionMiddleware)
 app.use(passport.initialize())
 app.use(passport.session())
@@ -87,6 +92,7 @@ app.use(function notFoundHandler(req, res, next) {
   next(createError(404))
 })
 
+app.use(errors())
 // error handler
 // eslint-disable-next-line no-unused-vars
 app.use(function errorHandler(err, req, res, next) {
@@ -137,7 +143,6 @@ app.createSocketServer = function createSocketServer(server) {
       const teacherRoom = classroomKey ? `teacher-class:${classroomKey}` : null
       const studentName = [user.name, user.surname].filter(Boolean).join(' ')
 
-      console.log('a user connected', socket.request.user?.id)
 
       if (user.role === 'teacher' && teacherRoom) {
         socket.join(teacherRoom)

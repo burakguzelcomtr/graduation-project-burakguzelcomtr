@@ -3,11 +3,15 @@ const mongoose = require('mongoose')
 
 const router = express.Router()
 
+const { celebrate, Joi, Segments } = require('celebrate')
+const authorize = require('../middleware/authorize')
 const User = require('../models/user')
 const Account = require('../models/account')
 
+const objectId = Joi.string().hex().length(24)
+
 /* GET teacher listing. */
-router.get('/', async (req, res) => {
+router.get('/', authorize('teachers', 'read'), async (req, res) => {
   // TODO: Implement pagination and filtering by class group
   try {
     const teachers = await User.Teacher.find()
@@ -21,7 +25,11 @@ router.get('/', async (req, res) => {
 })
 
 /* GET teacher by id. */
-router.get('/:id', async (req, res) => {
+router.get(
+  '/:id',
+  authorize('teachers', 'read'),
+  celebrate({ [Segments.PARAMS]: Joi.object({ id: objectId.required() }) }),
+  async (req, res) => {
   try {
     const { id } = req.params
     const teacher = await User.Teacher.findById(id)
@@ -35,7 +43,11 @@ router.get('/:id', async (req, res) => {
 })
 
 // GET teacher by class group
-router.get('/class-group/:classGroupId', async (req, res) => {
+router.get(
+  '/class-group/:classGroupId',
+  authorize('teachers', 'read'),
+  celebrate({ [Segments.PARAMS]: Joi.object({ classGroupId: objectId.required() }) }),
+  async (req, res) => {
   try {
     const { classGroupId } = req.params
     const teacher = await User.Teacher.find({ classGroup: classGroupId })
@@ -49,7 +61,22 @@ router.get('/class-group/:classGroupId', async (req, res) => {
 })
 
 /* POST create a new teacher. */
-router.post('/', async (req, res) => {
+router.post(
+  '/',
+  authorize('teachers', 'create'),
+  celebrate({
+    [Segments.BODY]: Joi.object({
+      name: Joi.string().required(),
+      surname: Joi.string().required(),
+      grade: Joi.number().integer().required(),
+      section: Joi.string().required(),
+      campus: Joi.string().required(),
+      classGroup: objectId,
+      email: Joi.string().email().required(),
+      password: Joi.string().min(6).required(),
+    }),
+  }),
+  async (req, res) => {
   const session = await mongoose.startSession()
   session.startTransaction()
   try {
@@ -69,7 +96,11 @@ router.post('/', async (req, res) => {
   }
 })
 
-router.delete('/:id', async (req, res) => {
+router.delete(
+  '/:id',
+  authorize('teachers', 'delete'),
+  celebrate({ [Segments.PARAMS]: Joi.object({ id: objectId.required() }) }),
+  async (req, res) => {
   try {
     const { id } = req.params
     const deletedTeacher = await User.Teacher.findByIdAndDelete(id)

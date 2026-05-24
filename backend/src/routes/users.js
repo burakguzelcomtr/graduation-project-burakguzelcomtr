@@ -2,15 +2,16 @@ const express = require('express')
 
 const router = express.Router()
 
+const { celebrate, Joi, Segments } = require('celebrate')
+const authorize = require('../middleware/authorize')
 const User = require('../models/user')
+
+const objectId = Joi.string().hex().length(24)
 
 /* GET /users/me
  * Returns the User profile for the currently logged-in account.
  */
-router.get('/me', async (req, res) => {
-  if (!req.user) {
-    return res.status(401).send({ error: 'Not authenticated' })
-  }
+router.get('/me', authorize('users', 'read'), async (req, res) => {
   try {
     const user = await User.findById(req.user.user)
     if (!user) {
@@ -23,7 +24,11 @@ router.get('/me', async (req, res) => {
 })
 
 /* GET /users/:id */
-router.get('/:id', async (req, res) => {
+router.get(
+  '/:id',
+  authorize('users', 'read'),
+  celebrate({ [Segments.PARAMS]: Joi.object({ id: objectId.required() }) }),
+  async (req, res) => {
   try {
     const user = await User.findById(req.params.id)
     if (!user) {

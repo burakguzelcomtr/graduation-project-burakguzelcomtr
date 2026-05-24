@@ -2,19 +2,29 @@ const express = require('express')
 
 const router = express.Router()
 
+const { celebrate, Joi, Segments } = require('celebrate')
+const authorize = require('../middleware/authorize')
 const ChatSessionManager = require('../managers/chat-session-manager')
 const openaiService = require('../services/openai-service')
 
-function requireAuth(req, res, next) {
-  if (!req.user) return res.status(401).send({ error: 'Unauthorized' })
-  return next()
-}
+const objectId = Joi.string().hex().length(24)
 
 /**
  * POST /chat/message
  * Body: { message, page, pageContext?, sessionId? }
  */
-router.post('/message', requireAuth, async (req, res) => {
+router.post(
+  '/message',
+  authorize('chat', 'use'),
+  celebrate({
+    [Segments.BODY]: Joi.object({
+      message: Joi.string().trim().min(1).required(),
+      page: Joi.string(),
+      pageContext: Joi.any(),
+      sessionId: objectId,
+    }),
+  }),
+  async (req, res) => {
   try {
     const { message, page, pageContext, sessionId: incomingSessionId } = req.body
 
@@ -72,7 +82,7 @@ router.post('/message', requireAuth, async (req, res) => {
  * GET /chat/sessions
  * Returns all sessions for the authenticated user (no messages)
  */
-router.get('/sessions', requireAuth, async (req, res) => {
+router.get('/sessions', authorize('chat', 'use'), async (req, res) => {
   try {
     const sessions = await ChatSessionManager.getSessionsByUser(req.user.user)
     return res.send(sessions)
@@ -85,7 +95,11 @@ router.get('/sessions', requireAuth, async (req, res) => {
  * GET /chat/sessions/:sessionId
  * Returns a single session with messages (ownership enforced)
  */
-router.get('/sessions/:sessionId', requireAuth, async (req, res) => {
+router.get(
+  '/sessions/:sessionId',
+  authorize('chat', 'use'),
+  celebrate({ [Segments.PARAMS]: Joi.object({ sessionId: objectId.required() }) }),
+  async (req, res) => {
   try {
     const session = await ChatSessionManager.getSessionById(req.params.sessionId, req.user.user)
     return res.send(session)

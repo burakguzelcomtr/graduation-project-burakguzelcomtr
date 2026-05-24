@@ -1,9 +1,10 @@
 const express = require('express')
+const authorize = require('../middleware/authorize')
 const Country = require('../models/country')
 
 const router = express.Router()
 
-router.get('/', async (req, res) => {
+router.get('/', authorize('countries', 'read'), async (req, res) => {
   try {
     const countries = await Country.find().sort({ name: 1 })
     res.send(countries)
