@@ -15,7 +15,7 @@ require('./database-connection')
 
 mongoose.connection.once('open', () => {
   //ProfileOptions().catch((err) => console.error('Seed error:', err))
-  seedAcl().catch((err) => console.error('ACL seed error:', err))
+  //seedAcl().catch((err) => console.error('ACL seed error:', err))
 })
 
 const passport = require('passport')
