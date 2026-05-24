@@ -33,5 +33,21 @@ export default defineConfig({
         ws: true,
       },
     },
-  }
+  },
+  preview: {
+    host: true,
+    allowedHosts: ['learnpass-frontend-623667359622.europe-west1.run.app','all'],
+    proxy: {
+      '/api': {
+        target: process.env.VITE_API_PROXY_TARGET || 'http://localhost:3000',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+      },
+      '/socket.io': {
+        target: process.env.VITE_API_PROXY_TARGET || 'http://localhost:3000',
+        changeOrigin: true,
+        ws: true,
+      },
+    },
+  },
 })
