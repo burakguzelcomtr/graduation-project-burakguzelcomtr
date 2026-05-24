@@ -17,7 +17,7 @@ export default defineConfig({
   },
   server: {
     host: true,
-    allowedHosts: 'all',
+    allowedHosts: ['learnpass-frontend-623667359622.europe-west1.run.app','all'],
     watch: {
       usePolling: true
     },
