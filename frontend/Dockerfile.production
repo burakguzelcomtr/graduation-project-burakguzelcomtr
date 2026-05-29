@@ -14,9 +14,4 @@ ADD vitest.config.js /app/vitest.config.js
 
 ADD src /app/src
 ADD public /app/public
-
-RUN npm run build
-
-EXPOSE 8080
-
-CMD ["sh", "-c", "npm run preview -- --port ${PORT:-8080} --host"]
+CMD [ "npm", "run", "dev", "--", "--host"]
