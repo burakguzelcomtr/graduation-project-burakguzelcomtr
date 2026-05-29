@@ -17,7 +17,7 @@ export const commonNavItems = [
 export const studentNavItems = [
   { label: 'My Passport',    to: '/passport',     icon: markRaw(IconPassport) },
   { label: 'My Globals',     to: '/globals',       icon: markRaw(IconGlobals)  },
-  { label: 'My Global Diary',to: '/global-diary',  icon: markRaw(IconDiary)    },
+  {/* label: 'My Global Diary',to: '/global-diary',  icon: markRaw(IconDiary)  */  },
   { label: 'Units',          to: '/units',         icon: markRaw(IconUntis)    },
   { label: 'PREMUN Hub',     to: '/premun',        icon: markRaw(IconPremun)    },
   { label: 'My Progress',    to: '/progress',      icon: markRaw(IconProgress) },
