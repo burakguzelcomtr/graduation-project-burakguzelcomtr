@@ -5,7 +5,7 @@ const router = express.Router()
 const { celebrate, Joi, Segments } = require('celebrate')
 const authorize = require('../middleware/authorize')
 const ChatSessionManager = require('../managers/chat-session-manager')
-const openaiService = require('../services/openai-service')
+const openaiService = require('../utils/openai-service')
 
 const objectId = Joi.string().hex().length(24)
 
@@ -25,58 +25,59 @@ router.post(
     }),
   }),
   async (req, res) => {
-  try {
-    const { message, page, pageContext, sessionId: incomingSessionId } = req.body
+    try {
+      const { message, page, pageContext, sessionId: incomingSessionId } = req.body
 
-    if (!message || typeof message !== 'string' || !message.trim()) {
-      return res.status(400).send({ error: 'message is required' })
-    }
-
-    const trimmedMessage = message.trim()
-    const { sessionId, isNewSession, historyMessages, studentContext } = await ChatSessionManager.prepareUserMessage(
-      req.user.user,
-      {
-        message: trimmedMessage,
-        page,
-        pageContext,
-        sessionId: incomingSessionId,
+      if (!message || typeof message !== 'string' || !message.trim()) {
+        return res.status(400).send({ error: 'message is required' })
       }
-    )
 
-    res.setHeader('Content-Type', 'text/event-stream')
-    res.setHeader('Cache-Control', 'no-cache')
-    res.setHeader('Connection', 'keep-alive')
-    res.flushHeaders()
+      const trimmedMessage = message.trim()
+      const { sessionId, isNewSession, historyMessages, studentContext } = await ChatSessionManager.prepareUserMessage(
+        req.user.user,
+        {
+          message: trimmedMessage,
+          page,
+          pageContext,
+          sessionId: incomingSessionId,
+        }
+      )
 
-    const stream = await openaiService.chatStream(historyMessages, trimmedMessage, pageContext, studentContext)
-    let fullReply = ''
+      res.setHeader('Content-Type', 'text/event-stream')
+      res.setHeader('Cache-Control', 'no-cache')
+      res.setHeader('Connection', 'keep-alive')
+      res.flushHeaders()
 
-    // eslint-disable-next-line no-restricted-syntax
-    for await (const chunk of stream) {
-      const content = chunk.choices[0]?.delta?.content
-      if (content) {
-        fullReply += content
-        res.write(`data: ${JSON.stringify({ content })}\n\n`)
+      const stream = await openaiService.chatStream(historyMessages, trimmedMessage, pageContext, studentContext)
+      let fullReply = ''
+
+      // eslint-disable-next-line no-restricted-syntax
+      for await (const chunk of stream) {
+        const content = chunk.choices[0]?.delta?.content
+        if (content) {
+          fullReply += content
+          res.write(`data: ${JSON.stringify({ content })}\n\n`)
+        }
       }
-    }
 
-    const { title } = await ChatSessionManager.finalizeAssistantReply(
-      sessionId,
-      isNewSession,
-      trimmedMessage,
-      fullReply
-    )
+      const { title } = await ChatSessionManager.finalizeAssistantReply(
+        sessionId,
+        isNewSession,
+        trimmedMessage,
+        fullReply
+      )
 
-    res.write(`data: ${JSON.stringify({ done: true, sessionId, ...(title ? { title } : {}) })}\n\n`)
-    return res.end()
-  } catch (error) {
-    if (!res.headersSent) {
-      return res.status(error.status || 500).send({ error: error.message })
+      res.write(`data: ${JSON.stringify({ done: true, sessionId, ...(title ? { title } : {}) })}\n\n`)
+      return res.end()
+    } catch (error) {
+      if (!res.headersSent) {
+        return res.status(error.status || 500).send({ error: error.message })
+      }
+      res.write(`data: ${JSON.stringify({ error: error.message })}\n\n`)
+      return res.end()
     }
-    res.write(`data: ${JSON.stringify({ error: error.message })}\n\n`)
-    return res.end()
   }
-})
+)
 
 /**
  * GET /chat/sessions
@@ -100,12 +101,13 @@ router.get(
   authorize('chat', 'use'),
   celebrate({ [Segments.PARAMS]: Joi.object({ sessionId: objectId.required() }) }),
   async (req, res) => {
-  try {
-    const session = await ChatSessionManager.getSessionById(req.params.sessionId, req.user.user)
-    return res.send(session)
-  } catch (error) {
-    return res.status(error.status || 500).send({ error: error.message })
+    try {
+      const session = await ChatSessionManager.getSessionById(req.params.sessionId, req.user.user)
+      return res.send(session)
+    } catch (error) {
+      return res.status(error.status || 500).send({ error: error.message })
+    }
   }
-})
+)
 
 module.exports = router

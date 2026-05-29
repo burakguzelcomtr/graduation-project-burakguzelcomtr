@@ -75,6 +75,12 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: '/progress',
+      name: 'progress',
+      component: () => import('../views/ProgressView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
       path: '/ai-assistant',
       name: 'ai-history',
       component: () => import('../views/AiHistoryView.vue'),

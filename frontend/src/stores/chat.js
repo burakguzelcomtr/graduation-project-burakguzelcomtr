@@ -35,7 +35,7 @@ export const useChatStore = defineStore('chat', () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ message: text, page, pageContext, sessionId: sessionId.value }),
+        body: JSON.stringify({ message: text, page, pageContext, ...(sessionId.value ? { sessionId: sessionId.value } : {}) }),
       })
 
       if (!response.ok) throw new Error('Request failed')

@@ -89,8 +89,9 @@ section.lp-home-testimonials#testimonials
   }
 
   &__accent {
-    color: $primary;
-    font-style: italic;
+    color: $primary !important;
+    font-style: italic; 
+    font-size: inherit !important;
   }
 
   &__grid {

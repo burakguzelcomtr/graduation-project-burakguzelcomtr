@@ -29,6 +29,10 @@ export default {
     showChatBox() {
       return Boolean(this.auth.user) && this.$route.path !== '/'
     },
+    
+    noPadding() {
+      return this.$route.path === '/' || this.$route.path === '/login'
+    },
   },
 
   watch: {
@@ -56,7 +60,7 @@ export default {
 </script>
 
 <template lang="pug">
-.lp-app
+.lp-app(:class="{ 'lp-app--no-padding': noPadding }")
   Sidebar(v-if="showSidebar")
   main.lp-app__main
     Suspense
@@ -80,9 +84,14 @@ body {
   &__main {
     min-width: 0;
     flex: 1;
-    padding: 0; 
-    transition: margin-left 0.25s ease;
     padding: 15px;
+    transition: margin-left 0.25s ease;
+  }
+
+  &--no-padding {
+    .lp-app__main {
+      padding: 0;
+    }
   }
 }
 

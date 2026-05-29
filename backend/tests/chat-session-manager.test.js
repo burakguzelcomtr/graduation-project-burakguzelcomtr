@@ -15,7 +15,7 @@ jest.mock('../src/models/user', () => ({
   findById: jest.fn(),
 }))
 
-jest.mock('../src/services/openai-service', () => ({
+jest.mock('../src/utils/openai-service', () => ({
   chat: jest.fn(),
   chatStream: jest.fn(),
   generateTitle: jest.fn(),
@@ -23,7 +23,7 @@ jest.mock('../src/services/openai-service', () => ({
 
 const ChatSession = require('../src/models/chat-session')
 const User = require('../src/models/user')
-const openaiService = require('../src/services/openai-service')
+const openaiService = require('../src/utils/openai-service')
 const ChatSessionManager = require('../src/managers/chat-session-manager')
 
 // Sets up the User.findById().select().lean() query chain mock

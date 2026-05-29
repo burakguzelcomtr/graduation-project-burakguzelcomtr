@@ -25,7 +25,6 @@ export const studentNavItems = [
 ]
 
 export const teacherNavItems = [ 
-  { label: 'My Class',   to: '/my-class',  icon: markRaw(IconClassRoom) }, 
   { label: 'Students',  to: '/students',      icon: markRaw(IconStudents)  },
   { label: 'Units',     to: '/units',        icon: markRaw(IconUntis) },
   { label: 'AI Assistant', to: '/ai-assistant', icon: markRaw(IconBrain) },

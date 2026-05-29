@@ -1,6 +1,6 @@
 const ChatSession = require('../models/chat-session')
 const User = require('../models/user')
-const openaiService = require('../services/openai-service')
+const openaiService = require('../utils/openai-service')
 
 class ChatSessionManager {
   static async createSession(userId, page, pageContext) {
