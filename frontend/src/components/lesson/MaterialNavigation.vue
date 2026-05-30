@@ -85,6 +85,7 @@ export default {
       }
 
       this.finishing = true
+      this.$emit('finish')
 
       try {
         await this.playFinishCelebration()

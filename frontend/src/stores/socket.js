@@ -67,15 +67,39 @@ export const useSocketStore = defineStore('Socket', {
       socket.emit('start material', materialId)
     },
 
-    showStudentActivityToast(payload) {
-      const isMaterial = payload?.type === 'material-started'
-      const student = (payload?.studentName ?? [payload?.student?.name, payload?.student?.surname].filter(Boolean).join(' ')) || 'A student'
-      const target = payload?.targetTitle ?? payload?.material?.title ?? payload?.unit?.title ?? (isMaterial ? 'Material' : 'Unit')
+    completeQuiz(materialId) {
+      if (!materialId || !socket.connected) {
+        return
+      }
 
-      toast.info(() => (isMaterial
-        ? h('span', [h('strong', student), ' joined ', h('strong', target)])
-        : h('span', [h('strong', student), ' join ', h('strong', target), ' Unit'])), {
-        autoClose: 5000,
+      socket.emit('complete quiz', materialId)
+    },
+
+    completeUnit(unitId) {
+      if (!unitId || !socket.connected) {
+        return
+      }
+
+      socket.emit('complete unit', unitId)
+    },
+
+    showStudentActivityToast(payload) {
+      const type = payload?.type
+      const student = (payload?.studentName ?? [payload?.student?.name, payload?.student?.surname].filter(Boolean).join(' ')) || 'A student'
+      const target = payload?.targetTitle ?? payload?.material?.title ?? payload?.unit?.title ?? 'Unknown'
+
+      const messageNode = (() => {
+        if (type === 'material-started') return h('span', [h('strong', student), ' joined ', h('strong', target)])
+        if (type === 'unit-started') return h('span', [h('strong', student), ' started ', h('strong', target), ' unit'])
+        if (type === 'quiz-completed') return h('span', [h('strong', student), ' completed the ', h('strong', target), ' quiz ✅'])
+        if (type === 'unit-completed') return h('span', [h('strong', student), ' completed the ', h('strong', target), ' unit 🎉'])
+        return h('span', [h('strong', student), ' did something in ', h('strong', target)])
+      })()
+
+      const toastFn = (type === 'quiz-completed' || type === 'unit-completed') ? toast.success : toast.info
+
+      toastFn(() => messageNode, {
+        autoClose: 6000,
         closeOnClick: true,
         position: 'top-right',
       })

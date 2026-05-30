@@ -41,5 +41,12 @@ export const useStudentsStore = defineStore('students', {
       await this.getStudentsByClassGroup()
       return res.data
     },
+
+    async createStudent(data) {
+      const res = await api.post('/students', data)
+      this.resetCache()
+      await this.getStudentsByClassGroup()
+      return res.data
+    },
   }
 })

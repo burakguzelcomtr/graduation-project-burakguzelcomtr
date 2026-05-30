@@ -23,6 +23,7 @@ export default {
       loading: false,
       errorMessage: '',
       material: null,
+      unit: null,
       unitItems: [],
       quizQuestions: [],
       quizResponses: {},
@@ -159,6 +160,7 @@ export default {
           this.lessonsStore.getUnitBySlug(this.lessonSlug, this.unitSlug),
         ])
         this.material = mat
+        this.unit = unit
         this.unitItems = unit?.items ?? []
 
         if (mat?.type === 'quiz') {
@@ -325,6 +327,7 @@ export default {
         }
 
         this.quizFinished = true
+        this.socketStore.completeQuiz(this.material?._id ?? this.material?.id)
       } catch (error) {
         this.quizQuestionStates = {
           ...this.quizQuestionStates,
@@ -353,6 +356,10 @@ export default {
       }
 
       this.currentQuizPage += 1
+    },
+
+    onUnitFinished() {
+      this.socketStore.completeUnit(this.unit?._id ?? this.unit?.id)
     },
   },
 }
@@ -468,6 +475,7 @@ section.lp-material.container-fluid
       :disable-finish="shouldDisableFinishInMaterialNav"
       :lesson-slug="lessonSlug"
       :unit-slug="unitSlug"
+      @finish="onUnitFinished"
     )
 </template>
 

@@ -37,7 +37,7 @@ export default {
   background-size: 400% 400%;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
   animation: lp-header-gradient-animation 15s ease infinite;
-
+  min-height: 280px;
   &::before {
     content: '';
     position: absolute;

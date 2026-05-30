@@ -200,6 +200,48 @@ app.createSocketServer = function createSocketServer(server) {
           socket.emit('socket error', { message: error.message })
         }
       })
+
+      socket.on('complete quiz', async function onCompleteQuiz(materialId) {
+        try {
+          if (user.role !== 'student' || !teacherRoom) {
+            return
+          }
+
+          const material = await LessonMaterialManager.getLessonMaterialById(materialId)
+          if (!material) {
+            return
+          }
+
+          io.to(teacherRoom).emit('student activity', {
+            type: 'quiz-completed',
+            studentName,
+            targetTitle: material.title,
+          })
+        } catch (error) {
+          socket.emit('socket error', { message: error.message })
+        }
+      })
+
+      socket.on('complete unit', async function onCompleteUnit(unitId) {
+        try {
+          if (user.role !== 'student' || !teacherRoom) {
+            return
+          }
+
+          const unit = await LessonManager.getUnitById(unitId)
+          if (!unit) {
+            return
+          }
+
+          io.to(teacherRoom).emit('student activity', {
+            type: 'unit-completed',
+            studentName,
+            targetTitle: unit.title,
+          })
+        } catch (error) {
+          socket.emit('socket error', { message: error.message })
+        }
+      })
     } catch (error) {
       socket.disconnect()
     }

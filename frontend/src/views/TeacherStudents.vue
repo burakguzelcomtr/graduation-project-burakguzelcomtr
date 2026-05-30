@@ -3,6 +3,7 @@ import { useStudentsStore } from '@/stores/students'
 import { useUserStore } from '@/stores/user'
 import PageHeader from '@/components/PageHeader.vue'
 import StudentProfileEditModal from '@/components/student/StudentProfileEditModal.vue'
+import StudentCreateModal from '@/components/student/StudentCreateModal.vue'
 
 export default {
   name: 'TeacherStudents',
@@ -10,6 +11,7 @@ export default {
   components: {
     PageHeader,
     StudentProfileEditModal,
+    StudentCreateModal,
   },
 
   data() {
@@ -19,6 +21,7 @@ export default {
       loading: false,
       error: '',
       editingStudent: null,
+      showCreateModal: false,
     }
   },
 
@@ -58,6 +61,7 @@ export default {
   <div class="lp-teacher-students container-fluid">
     <PageHeader title="My Students">
       <span class="lp-teacher-students__count" v-if="students.length">{{ students.length }} students</span>
+      <button class="lp-teacher-students__add-btn" @click="showCreateModal = true" type="button">+ Add Student</button>
     </PageHeader>
 
     <div class="lp-teacher-students__state" v-if="loading">Loading students...</div>
@@ -105,6 +109,12 @@ export default {
       :student="editingStudent"
       @close="editingStudent = null"
       @saved="editingStudent = null"
+    />
+
+    <StudentCreateModal
+      v-if="showCreateModal"
+      @close="showCreateModal = false"
+      @created="showCreateModal = false"
     />
   </div>
 </template>
@@ -204,6 +214,26 @@ export default {
     &--action {
       text-align: right;
       white-space: nowrap;
+    }
+  }
+
+  &__add-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 16px;
+    border: none;
+    border-radius: 8px;
+    background: $primary;
+    color: #fff;
+    font-size: 13.6px;
+    font-weight: 700;
+    font-family: $font-main;
+    cursor: pointer;
+    transition: background 0.15s;
+
+    &:hover {
+      background: $primary-dark;
     }
   }
 
