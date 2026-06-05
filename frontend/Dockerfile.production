@@ -1,18 +1,15 @@
-FROM node:alpine
+FROM node:22-alpine
 
 WORKDIR /app
 
-ADD package.json ./
-
+COPY package.json ./
 RUN npm install
 
-ADD eslint.config.js /app/eslint.config.js
-ADD .prettierrc.json /app/.prettierrc.json
-ADD index.html /app/index.html
-ADD vite.config.js /app/vite.config.js
-ADD vitest.config.js /app/vitest.config.js
+COPY . .
+RUN npm run build
 
-ADD src /app/src
-ADD public /app/public
+ENV PORT=8080
 
-CMD ["npm", "run", "dev", "--", "--host"]
+EXPOSE 8080
+
+CMD ["sh", "-c", "npm run preview -- --host 0.0.0.0 --port ${PORT}"]
